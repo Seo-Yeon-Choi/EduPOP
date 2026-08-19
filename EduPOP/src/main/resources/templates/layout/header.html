@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<!--
+    공통 상단 Header
+
+    사용 방법
+    <div th:replace="~{layout/header :: header}"></div>
+-->
+<header th:fragment="header" class="top-header">
+
+    <!-- 로고 -->
+    <div class="header-logo">
+        <a th:href="@{/}" class="logo-link">
+            EduPOP
+        </a>
+    </div>
+
+    <!-- 우측 사용자 정보 -->
+    <div class="header-user">
+
+        <!-- 로그인 상태 -->
+        <th:block th:if="${session.loginUser != null}">
+
+            <span class="user-name"
+                  th:text="|${session.loginUser.name}님|">
+                사용자님
+            </span>
+
+            <span class="user-role"
+                  th:text="${session.loginUser.role}">
+                STUDENT
+            </span>
+
+            <a th:href="@{/logout}"
+               class="logout-link">
+                로그아웃
+            </a>
+
+        </th:block>
+
+        <!-- 비로그인 상태 -->
+        <th:block th:unless="${session.loginUser != null}">
+
+            <a th:href="@{/login}">
+                로그인
+            </a>
+
+        </th:block>
+
+    </div>
+
+</header>
+
+</body>
+</html>

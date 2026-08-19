@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<!--
+    학생 Sidebar
+
+    사용 방법
+    <div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+-->
+<aside th:fragment="sidebar" class="sidebar">
+
+    <div class="sidebar-title">
+        학생
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <!-- 홈 -->
+        <a th:href="@{/student}"
+           class="nav-item">
+            <span class="nav-icon">⌂</span>
+            <span>홈</span>
+        </a>
+
+        <!-- 시험 -->
+        <a th:href="@{/student/exams}"
+           class="nav-item">
+            <span class="nav-icon">✎</span>
+            <span>시험</span>
+        </a>
+
+        <!-- 학습 과제 -->
+        <a th:href="@{/student/assignments}"
+           class="nav-item">
+            <span class="nav-icon">✓</span>
+            <span>학습 과제</span>
+        </a>
+
+        <!-- 독서 -->
+        <a th:href="@{/student/reading}"
+           class="nav-item">
+            <span class="nav-icon">▤</span>
+            <span>독서</span>
+        </a>
+
+        <!-- 자기성찰 리포트 -->
+        <a th:href="@{/student/reports}"
+           class="nav-item">
+            <span class="nav-icon">▧</span>
+            <span>나의 리포트</span>
+        </a>
+
+        <!-- 성장 -->
+        <a th:href="@{/student/growth}"
+           class="nav-item">
+            <span class="nav-icon">★</span>
+            <span>나의 성장</span>
+        </a>
+
+    </nav>
+
+</aside>
+
+</body>
+</html>

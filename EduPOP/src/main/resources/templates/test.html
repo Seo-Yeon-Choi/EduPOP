@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>EduPOP Layout Test</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/common.css}">
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="main-content">
+
+    <h1 class="page-title">
+        레이아웃 테스트
+    </h1>
+
+    <div class="content-card">
+
+        <h2>EduPOP</h2>
+
+        <p>
+            Header와 Sidebar가 정상적으로 보이면 성공입니다.
+        </p>
+
+        <button class="btn btn-primary">
+            테스트 버튼
+        </button>
+
+    </div>
+
+</main>
+
+</body>
+
+</html>
