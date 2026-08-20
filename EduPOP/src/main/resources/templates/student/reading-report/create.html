@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독서록 작성 | EduPOP</title>
+
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/reading-report-create.css}">
+    <script th:src="@{/js/reading-report-create.js}" defer></script>
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="main-content">
+
+    <form id="readingReportForm"
+          class="reading-report-form"
+          th:action="@{/student/reading-reports/create}"
+          method="post">
+
+        <div class="page-heading">
+            <div>
+                <p class="page-kicker">나의 독서</p>
+                <h1 class="page-title">독서록 작성</h1>
+                <p class="page-description">읽은 책의 정보와 느낀 점을 차근차근 기록해 보세요.</p>
+            </div>
+
+            <div class="status-guide">
+                <span class="status-dot"></span>
+                임시 저장 후 나중에 이어서 작성할 수 있습니다.
+            </div>
+        </div>
+
+        <div class="message message-error" th:if="${errors != null}">
+            <strong>입력 내용을 확인해 주세요.</strong>
+            <ul>
+                <li th:each="error : ${errors}" th:text="${error}">오류 내용</li>
+            </ul>
+        </div>
+
+        <div class="message message-success" th:if="${successMessage != null}">
+            <strong th:text="${successMessage}">요청을 정상적으로 받았습니다.</strong>
+        </div>
+
+        <section class="content-card form-section">
+            <div class="section-heading">
+                <span class="section-number">1</span>
+                <div>
+                    <h2>책 정보</h2>
+                    <p>독서록을 작성할 책의 기본 정보를 입력하세요.</p>
+                </div>
+            </div>
+
+            <div class="book-fields">
+                <div class="form-group">
+                    <label class="form-label" for="bookTitle">
+                        책 제목 <span class="required-mark">필수</span>
+                    </label>
+                    <input id="bookTitle"
+                           class="form-input"
+                           type="text"
+                           name="bookTitle"
+                           maxlength="200"
+                           th:value="${readingReportCreateRequest.bookTitle}"
+                           placeholder="예: 어린 왕자"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="bookAuthor">
+                        저자 <span class="optional-mark">선택</span>
+                    </label>
+                    <input id="bookAuthor"
+                           class="form-input"
+                           type="text"
+                           name="bookAuthor"
+                           maxlength="100"
+                           th:value="${readingReportCreateRequest.bookAuthor}"
+                           placeholder="예: 앙투안 드 생텍쥐페리">
+                </div>
+            </div>
+        </section>
+
+        <section class="content-card form-section">
+            <div class="section-heading">
+                <span class="section-number">2</span>
+                <div>
+                    <h2>독서록 내용</h2>
+                    <p>책을 읽고 기억에 남은 내용과 자신의 생각을 작성하세요.</p>
+                </div>
+            </div>
+
+            <div class="form-group report-title-group">
+                <label class="form-label" for="reportTitle">
+                    독서록 제목 <span class="required-mark">필수</span>
+                </label>
+                <input id="reportTitle"
+                       class="form-input"
+                       type="text"
+                       name="reportTitle"
+                       maxlength="200"
+                       th:value="${readingReportCreateRequest.reportTitle}"
+                       placeholder="예: 어린 왕자를 읽고"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <div class="content-label-row">
+                    <label class="form-label" for="reportContent">
+                        내용 <span class="required-mark">제출 시 50자 이상</span>
+                    </label>
+
+                    <span class="character-counter">
+                        <strong id="contentLength">0</strong> / 10,000자
+                    </span>
+                </div>
+
+                <textarea id="reportContent"
+                          class="form-textarea"
+                          name="content"
+                          rows="16"
+                          maxlength="10000"
+                          th:text="${readingReportCreateRequest.content}"
+                          placeholder="책에서 기억에 남은 장면, 새롭게 알게 된 점, 자신의 생각과 느낌을 작성해 보세요."></textarea>
+
+                <p id="contentHelp" class="form-help">
+                    임시 저장은 50자 미만도 가능하지만, 최종 제출은 50자 이상 작성해야 합니다.
+                </p>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <button class="btn btn-secondary action-button"
+                    type="submit"
+                    name="action"
+                    value="DRAFT">
+                임시 저장
+            </button>
+
+            <button class="btn btn-primary action-button"
+                    type="submit"
+                    name="action"
+                    value="SUBMITTED">
+                독서록 제출
+            </button>
+        </div>
+
+    </form>
+
+</main>
+
+</body>
+</html>

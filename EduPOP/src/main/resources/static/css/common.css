@@ -196,6 +196,17 @@ a {
 }
 
 
+/* 상위 메뉴 아래에 표시하는 세부 메뉴 */
+
+.nav-subitem {
+    min-height: 38px;
+    margin-left: 18px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 14px;
+}
+
+
 /* 메뉴 아이콘 */
 
 .nav-icon {
