@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>독서감상문 작성 | EduPOP</title>
+
+    <!-- 팀 공통 화면 모양과 독서 화면 전용 모양 적용 -->
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/reading.css}">
+
+    <!-- 도서 선택과 글자 수 표시 기능 실행 -->
+    <script th:src="@{/js/reading.js}" defer></script>
+</head>
+
+<body>
+
+<!-- 팀 공통 상단 영역 불러오기 -->
+<div th:replace="~{layout/header :: header}"></div>
+
+<!-- 팀 공통 학생 사이드바 불러오기 -->
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="main-content">
+    <div class="reading-page">
+
+        <!-- 페이지 제목 영역 -->
+        <div class="page-toolbar">
+            <div>
+                <p class="page-kicker">나의 독서</p>
+
+                <h1 class="page-title">
+                    독서감상문 작성
+                </h1>
+
+                <p class="page-description">
+                    도서를 선택하고 읽은 내용과 생각을 작성하세요.
+                </p>
+            </div>
+
+            <a class="btn btn-secondary"
+               th:href="@{/student/reading}">
+                목록으로
+            </a>
+        </div>
+
+        <!-- 컨트롤러가 전달한 성공 문구가 있을 때만 표시 -->
+        <div class="alert alert-success"
+             th:if="${successMessage != null}"
+             th:text="${successMessage}">
+            처리되었습니다.
+        </div>
+
+        <!-- 컨트롤러가 전달한 실패 문구가 있을 때만 표시 -->
+        <div class="alert alert-error"
+             th:if="${errorMessage != null}"
+             th:text="${errorMessage}">
+            오류가 발생했습니다.
+        </div>
+
+        <!-- 1단계: 기존 도서를 검색하거나 새 도서 등록 -->
+        <section class="content-card reading-section">
+
+            <div class="section-title-row">
+                <div>
+                    <h2 class="section-title">
+                        1. 도서 검색 및 선택
+                    </h2>
+
+                    <p class="section-description">
+                        등록된 도서를 검색한 후 감상문을 작성할 도서를 선택하세요.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 검색어를 GET(겟, 조회) 방식으로 컨트롤러에 전송 -->
+            <form class="search-form"
+                  th:action="@{/student/reading-reports/create}"
+                  method="get">
+
+                <input class="form-input"
+                       type="search"
+                       name="keyword"
+                       th:value="${keyword}"
+                       placeholder="도서 제목 또는 저자 검색">
+
+                <button class="btn btn-secondary"
+                        type="submit">
+                    검색
+                </button>
+            </form>
+
+            <!-- 검색 결과로 전달받은 도서 목록 반복 출력 -->
+            <div class="book-select-grid"
+                 th:if="${!#lists.isEmpty(books)}">
+
+                <label class="book-select-card"
+                       th:each="item : ${books}">
+
+                    <!-- 선택한 도서 번호 저장 -->
+                    <input class="book-radio"
+                           type="radio"
+                           name="bookPreview"
+                           th:value="${item.bookId}"
+                           th:attr="data-book-id=${item.bookId}"
+                           th:checked="${selectedBookId != null
+                                       and selectedBookId == item.bookId}">
+
+                    <!-- 도서 표지 출력 -->
+                    <span class="book-cover-small">
+
+                        <img th:if="${item.coverImageUrl != null
+                                    and !#strings.isEmpty(item.coverImageUrl)}"
+                             th:src="${item.coverImageUrl}"
+                             th:alt="|${item.title} 표지|">
+
+                        <span th:unless="${item.coverImageUrl != null
+                                         and !#strings.isEmpty(item.coverImageUrl)}">
+                            표지 없음
+                        </span>
+                    </span>
+
+                    <!-- 도서 제목과 저자 출력 -->
+                    <span class="book-select-info">
+
+                        <strong th:text="${item.title}">
+                            도서 제목
+                        </strong>
+
+                        <span th:text="${item.author != null
+                                        and !#strings.isEmpty(item.author)
+                                        ? item.author
+                                        : '저자 없음'}">
+                            저자
+                        </span>
+                    </span>
+                </label>
+            </div>
+
+            <!-- 검색 결과가 없을 때 표시 -->
+            <div class="empty-inline"
+                 th:if="${#lists.isEmpty(books)}">
+
+                검색된 도서가 없습니다. 아래에서 새 도서를 등록하세요.
+            </div>
+
+            <!-- 검색 결과에 없는 도서를 새로 등록하는 영역 -->
+            <details class="book-register-box">
+
+                <summary>
+                    검색한 도서가 없나요? 새 도서 등록
+                </summary>
+
+                <!-- 새 도서 정보를 POST(포스트, 등록) 방식으로 전송 -->
+                <form class="book-register-form"
+                      th:action="@{/student/reading/books}"
+                      th:object="${book}"
+                      method="post">
+
+                    <div class="form-grid-three">
+
+                        <!-- 도서 제목 입력 -->
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="bookTitle">
+
+                                도서 제목
+                                <span class="required">필수</span>
+                            </label>
+
+                            <input class="form-input"
+                                   id="bookTitle"
+                                   type="text"
+                                   th:field="*{title}"
+                                   maxlength="200"
+                                   required>
+                        </div>
+
+                        <!-- 저자 입력 -->
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="bookAuthor">
+
+                                저자
+                                <span class="optional">선택</span>
+                            </label>
+
+                            <input class="form-input"
+                                   id="bookAuthor"
+                                   type="text"
+                                   th:field="*{author}"
+                                   maxlength="100">
+                        </div>
+
+                        <!-- 표지 이미지 주소 입력 -->
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="coverImageUrl">
+
+                                표지 이미지 주소
+                                <span class="optional">선택</span>
+                            </label>
+
+                            <input class="form-input"
+                                   id="coverImageUrl"
+                                   type="url"
+                                   th:field="*{coverImageUrl}"
+                                   maxlength="500">
+                        </div>
+                    </div>
+
+                    <div class="inline-actions">
+
+                        <button class="btn btn-secondary"
+                                type="submit">
+                            새 도서 등록
+                        </button>
+                    </div>
+                </form>
+            </details>
+        </section>
+
+        <!-- 2단계: 선택한 도서의 독서감상문 작성 -->
+        <section class="content-card reading-section">
+
+            <div class="section-title-row">
+                <div>
+                    <h2 class="section-title">
+                        2. 감상문 작성
+                    </h2>
+
+                    <p class="section-description">
+                        제목은 선택 사항이며 내용은 50자 이상 작성해야 합니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 선택한 도서 번호·제목·내용을 컨트롤러에 전송 -->
+            <form id="readingReportForm"
+                  th:action="@{/student/reading-reports}"
+                  th:object="${readingReport}"
+                  method="post">
+
+                <!-- 감상문과 연결할 도서 선택 -->
+                <div class="form-group">
+
+                    <label class="form-label"
+                           for="selectedBook">
+
+                        선택한 도서
+                        <span class="required">필수</span>
+                    </label>
+
+                    <!-- name의 bookId가 ReadingReport의 bookId에 저장됨 -->
+                    <select class="form-input"
+                            id="selectedBook"
+                            name="bookId"
+                            required>
+
+                        <option value="">
+                            도서를 선택하세요
+                        </option>
+
+                        <option th:each="item : ${books}"
+                                th:value="${item.bookId}"
+                                th:selected="${selectedBookId != null
+                                              and selectedBookId == item.bookId}"
+                                th:text="${item.author != null
+                                          and !#strings.isEmpty(item.author)
+                                          ? item.title + ' - ' + item.author
+                                          : item.title + ' - 저자 없음'}">
+                            도서
+                        </option>
+                    </select>
+                </div>
+
+                <!-- 감상문 제목 입력 -->
+                <div class="form-group">
+
+                    <label class="form-label"
+                           for="reportTitle">
+
+                        감상문 제목
+                        <span class="optional">선택</span>
+                    </label>
+
+                    <input class="form-input"
+                           id="reportTitle"
+                           type="text"
+                           th:field="*{title}"
+                           maxlength="200"
+                           placeholder="예: 어린 왕자를 읽고">
+                </div>
+
+                <!-- 감상문 본문 입력 -->
+                <div class="form-group">
+
+                    <div class="textarea-label-row">
+
+                        <label class="form-label"
+                               for="reportContent">
+
+                            감상문 내용
+                            <span class="required">필수</span>
+                        </label>
+
+                        <!-- 자바스크립트가 현재 입력 글자 수를 표시 -->
+                        <span class="character-count">
+                            <strong data-count-value>0</strong>
+                            / 10,000자
+                        </span>
+                    </div>
+
+                    <textarea class="form-textarea"
+                              id="reportContent"
+                              th:field="*{content}"
+                              rows="15"
+                              minlength="50"
+                              maxlength="10000"
+                              data-character-input
+                              required
+                              placeholder="책에서 기억에 남은 내용과 자신의 생각을 50자 이상 작성하세요."></textarea>
+
+                    <p class="form-help">
+                        50자 이상 10,000자 이하로 작성하세요.
+                    </p>
+                </div>
+
+                <!-- 취소 및 등록 버튼 -->
+                <div class="form-actions">
+
+                    <a class="btn btn-secondary"
+                       th:href="@{/student/reading}">
+                        취소
+                    </a>
+
+                    <button class="btn btn-primary"
+                            type="submit">
+                        감상문 등록
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+</main>
+
+</body>
+</html>

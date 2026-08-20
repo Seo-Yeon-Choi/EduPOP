@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>독서감상문 수정 | EduPOP</title>
+
+  <!-- 팀 공통 화면 모양과 독서 화면 전용 모양 적용 -->
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/reading.css}">
+
+  <!-- 기존 글자 수와 입력 중인 글자 수 표시 -->
+  <script th:src="@{/js/reading.js}" defer></script>
+</head>
+
+<body>
+
+<!-- 팀 공통 상단 영역 불러오기 -->
+<div th:replace="~{layout/header :: header}"></div>
+
+<!-- 팀 공통 학생 사이드바 불러오기 -->
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="main-content">
+  <div class="reading-page reading-form-page">
+
+    <!-- 페이지 제목과 상세 화면 이동 버튼 -->
+    <div class="page-toolbar">
+      <div>
+        <p class="page-kicker">
+          나의 독서
+        </p>
+
+        <h1 class="page-title">
+          독서감상문 수정
+        </h1>
+
+        <p class="page-description">
+          도서는 변경할 수 없으며 감상문 제목과 내용만 수정할 수 있습니다.
+        </p>
+      </div>
+
+      <!-- 현재 감상문의 상세 화면으로 이동 -->
+      <a class="btn btn-secondary"
+         th:href="@{/student/reading-reports/{id}(id=${readingReport.readingReportId})}">
+        상세로
+      </a>
+    </div>
+
+    <!-- 컨트롤러가 전달한 수정 실패 문구가 있을 때만 표시 -->
+    <div class="alert alert-error"
+         th:if="${errorMessage != null}"
+         th:text="${errorMessage}">
+      오류가 발생했습니다.
+    </div>
+
+    <!-- 감상문과 연결된 변경 불가능한 도서 정보 -->
+    <section class="content-card book-readonly-card">
+
+      <!-- 도서 제목 표시 -->
+      <strong th:text="${book.title}">
+        도서 제목
+      </strong>
+
+      <!-- 저자가 없으면 저자 없음 표시 -->
+      <span th:text="${book.author != null
+                            and !#strings.isEmpty(book.author)
+                            ? book.author
+                            : '저자 없음'}">
+                저자
+            </span>
+    </section>
+
+    <!-- 감상문 제목과 내용 수정 영역 -->
+    <section class="content-card reading-section">
+
+      <!-- 수정된 값을 POST(포스트, 변경 요청) 방식으로 전송 -->
+      <form th:action="@{/student/reading-reports/{id}/edit(id=${readingReport.readingReportId})}"
+            th:object="${readingReport}"
+            method="post">
+
+        <!-- 감상문 제목 수정 -->
+        <div class="form-group">
+
+          <label class="form-label"
+                 for="reportTitle">
+
+            감상문 제목
+            <span class="optional">선택</span>
+          </label>
+
+          <!-- 기존 제목을 보여주고 변경된 제목을 객체에 저장 -->
+          <input class="form-input"
+                 id="reportTitle"
+                 type="text"
+                 th:field="*{title}"
+                 maxlength="200"
+                 placeholder="감상문 제목을 입력하세요">
+        </div>
+
+        <!-- 감상문 본문 수정 -->
+        <div class="form-group">
+
+          <div class="textarea-label-row">
+
+            <label class="form-label"
+                   for="reportContent">
+
+              감상문 내용
+              <span class="required">필수</span>
+            </label>
+
+            <!-- 자바스크립트가 현재 글자 수를 표시 -->
+            <span class="character-count">
+                            <strong data-count-value>0</strong>
+                            / 10,000자
+                        </span>
+          </div>
+
+          <!-- 기존 내용을 보여주고 변경된 내용을 객체에 저장 -->
+          <textarea class="form-textarea"
+                    id="reportContent"
+                    th:field="*{content}"
+                    rows="15"
+                    minlength="50"
+                    maxlength="10000"
+                    data-character-input
+                    required
+                    placeholder="책에서 기억에 남은 내용과 자신의 생각을 50자 이상 작성하세요."></textarea>
+
+          <p class="form-help">
+            50자 이상 10,000자 이하로 작성하세요.
+          </p>
+        </div>
+
+        <!-- 취소 및 수정 저장 버튼 -->
+        <div class="form-actions">
+
+          <!-- 수정하지 않고 상세 화면으로 이동 -->
+          <a class="btn btn-secondary"
+             th:href="@{/student/reading-reports/{id}(id=${readingReport.readingReportId})}">
+            취소
+          </a>
+
+          <!-- 변경된 제목과 내용을 컨트롤러로 전송 -->
+          <button class="btn btn-primary"
+                  type="submit">
+            수정 저장
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>나의 독서 | EduPOP</title>
+
+    <!-- 팀 공통 화면 모양과 독서 화면 전용 모양 적용 -->
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/reading.css}">
+</head>
+
+<body>
+
+<!-- 팀 공통 상단 영역 불러오기 -->
+<div th:replace="~{layout/header :: header}"></div>
+
+<!-- 팀 공통 학생 사이드바 불러오기 -->
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="main-content">
+    <div class="reading-page">
+
+        <!-- 페이지 제목과 감상문 작성 버튼 -->
+        <div class="page-toolbar">
+            <div>
+                <p class="page-kicker">
+                    나의 독서
+                </p>
+
+                <h1 class="page-title">
+                    독서감상문
+                </h1>
+
+                <p class="page-description">
+                    내가 작성한 감상문과 선생님의 첨삭을 확인할 수 있습니다.
+                </p>
+            </div>
+
+            <!-- 감상문 작성 화면으로 이동 -->
+            <a class="btn btn-primary"
+               th:href="@{/student/reading-reports/create}">
+                감상문 작성
+            </a>
+        </div>
+
+        <!-- 컨트롤러가 전달한 성공 문구가 있을 때만 표시 -->
+        <div class="alert alert-success"
+             th:if="${successMessage != null}"
+             th:text="${successMessage}">
+            처리되었습니다.
+        </div>
+
+        <!-- 컨트롤러가 전달한 실패 문구가 있을 때만 표시 -->
+        <div class="alert alert-error"
+             th:if="${errorMessage != null}"
+             th:text="${errorMessage}">
+            오류가 발생했습니다.
+        </div>
+
+        <!-- 작성한 감상문이 하나도 없을 때 표시 -->
+        <section class="content-card empty-card"
+                 th:if="${#lists.isEmpty(readingReports)}">
+
+            <strong>
+                아직 작성한 독서감상문이 없습니다.
+            </strong>
+
+            <p>
+                책을 읽고 첫 감상문을 작성해 보세요.
+            </p>
+
+            <a class="btn btn-primary"
+               th:href="@{/student/reading-reports/create}">
+                첫 감상문 작성
+            </a>
+        </section>
+
+        <!-- 작성한 감상문이 있을 때 목록 표시 -->
+        <section class="report-grid"
+                 th:if="${!#lists.isEmpty(readingReports)}">
+
+            <!-- 감상문 개수만큼 반복하여 카드 생성 -->
+            <article class="report-card"
+                     th:each="report : ${readingReports}">
+
+                <div class="report-book-row">
+
+                    <!-- 감상문에 연결된 도서 표지 출력 -->
+                    <div class="book-cover">
+
+                        <img th:if="${booksById[report.bookId].coverImageUrl != null
+                                    and !#strings.isEmpty(booksById[report.bookId].coverImageUrl)}"
+                             th:src="${booksById[report.bookId].coverImageUrl}"
+                             th:alt="|${booksById[report.bookId].title} 표지|">
+
+                        <span th:unless="${booksById[report.bookId].coverImageUrl != null
+                                         and !#strings.isEmpty(booksById[report.bookId].coverImageUrl)}">
+                            표지 없음
+                        </span>
+                    </div>
+
+                    <!-- 감상문과 도서의 주요 정보 출력 -->
+                    <div class="report-summary">
+
+                        <div class="badge-row">
+
+                            <!-- 같은 책으로 작성한 전체 감상문 개수 표시 -->
+                            <span class="badge badge-neutral"
+                                  th:text="|독서 ${readingCountsByBookId[report.bookId]}회|">
+                                독서 1회
+                            </span>
+
+                            <!-- 첨삭이 등록된 경우 표시 -->
+                            <span class="badge badge-success"
+                                  th:if="${feedbacksByReportId[report.readingReportId] != null}">
+                                첨삭 완료
+                            </span>
+
+                            <!-- 첨삭이 아직 없는 경우 표시 -->
+                            <span class="badge badge-waiting"
+                                  th:unless="${feedbacksByReportId[report.readingReportId] != null}">
+                                첨삭 대기
+                            </span>
+                        </div>
+
+                        <!-- 감상문 제목이 없으면 기본 문구 표시 -->
+                        <h2 th:text="${report.title != null
+                                      and !#strings.isEmpty(report.title)
+                                      ? report.title
+                                      : '제목 없는 독서감상문'}">
+                            감상문 제목
+                        </h2>
+
+                        <!-- 연결된 도서 제목 표시 -->
+                        <p class="book-name"
+                           th:text="${booksById[report.bookId].title}">
+                            도서 제목
+                        </p>
+
+                        <!-- 저자가 없으면 저자 없음 표시 -->
+                        <p class="book-author"
+                           th:text="${booksById[report.bookId].author != null
+                                     and !#strings.isEmpty(booksById[report.bookId].author)
+                                     ? booksById[report.bookId].author
+                                     : '저자 없음'}">
+                            저자
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 감상문 내용을 120자까지 미리 표시 -->
+                <p class="report-preview"
+                   th:text="${#strings.abbreviate(report.content, 120)}">
+                    감상문 내용 미리보기
+                </p>
+
+                <div class="card-actions">
+
+                    <!-- 선택한 감상문의 상세 화면으로 이동 -->
+                    <a class="btn btn-secondary"
+                       th:href="@{/student/reading-reports/{id}(id=${report.readingReportId})}">
+                        자세히 보기
+                    </a>
+                </div>
+            </article>
+        </section>
+    </div>
+</main>
+
+</body>
+</html>
