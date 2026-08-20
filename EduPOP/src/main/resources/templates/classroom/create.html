@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>EduPOP - 반 개설</title>
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <style>
+    .page-container {
+      display: flex;
+      min-height: calc(100vh - 120px);
+    }
+    .content-area {
+      flex: 1;
+      padding: 30px;
+      background-color: #f4f6f9;
+    }
+    .card {
+      max-width: 650px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 25px;
+      font-size: 22px;
+      color: #333333;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 10px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #495057;
+    }
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .form-control:focus {
+      border-color: #80bdff;
+      outline: none;
+    }
+    .teacher-box {
+      background-color: #e9ecef;
+      padding: 15px;
+      border-radius: 6px;
+    }
+    .teacher-row {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn-submit:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 상단 헤더 -->
+<div th:replace="~{layout/header}"></div>
+
+<div class="page-container">
+  <!-- 관리자 사이드바 -->
+  <div th:replace="~{layout/sidebar-admin}"></div>
+
+  <!-- 본문 폼 영역 -->
+  <main class="content-area">
+    <div class="card">
+      <h2>신규 반 개설 (WBS 1.2.1)</h2>
+
+      <form th:action="@{/classroom/create}" method="post">
+
+        <!-- 학원 식별자 (테스트용 고정 1번) -->
+        <input type="hidden" name="academyId" value="1"/>
+
+        <div class="form-group">
+          <label for="name">반 명칭 *</label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="예: 중등 수학 심화A반" required>
+        </div>
+
+        <div class="form-group">
+          <label for="targetGrade">대상 학년 *</label>
+          <input type="text" id="targetGrade" name="targetGrade" class="form-control" placeholder="예: 중2" required>
+        </div>
+
+        <div class="form-group">
+          <label for="maxStudents">수강 정원 (명) *</label>
+          <input type="number" id="maxStudents" name="maxStudents" class="form-control" value="20" min="1" required>
+        </div>
+
+        <div class="form-group">
+          <label for="description">반 설명</label>
+          <textarea id="description" name="description" class="form-control" rows="3" placeholder="반 운영 계획 및 설명을 입력하세요."></textarea>
+        </div>
+
+        <!-- 강사 배정 영역 (도메인 Enum: MAIN / SUB 매핑) -->
+        <div class="form-group teacher-box">
+          <label>담당 강사 배정</label>
+          <div class="teacher-row">
+            <input type="number" name="teachers[0].teacherId" value="1" class="form-control" placeholder="강사 User ID" style="flex: 1;" required>
+            <select name="teachers[0].roleType" class="form-control" style="flex: 1;">
+              <option value="MAIN">대표/담임 강사 (MAIN)</option>
+              <option value="SUB">부담임/과목 강사 (SUB)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">반 개설 완료</button>
+      </form>
+    </div>
+  </main>
+</div>
+
+<!-- 하단 푸터 -->
+<div th:replace="~{layout/footer}"></div>
+
+</body>
+</html>

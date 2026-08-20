@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XML 선언: UTF-8 인코딩을 명시합니다. -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- MyBatis DTD 선언: 이 파일이 MyBatis 매퍼 규격을 따른다는 정의문입니다. -->
+
+<!-- namespace 속성에는 이 XML과 짝을 이루는 실제 Java Mapper 인터페이스의 풀 패키지 경로를 작성합니다. -->
+<mapper namespace="com.example.EduPOP.repository.user.UserMapper">
+
+    <!-- 테스트용 쿼리 또는 실제 필요한 SQL을 태그 안에 작성합니다. -->
+    <!-- id 값은 Java 인터페이스의 메서드 이름과 반드시 일치해야 합니다. -->
+    <select id="selectTest" resultType="int">
+        SELECT 1
+    </select>
+
+</mapper>

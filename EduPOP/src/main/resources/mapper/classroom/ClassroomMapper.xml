@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XML 선언: UTF-8 인코딩을 명시합니다. -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- MyBatis DTD 선언: 이 파일이 MyBatis 매퍼 규격을 따른다는 정의문입니다. -->
+
+<!-- namespace 속성에는 이 XML과 짝을 이루는 실제 Java Mapper 인터페이스의 풀 패키지 경로를 작성합니다. -->
+<mapper namespace="com.example.EduPOP.repository.classroom.ClassroomMapper">
+
+    <!-- 반 기본 정보 등록 (생성된 AUTO_INCREMENT PK는 classId 필드로 주입) -->
+    <insert id="insertClass" parameterType="classroom"
+            useGeneratedKeys="true" keyProperty="classId">
+        INSERT INTO classes(academy_id,
+                            name,
+                            target_grade,
+                            max_students,
+                            status,
+                            description)
+                    VALUES(#{academyId},
+                            #{name},
+                            #{targetGrade},
+                            #{maxStudents},
+                            #{status},
+                            #{description})
+    </insert>
+
+    <!-- 반-강사 매핑 등록 (다중 강사 N:M 배정) -->
+    <insert id="insertClassTeacher" parameterType="classTeacher">
+        INSERT INTO class_teachers (class_id, teacher_id, role_type, created_at)
+        VALUES (#{classId}, #{teacherId}, #{roleType}, NOW())
+    </insert>
+
+    <!-- 동일 학원 내 활성 상태(ACTIVE) 반 이름 중복 검사 -->
+    <select id="findByNameAndAcademyId" resultType="classroom">
+        SELECT * FROM classes WHERE name = #{name} AND academy_id = #{academyId} AND status = 'ACTIVE'
+    </select>
+
+</mapper>
