@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace는 나중에 실제 매퍼 인터페이스 경로로 수정하면 됩니다 -->
+<mapper namespace="com.example.EduPOP.mapper.UserMapper">
+
+    <!-- 나중에 데이터베이스 SQL 쿼리를 이 안에 작성하게 됩니다 -->
+
+</mapper>

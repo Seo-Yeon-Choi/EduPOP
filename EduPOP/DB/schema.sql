@@ -292,9 +292,19 @@ CREATE TABLE student_reports (
     -- [3. 시스템 관리 메타데이터]
                                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                  updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    -- [4. 아는 개념 / 모르는 개념]
+                                 known_concepts TEXT,
+                                 unknown_concepts TEXT,
 
                                  CONSTRAINT fk_student_reports_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+-- 3. 지난 달 리포트 (report_id = 1) 가상 데이터 추가
+INSERT INTO student_reports (student_id, period_start, period_end, books_read_count, exam_completion_rate, retest_completion_rate, study_attendance_days, overcome_wrong_count)
+VALUES (999, '2026-06-01', '2026-06-28', 3, 88.00, 78.00, 20, 28);
+
+-- 4. 이번 달 리포트 (report_id = 2) 가상 데이터 추가
+INSERT INTO student_reports (student_id, period_start, period_end, books_read_count, exam_completion_rate, retest_completion_rate, study_attendance_days, overcome_wrong_count)
+VALUES (999, '2026-07-01', '2026-07-28', 4, 92.00, 85.00, 24, 37);
 
 -- 2) 학부모 월간 발송 리포트 (교사 발행 / 무로그인 웹뷰)
 CREATE TABLE parent_reports (

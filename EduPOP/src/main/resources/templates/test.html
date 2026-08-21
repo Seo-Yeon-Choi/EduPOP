@@ -1,44 +1,348 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <title>EduPOP - 자아성찰 리포트</title>
 
-    <title>EduPOP Layout Test</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
 
-    <link rel="stylesheet"
-          th:href="@{/css/common.css}">
+    <style>
+        .layout-wrapper { display: flex; gap: 24px; margin-top: 20px; max-width: 1200px; }
+        .left-panel { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .kpt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .kpt-full { grid-column: 1 / -1; }
+        .right-panel { width: 320px; background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #f1f3f5; height: fit-content; }
+        .box { border-radius: 12px; padding: 20px; width: 100%; box-sizing: border-box; }
+
+        .box-past { background-color: #f8f9ff; border: 1px solid #dbe4ff; }
+        .box-keep { background-color: #f4faf6; border: 1px solid #d1e7dd; }
+        .box-problem { background-color: #fff5f8; border: 1px solid #f8d7da; }
+        .box-feedback { background-color: #fffbeb; border: 1px solid #ffe69c; }
+        .box-try { background-color: #f8f9fa; border: 1px solid #e2e3e5; }
+        .box-mood { background-color: #ffffff; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;}
+        .box-concept { background-color: #ffffff; border: 1px solid #e2e8f0; }
+
+        .title { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .desc { font-size: 12px; color: #868e96; margin-bottom: 15px; }
+
+        textarea { width: 100%; height: 60px; border: none; background-color: rgba(255,255,255,0.7); resize: none; font-size: 14px; outline: none; padding: 12px; border-radius: 8px; box-sizing: border-box; color: #212529; }
+        .readonly-box { width: 100%; min-height: 60px; background-color: #ffffff; font-size: 14px; padding: 12px; border-radius: 8px; box-sizing: border-box; color: #495057; line-height: 1.5; }
+
+        .status-msg { font-size: 12px; margin-top: 10px; text-align: right; height: 15px; font-weight: bold; }
+        .concept-wrap { display: flex; gap: 15px; }
+        .concept-wrap textarea { height: 80px; background-color: #f8f9fa; border: 1px solid #f1f3f5; }
+
+        .right-title { font-size: 16px; font-weight: bold; color: #343a40; margin-bottom: 20px; margin-top: 0; }
+        .metric-item { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid #f1f3f5; }
+        .metric-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .icon-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .ic-blue { background-color: #e7f1ff; color: #0d6efd; }
+        .ic-green { background-color: #d1e7dd; color: #198754; }
+        .ic-orange { background-color: #fff3cd; color: #fd7e14; }
+        .ic-purple { background-color: #f3f0ff; color: #6f42c1; }
+        .ic-red { background-color: #ffe3e3; color: #fa5252; }
+        .metric-info { flex: 1; }
+        .metric-name { font-size: 13px; color: #868e96; margin-bottom: 4px; }
+        .metric-value { font-size: 22px; font-weight: bold; color: #212529; line-height: 1; }
+        .metric-unit { font-size: 14px; font-weight: normal; color: #495057; }
+        .metric-compare { font-size: 11px; color: #adb5bd; margin-top: 6px; display: flex; justify-content: space-between; }
+        .trend-up { color: #20c997; font-weight: bold; }
+        .trend-down { color: #fa5252; font-weight: bold; }
+
+        .report-footer { display: flex; justify-content: center; gap: 40px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e9ecef; font-size: 13px; color: #868e96; }
+        .footer-item { display: flex; align-items: center; gap: 12px; }
+        .footer-value { color: #495057; }
+    </style>
 </head>
 
 <body>
 
 <div th:replace="~{layout/header :: header}"></div>
-
 <div th:replace="~{layout/sidebar-student :: sidebar}"></div>
 
 <main class="main-content">
+    <h1 class="page-title">자아성찰</h1>
+    <p style="color: #6c757d; margin-bottom: 20px;">나를 돌아보고 더 나은 내일을 준비해요.</p>
 
-    <h1 class="page-title">
-        레이아웃 테스트
-    </h1>
+    <div class="layout-wrapper">
+        <!-- 🟢 왼쪽 패널: 튜티님이 완벽하게 연동하신 회고 영역! -->
+        <div class="left-panel">
+            <div class="kpt-grid">
 
-    <div class="content-card">
+                <div class="box box-past">
+                    <div class="title" style="color: #339af0;">1. 과거의 목표 (Past)</div>
+                    <div class="desc">4주 전, 이 달을 시작하며 세웠던 목표</div>
+                    <div class="readonly-box" th:text="${report.pastResolution ?: '이전 달 다짐이 없습니다.'}"></div>
+                </div>
 
-        <h2>EduPOP</h2>
+                <div class="box box-keep">
+                    <div class="title" style="color: #20c997;">2. 가장 칭찬하고 싶은 점 (Keep)</div>
+                    <div class="desc">이번 달, 나 스스로를 가장 칭찬해주고 싶은 순간</div>
+                    <textarea id="proudestInput" onblur="saveData('proudest-moment', 'proudestMoment', 'proudestInput', 'status-keep')" placeholder="ex) 저번 달 목표 달성!" th:text="${report.proudestMoment}"></textarea>
+                    <div id="status-keep" class="status-msg"></div>
+                </div>
 
-        <p>
-            Header와 Sidebar가 정상적으로 보이면 성공입니다.
-        </p>
+                <div class="box box-problem">
+                    <div class="title" style="color: #ff6b6b;">3. 고치고 싶은 점 (Problem)</div>
+                    <div class="desc">다음 달을 위해 꼭 고치고 싶거나 버리고 싶은 습관</div>
+                    <textarea id="habitInput" onblur="saveData('habit-to-improve', 'habitToImprove', 'habitInput', 'status-problem')" placeholder="ex) 스마트폰을 자꾸 오래 사용했다." th:text="${report.habitToImprove}"></textarea>
+                    <div id="status-problem" class="status-msg"></div>
+                </div>
 
-        <button class="btn btn-primary">
-            테스트 버튼
-        </button>
+                <div class="box box-feedback">
+                    <div class="title" style="color: #f59f00;">4. 나의 셀프 피드백 (Feedback)</div>
+                    <div class="desc">4주간의 나를 종합적으로 돌아보는 자유로운 일기</div>
+                    <textarea id="feedbackInput" onblur="saveData('self-feedback', 'selfFeedback', 'feedbackInput', 'status-feedback')" placeholder="ex) 시험 기간에 힘들었지만 포기하지 않았다." th:text="${report.selfFeedback}"></textarea>
+                    <div id="status-feedback" class="status-msg"></div>
+                </div>
 
+                <div class="box box-try kpt-full">
+                    <div class="title" style="color: #845ef7;">5. 다음 달 목표 (Try)</div>
+                    <div class="desc">다음 4주를 위해 새롭게 다짐하는 목표와 행동</div>
+                    <textarea id="resolutionInput" onblur="saveData('next-resolution', 'nextResolution', 'resolutionInput', 'status-try')" placeholder="ex) 다음 달에는 매일 30분 이상 독서를 할 것이다." th:text="${report.nextResolution}"></textarea>
+                    <div id="status-try" class="status-msg"></div>
+                </div>
+            </div>
+
+            <div class="box box-mood">
+                <div>
+                    <div class="title">이번 달 나의 성실 만족도</div>
+                    <div class="desc" style="margin-bottom:0;">결과보다 과정의 나를 칭찬해요! &nbsp;&nbsp;
+                        <input type="number" id="scoreInput" min="1" max="5" placeholder="점수" style="width: 50px; padding: 2px;" th:value="${report.selfEffortScore}"> / 5점
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="title">이번 달 나의 기분</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="text" id="moodInput" placeholder="예) 뿌듯함" style="padding: 5px; width: 100px;" th:value="${report.monthlyMood}">
+                        <button onclick="saveMoodAndScore()" style="padding: 6px 12px; background: #845ef7; color: white; border: none; border-radius: 5px; cursor: pointer;">저장</button>
+                    </div>
+                    <div id="status-mood" class="status-msg" style="margin-top: 5px;"></div>
+                </div>
+            </div>
+
+            <div class="box box-concept">
+                <div class="title">모르는 개념과 아는 개념 구별</div>
+                <div class="desc">이번 달 학습 내용을 돌아보고, 나의 이해도를 점검해요.</div>
+                <div class="concept-wrap" style="margin-top: 10px;">
+                    <div style="flex: 1;">
+                        <div style="color: #20c997; font-weight: bold; margin-bottom: 5px;">아는 개념 ✔️</div>
+                        <textarea id="knownInput" placeholder="• 영어 단어 (중단원 1~8)" th:text="${report.knownConcepts}"></textarea>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="color: #ff6b6b; font-weight: bold; margin-bottom: 5px;">모르는 개념 ❓</div>
+                        <textarea id="unknownInput" placeholder="• 수학: 함수와 그래프" th:text="${report.unknownConcepts}"></textarea>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <button onclick="saveConcepts()" style="margin-top: 10px; padding: 6px 15px; background: #339af0; color: white; border: none; border-radius: 5px; cursor: pointer;">저장</button>
+                    <div id="status-concept" class="status-msg"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔵 오른쪽 패널: 행동 지표 (DB 연동 & 증감 로직 완벽 적용!) -->
+        <div class="right-panel">
+            <h3 class="right-title">이번 달 행동 지표</h3>
+
+            <!-- 1. 읽은 책 수 -->
+            <div class="metric-item">
+                <div class="icon-circle ic-blue">📖</div>
+                <div class="metric-info">
+                    <div class="metric-name">읽은 책 수</div>
+                    <div class="metric-value"><span th:text="${report.booksReadCount ?: 0}"></span><span class="metric-unit">권</span></div>
+                    <div class="metric-compare">
+                        <span th:text="'지난 달 ' + (${lastMonthBooks ?: 0}) + '권'"></span>
+                        <span th:if="${booksDiff != null && booksDiff > 0}" class="trend-up" th:text="'▲ ' + ${booksDiff} + '권'"></span>
+                        <span th:if="${booksDiff != null && booksDiff < 0}" class="trend-down" th:text="'▼ ' + ${-booksDiff} + '권'"></span>
+                        <span th:if="${booksDiff == null || booksDiff == 0}" style="color: #adb5bd;">- 변동 없음</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 시험 응시율 -->
+            <div class="metric-item">
+                <div class="icon-circle ic-green">📝</div>
+                <div class="metric-info">
+                    <div class="metric-name">시험 응시율</div>
+                    <!-- 소수점이 보기 싫다면 ${#numbers.formatDecimal(report.examCompletionRate, 0, 0)} 를 쓸 수도 있습니다 -->
+                    <div class="metric-value"><span th:text="${report.examCompletionRate ?: 0}"></span><span class="metric-unit">%</span></div>
+                    <div class="metric-compare">
+                        <span th:text="'지난 달 ' + (${lastMonthExam ?: 0}) + '%'"></span>
+                        <span th:if="${examDiff != null && examDiff > 0}" class="trend-up" th:text="'▲ ' + ${examDiff} + '%p'"></span>
+                        <span th:if="${examDiff != null && examDiff < 0}" class="trend-down" th:text="'▼ ' + ${-examDiff} + '%p'"></span>
+                        <span th:if="${examDiff == null || examDiff == 0}" style="color: #adb5bd;">- 변동 없음</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 재시험 응시율 -->
+            <div class="metric-item">
+                <div class="icon-circle ic-orange">🔄</div>
+                <div class="metric-info">
+                    <div class="metric-name">재시험 응시율</div>
+                    <div class="metric-value"><span th:text="${report.retestCompletionRate ?: 0}"></span><span class="metric-unit">%</span></div>
+                    <div class="metric-compare">
+                        <span th:text="'지난 달 ' + (${lastMonthRetest ?: 0}) + '%'"></span>
+                        <span th:if="${retestDiff != null && retestDiff > 0}" class="trend-up" th:text="'▲ ' + ${retestDiff} + '%p'"></span>
+                        <span th:if="${retestDiff != null && retestDiff < 0}" class="trend-down" th:text="'▼ ' + ${-retestDiff} + '%p'"></span>
+                        <span th:if="${retestDiff == null || retestDiff == 0}" style="color: #adb5bd;">- 변동 없음</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 학습 출석 일수 -->
+            <div class="metric-item">
+                <div class="icon-circle ic-purple">📅</div>
+                <div class="metric-info">
+                    <div class="metric-name">학습 출석 일수</div>
+                    <div class="metric-value"><span th:text="${report.studyAttendanceDays ?: 0}"></span><span class="metric-unit">일</span></div>
+                    <div class="metric-compare">
+                        <span th:text="'지난 달 ' + (${lastMonthAtt ?: 0}) + '일'"></span>
+                        <span th:if="${attDiff != null && attDiff > 0}" class="trend-up" th:text="'▲ ' + ${attDiff} + '일'"></span>
+                        <span th:if="${attDiff != null && attDiff < 0}" class="trend-down" th:text="'▼ ' + ${-attDiff} + '일'"></span>
+                        <span th:if="${attDiff == null || attDiff == 0}" style="color: #adb5bd;">- 변동 없음</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. 극복한 문제 수 -->
+            <div class="metric-item">
+                <div class="icon-circle ic-red">🎯</div>
+                <div class="metric-info">
+                    <div class="metric-name">극복한 문제 수</div>
+                    <div class="metric-value"><span th:text="${report.overcomeWrongCount ?: 0}"></span><span class="metric-unit">문제</span></div>
+                    <div class="metric-compare">
+                        <span th:text="'지난 달 ' + (${lastMonthOvercome ?: 0}) + '문제'"></span>
+                        <span th:if="${overcomeDiff != null && overcomeDiff > 0}" class="trend-up" th:text="'▲ ' + ${overcomeDiff} + '문제'"></span>
+                        <span th:if="${overcomeDiff != null && overcomeDiff < 0}" class="trend-down" th:text="'▼ ' + ${-overcomeDiff} + '문제'"></span>
+                        <span th:if="${overcomeDiff == null || overcomeDiff == 0}" style="color: #adb5bd;">- 변동 없음</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
+    <!-- 🚀 하단 리포트 정보 (튜티님 자바에 확실히 있는 데이터로 교체 완료!) -->
+    <div class="report-footer">
+        <div class="footer-item">
+            <span>🕒 리포트 시작일</span>
+            <span class="footer-value" th:text="${report.periodStart}"></span>
+        </div>
+        <div class="footer-item">
+            <span>🔄 리포트 종료일</span>
+            <span class="footer-value" th:text="${report.periodEnd}"></span>
+        </div>
+        <div class="footer-item">
+            <span>📄 리포트 ID</span>
+            <span class="footer-value" th:text="${report.reportId}"></span>
+        </div>
+    </div>
 </main>
 
-</body>
+<script>
+    function saveData(apiPath, jsonKey, inputId, statusId) {
+        const inputText = document.getElementById(inputId).value;
+        const statusDiv = document.getElementById(statusId);
 
+        const hasText = inputText.trim() !== ""; // 💡 글씨가 한 글자라도 있는지 확인!
+
+        // 빈칸이면 "저장 중..." 메시지도 띄우지 않고 조용히 진행합니다.
+        if (hasText) {
+            statusDiv.innerText = "저장 중... ⏳";
+            statusDiv.style.color = "#0d6efd";
+        } else {
+            statusDiv.innerText = "";
+        }
+
+        const requestBody = {};
+        requestBody[jsonKey] = inputText;
+
+        fetch('/api/student-reports/2/' + apiPath, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        }).then(response => {
+            if(response.ok) {
+                // 💡 글씨가 있을 때만 성공 메시지를 띄우고, 빈칸으로 지웠을 때는 조용히 넘어갑니다!
+                if (hasText) {
+                    statusDiv.innerText = "✅ 자동 저장 완료!";
+                    statusDiv.style.color = "#20c997";
+                    setTimeout(() => { statusDiv.innerText = ""; }, 2000);
+                } else {
+                    statusDiv.innerText = "";
+                }
+            } else {
+                statusDiv.innerText = "❌ 저장 실패";
+                statusDiv.style.color = "red";
+            }
+        });
+    }
+
+    function saveMoodAndScore() {
+        const mood = document.getElementById('moodInput').value;
+        const score = document.getElementById('scoreInput').value;
+        const statusDiv = document.getElementById('status-mood');
+
+        const finalMood = mood.trim() === "" ? null : mood;
+        const finalScore = score.trim() === "" ? null : parseInt(score);
+
+        statusDiv.innerText = "저장 중... ⏳";
+        statusDiv.style.color = "#0d6efd";
+
+        // ★ 여기도 숫자 2로 교체!
+        fetch('/api/student-reports/2/mood-and-score', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ monthlyMood: finalMood, selfEffortScore: finalScore })
+        }).then(response => {
+            if(response.ok) {
+                if (finalMood === null && finalScore === null) {
+                    statusDiv.innerText = "";
+                } else {
+                    statusDiv.innerText = "✅ 저장 완료!";
+                    statusDiv.style.color = "#20c997";
+                    setTimeout(() => { statusDiv.innerText = ""; }, 2000);
+                }
+            } else {
+                statusDiv.innerText = "❌ 저장 실패";
+                statusDiv.style.color = "red";
+            }
+        });
+    }
+
+    function saveConcepts() {
+        const known = document.getElementById('knownInput').value;
+        const unknown = document.getElementById('unknownInput').value;
+        const statusDiv = document.getElementById('status-concept');
+
+        const finalKnown = known.trim() === "" ? null : known;
+        const finalUnknown = unknown.trim() === "" ? null : unknown;
+
+        statusDiv.innerText = "저장 중... ⏳";
+        statusDiv.style.color = "#0d6efd";
+
+        // ★ 여기도 숫자 2로 교체!
+        fetch('/api/student-reports/2/learning-concepts', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ knownConcepts: finalKnown, unknownConcepts: finalUnknown })
+        }).then(response => {
+            if(response.ok) {
+                if (finalKnown === null && finalUnknown === null) {
+                    statusDiv.innerText = "";
+                } else {
+                    statusDiv.innerText = "✅ 저장 완료!";
+                    statusDiv.style.color = "#20c997";
+                    setTimeout(() => { statusDiv.innerText = ""; }, 2000);
+                }
+            } else {
+                statusDiv.innerText = "❌ 저장 실패";
+                statusDiv.style.color = "red";
+            }
+        });
+    }
+</script>
+</body>
 </html>
