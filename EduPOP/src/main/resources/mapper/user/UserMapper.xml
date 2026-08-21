@@ -4,6 +4,18 @@
 
 <mapper namespace="com.example.EduPOP.repository.user.UserMapper">
 
+    <resultMap id="UserResultMap" type="com.example.EduPOP.domain.user.User">
+        <result property="user_id" column="user_id"/>
+        <result property="login_id" column="login_id"/>
+        <result property="password_hash" column="password_hash"/>  <!-- 👈 비밀번호를 이 변수에 콕 찝어 넣어라! -->
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="role" column="role"/>
+        <result property="status" column="status"/>
+        <result property="kakaoId" column="kakaoId"/>
+    </resultMap>
+
+
     <!-- -->
     <select id="findById" parameterType="Long" resultType="com.example.EduPOP.domain.user.User">
         SELECT user_id,
@@ -30,6 +42,19 @@
         WHERE kakaoId = #{kakaoId}
     </select>
 
+    <select id="findByLoginId" parameterType="String" resultType="com.example.EduPOP.domain.user.User" resultMap="UserResultMap">
+        SELECT user_id,
+               kakaoId,
+               login_id,
+               password_hash,
+               name,
+               email,
+               role,
+               status
+        FROM users
+        WHERE login_id = #{login_id}
+    </select>
+
     <insert id="save" parameterType="com.example.EduPOP.domain.user.User" useGeneratedKeys="true" keyProperty="user_id">
         INSERT INTO users(
             academy_id,
@@ -47,6 +72,8 @@
                   #{role},#{status},NOW(),
                   #{kakaoId})
     </insert>
+
+
 
     <update id="updateAcademyAndStatus">
         UPDATE users

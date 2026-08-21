@@ -58,7 +58,7 @@ public class KakaoService {
 
 
             // ========================================================
-            // [두 번째 심부름] Access Token(입장권)을 보여주고 사용자 정보(이름, 이메일) 받아오기
+            // [두 번째 심부름] Access Token(입장권)을 보여주고 사용자 정보(이름) 받아오기
             // ========================================================
 
             // 새 편지 봉투 작성: 이번엔 방금 받은 입장권(토큰)을 봉투 겉면에 붙여서 내가 누군지 증명합니다.
@@ -95,7 +95,6 @@ public class KakaoService {
             newUser.setPassword_hash(UUID.randomUUID().toString());
 
             //처음 온 사람은 역할이 없어서 PENDING 상태
-            newUser.setRole(UserRole.NONE);
             newUser.setStatus(UserStatus.PENDING);
 
             //새로운 회원 저장

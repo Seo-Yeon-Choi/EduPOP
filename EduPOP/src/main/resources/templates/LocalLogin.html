@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="/login" method="post">
+
+    <div>
+        <label>아이디:</label>
+        <input type="text" name="login_id" placeholder="아이디" required autofocus>
+    </div>
+
+    <br>
+
+    <div>
+        <label>비밀번호:</label>
+        <input type="text" name="password_hash" placeholder="비밀번호" required>
+    </div>
+
+    <br>
+
+    <!-- 아이디/비번이 틀렸을 때 나타날 빨간색 에러 메시지 칸 -->
+    <div th:if="${error != null}" style="color: red;">
+        <p th:text="${error}"></p>
+    </div>
+
+    <button type="submit">로그인 하기</button>
+
+    <script th:if="${error != null}">
+        alert("[[${error}]]");
+    </script>
+    <!-- 회원가입 성공 메시지 띄우기 -->
+    <script th:if="${message != null}">
+        alert("[[${message}]]");
+    </script>
+</form>
+
+</body>
+</html>

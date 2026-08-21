@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.Param;
 public interface UserMapper {
     User findById(@Param("user_id") Long user_id);
     User findByKakaoId(@Param("kakaoId") String kakaoId);
+    User findByLoginId(@Param("login_id") String login_id);
+
     void save(User user);
     void updateAcademyAndStatus(@Param("user_id") Long user_id,
                                 @Param("academy_id") Long academy_id,

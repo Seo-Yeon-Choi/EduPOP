@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인 후 메인 화면(승인 전)</title>
+</head>
+<h1>Welcome! 승인 대기 중</h1>
+<body>
+<div th:if="${session.loginUser != null}">
+    <h3>🎉 <span th:text="${session.loginUser.name}"></span>님, 환영합니다! 🎉</h3>
+
+    <a href="/register-page">
+        <button style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+            관리자 -> 학원 등록하기
+        </button>
+    </a>
+
+    <a href="/logout">
+        <button style="background-color: #ff6b6b; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+            로그아웃
+        </button>
+    </a>
+</div>
+</body>
+</html>

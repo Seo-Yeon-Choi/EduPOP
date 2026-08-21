@@ -14,10 +14,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AuthControllerKakao {
     private final KakaoService kakaoService;
 
-    @GetMapping("/")
-    public String mainHome(){
-        return "mainPage";
-    }
+//    @GetMapping("/")
+//    public String mainHome(){
+//        return "/main/mainHomePage";
+//    }
     //카카오 로그인 버튼 누르면 카카오로 안내
     @GetMapping("/kakao/login")
     public String kakaoLogin(){
@@ -38,15 +38,5 @@ public class AuthControllerKakao {
         session.setAttribute("loginUser",kakaoUser);
         return "redirect:/blankPage";
     }
-    @GetMapping("/blankPage")
-    public String adminMain() {
-        return "main/blankPage/blankPage";
-    }
 
-    @GetMapping("/logout")
-    public String logout(HttpSession session){
-        //세션 지움
-        session.invalidate();
-        return "redirect:/";
-    }
 }

@@ -25,6 +25,7 @@ public class AcademyService {
                 user_id,
                 academy.getAcademy_id(),
                 UserRole.ADMIN,
-                UserStatus.ACTIVE);
+                UserStatus.ACTIVE
+        );
     }
 }

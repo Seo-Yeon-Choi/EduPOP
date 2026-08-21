@@ -1,4 +1,4 @@
-package com.example.EduPOP.DTO;
+package com.example.EduPOP.controller.auth.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

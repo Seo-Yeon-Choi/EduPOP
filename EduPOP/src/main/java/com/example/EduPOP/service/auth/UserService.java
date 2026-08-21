@@ -7,6 +7,9 @@ import com.example.EduPOP.repository.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -15,17 +18,28 @@ public class UserService {
     private final UserMapper userMapper;
 
     @Transactional
-    public void updateUserRoleAndStatus(Long user_id, UserRole role){
-        User user = userMapper.findById(user_id);
-        //데이터가 없을 시 중단하는 에러 처리
-        if (user == null){
-            throw new
-                    IllegalArgumentException("해당 회원을 찾을 수 없습니다.");
+
+    // 중복 확인
+    public boolean registerLocalUser(User user){
+        User existingUser = userMapper.findByLoginId(user.getLogin_id());
+        if (existingUser != null){
+           return false;
         }
 
-        user.setRole(role);
-        user.setStatus(UserStatus.ACTIVE);
-
+        //로그인 시 회원 기본값
+        user.setStatus(UserStatus.PENDING);
         userMapper.save(user);
+        return true;
+    }
+
+
+    public User login(String login_id, String password_hash){
+        User user = userMapper.findByLoginId(login_id);
+
+        if (user==null || !password_hash.equals(user.getPassword_hash())){
+        return  null;
+        }
+
+        return user;
     }
 }

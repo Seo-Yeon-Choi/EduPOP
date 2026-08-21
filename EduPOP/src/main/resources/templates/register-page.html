@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>학원 등록하기</title>
     <style>
-        /* 화면을 예쁘게 꾸며주는 CSS (미술 시간) */
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .register-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 400px; }
         h2 { text-align: center; color: #333; margin-bottom: 20px; }
@@ -21,31 +20,30 @@
 <div class="register-container">
     <h2>🏫 우리 학원 등록하기</h2>
 
-    <!-- 🌟 입력한 정보를 /academy/register 주소로, 내용물이 안 보이게(POST) 보냅니다. -->
     <form action="/academy/register" method="POST" id="academyForm" onsubmit="return checkForm()">
 
         <div class="form-group">
             <label for="name">학원 이름</label>
             <!-- name 속성은 자바 Academy 클래스의 변수명과 똑같아야 합니다! -->
-            <input type="text" id="name" name="name" placeholder="예: 코딩명문학원">
+            <input type="text" id="name" name="name" placeholder="예: 한국정보교육원">
         </div>
 
         <div class="form-group">
             <label for="address">학원 주소</label>
-            <input type="text" id="address" name="address" placeholder="예: 서울시 강남구 테헤란로">
+            <input type="text" id="address" name="address" placeholder="예: 서울시 관악구 봉천로">
         </div>
 
         <div class="form-group">
-            <label for="phone">대표 전화번호</label>
+            <label for="phone">연락처</label>
             <input type="text" id="phone" name="phone" placeholder="예: 02-1234-5678">
         </div>
 
         <div class="form-group">
-            <label for="businessCer">사업자 등록번호</label>
-            <input type="text" id="businessCer" name="businessCer" placeholder="예: 123-45-67890">
+            <label for="business_cer">사업자 등록번호</label>
+            <input type="text" id="business_cer" name="business_cer" placeholder="예: 123-45-67890">
         </div>
 
-        <button type="submit" class="submit-btn">관리자로 등록 완료하기</button>
+        <button type="submit" class="submit-btn">등록하기</button>
     </form>
 </div>
 
@@ -55,7 +53,7 @@
         const name = document.getElementById('name').value;
         const address = document.getElementById('address').value;
         const phone = document.getElementById('phone').value;
-        const businessCer = document.getElementById('businessCer').value;
+        const business_Cer = document.getElementById('business_Cer').value;
 
         if (name.trim() === '') {
             alert('학원 이름을 입력해 주세요!');
@@ -69,7 +67,7 @@
             alert('전화번호를 입력해 주세요!');
             return false;
         }
-        if (businessCer.trim() === '') {
+        if (business_Cer.trim() === '') {
             alert('사업자 등록번호를 입력해 주세요!');
             return false;
         }

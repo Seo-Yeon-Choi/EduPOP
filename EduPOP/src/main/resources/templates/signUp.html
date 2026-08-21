@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/signUp}" method="post">
+
+    <!-- 기존 아이디, 비밀번호 칸 -->
+    <input type="text" name="login_id" placeholder="아이디" required>
+    <input type="text" name="password_hash" placeholder="비밀번호" required>
+    <input type="text" name="name" placeholder="이름" required>
+    <input type="text" name="email" placeholder="이메일" required>
+    <input type="text" name="phone" placeholder="전화번호" required>
+
+    <div>
+        <button type="submit">가입하기</button>
+    </div>
+</form>
+<script th:if="${error != null}">
+    alert("[[${error}]]");
+</script>
+</body>
+</html>
