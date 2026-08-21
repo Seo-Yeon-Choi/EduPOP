@@ -1,0 +1,5 @@
+jwt:
+  # HS256 알고리즘을 위해 반드시 32바이트(256비트) 이상의 문자열을 사용해야 합니다.
+  secret: "ThisIsAProductionReadySecretKeyForAcademyProject2026"
+  # 만료 시간 (밀리초 단위, 24시간 = 86400000)
+  expiration: 86400000
