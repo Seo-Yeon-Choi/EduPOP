@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.EduPOP.repository.user.UserMapper">
+
+    <!-- -->
+    <select id="findById" parameterType="Long" resultType="com.example.EduPOP.domain.user.User">
+        SELECT user_id,
+               kakaoId,
+               login_id,
+               name,
+               email,
+               role,
+               status
+        FROM users
+        WHERE user_id = #{user_id}
+
+    </select>
+
+    <select id="findByKakaoId" parameterType="String" resultType="com.example.EduPOP.domain.user.User">
+        SELECT user_id,
+               kakaoId,
+               login_id,
+               name,
+               email,
+               role,
+               status
+        FROM users
+        WHERE kakaoId = #{kakaoId}
+    </select>
+
+    <insert id="save" parameterType="com.example.EduPOP.domain.user.User" useGeneratedKeys="true" keyProperty="user_id">
+        INSERT INTO users(
+            academy_id,
+            login_id,
+            password_hash,
+            name,
+            email,
+            phone,
+            role,
+            status,
+            created_at,
+            kakaoId
+        ) VALUES (#{academy_id},#{login_id},#{password_hash},
+                  #{name},#{email},#{phone},
+                  #{role},#{status},NOW(),
+                  #{kakaoId})
+    </insert>
+
+    <update id="updateAcademyAndStatus">
+        UPDATE users
+        SET academy_id = #{academy_id},
+            role = #{role},
+            status = #{status}
+        WHERE user_id = #{user_id}
+    </update>
+</mapper>
