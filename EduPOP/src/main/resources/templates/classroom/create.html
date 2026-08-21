@@ -1,141 +1,347 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>EduPOP - 반 개설</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduPOP - 신규 반 개설</title>
   <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    .page-container {
+    /* 1. 전체 화면 배경 및 레이아웃 */
+    body {
+      background-color: #f1f5f9;
+      margin: 0;
+      color: #334155;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .main-container {
       display: flex;
-      min-height: calc(100vh - 120px);
+      min-height: calc(100vh - 65px);
     }
-    .content-area {
+
+    /* 2. 본문 컨텐츠 영역 */
+    .content-wrapper {
       flex: 1;
-      padding: 30px;
-      background-color: #f4f6f9;
+      padding: 40px;
+      background-color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
-    .card {
-      max-width: 650px;
-      margin: 0 auto;
+
+    /* 3. 폼 카드 */
+    .form-card {
+      width: 100%;
+      max-width: 760px;
       background: #ffffff;
-      border-radius: 8px;
-      padding: 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      border: 1px solid #e2e8f0;
     }
-    .card h2 {
-      margin-top: 0;
-      margin-bottom: 25px;
-      font-size: 22px;
-      color: #333333;
-      border-bottom: 2px solid #007bff;
-      padding-bottom: 10px;
+
+    .form-header {
+      margin-bottom: 30px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 20px;
     }
+
+    .form-header h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 8px 0;
+      letter-spacing: -0.5px;
+    }
+
+    .form-header p {
+      font-size: 14px;
+      color: #64748b;
+      margin: 0;
+    }
+
+    /* 4. 2열 배치 그리드 */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
     .form-group label {
       display: block;
-      margin-bottom: 6px;
+      font-size: 13.5px;
       font-weight: 600;
-      color: #495057;
+      color: #334155;
+      margin-bottom: 8px;
     }
-    .form-control {
+
+    .required-star {
+      color: #ef4444;
+      margin-left: 3px;
+    }
+
+    /* 5. 인풋 필드 스타일 */
+    .form-input, .form-textarea, .form-select {
       width: 100%;
-      padding: 10px 12px;
+      padding: 11px 16px;
       font-size: 14px;
-      border: 1px solid #ced4da;
-      border-radius: 4px;
+      color: #1e293b;
+      background-color: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
       box-sizing: border-box;
+      transition: all 0.2s ease;
     }
-    .form-control:focus {
-      border-color: #80bdff;
+
+    .form-input::placeholder, .form-textarea::placeholder {
+      color: #94a3b8;
+      font-size: 13.5px;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: #2563eb;
       outline: none;
+      box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.12);
     }
-    .teacher-box {
-      background-color: #e9ecef;
-      padding: 15px;
-      border-radius: 6px;
+
+    /* 검증 에러 스타일 */
+    .field-error-input {
+      border-color: #ef4444 !important;
+      background-color: #fef2f2;
     }
+
+    .error-message {
+      color: #ef4444;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* 6. 강사 배정 섹션 박스 */
+    .teacher-section {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 8px;
+    }
+
     .teacher-row {
       display: flex;
-      gap: 10px;
+      gap: 12px;
+      align-items: center;
     }
-    .btn-submit {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #ffffff;
-      background-color: #007bff;
-      border: none;
-      border-radius: 4px;
+
+    .teacher-badge {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    /* 7. 버튼 그룹 */
+    .btn-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 32px;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 24px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.2s;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
-    .btn-submit:hover {
-      background-color: #0056b3;
+
+    .btn-cancel {
+      background-color: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #64748b;
+    }
+
+    .btn-cancel:hover {
+      background-color: #f8fafc;
+      color: #334155;
+    }
+
+    .btn-primary {
+      background-color: #2563eb;
+      border: 1.5px solid #2563eb;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
     }
   </style>
 </head>
 <body>
 
-<!-- 상단 헤더 -->
+<!-- 헤더 -->
 <div th:replace="~{layout/header}"></div>
 
-<div class="page-container">
-  <!-- 관리자 사이드바 -->
+<div class="main-container">
+  <!-- 사이드바 -->
   <div th:replace="~{layout/sidebar-admin}"></div>
 
-  <!-- 본문 폼 영역 -->
-  <main class="content-area">
-    <div class="card">
-      <h2>신규 반 개설 (WBS 1.2.1)</h2>
+  <!-- 본문 폼 -->
+  <main class="content-wrapper">
+    <div class="form-card">
 
-      <form th:action="@{/classroom/create}" method="post">
+      <div class="form-header">
+        <h2>신규 반 개설</h2>
+        <p>학원 내 신규 클래스를 등록하고 기본 운영 정보를 설정합니다.</p>
+      </div>
 
-        <!-- 학원 식별자 (테스트용 고정 1번) -->
-        <input type="hidden" name="academyId" value="1"/>
+      <form th:action="@{/classroom/create}" th:object="${request}" method="post">
 
-        <div class="form-group">
-          <label for="name">반 명칭 *</label>
-          <input type="text" id="name" name="name" class="form-control" placeholder="예: 중등 수학 심화A반" required>
-        </div>
+        <!-- 학원 식별자 히든 필드 -->
+        <input type="hidden" th:field="*{academyId}" th:value="1"/>
+        <span th:if="${#fields.hasErrors('academyId')}" th:errors="*{academyId}" class="error-message"></span>
 
-        <div class="form-group">
-          <label for="targetGrade">대상 학년 *</label>
-          <input type="text" id="targetGrade" name="targetGrade" class="form-control" placeholder="예: 중2" required>
-        </div>
-
-        <div class="form-group">
-          <label for="maxStudents">수강 정원 (명) *</label>
-          <input type="number" id="maxStudents" name="maxStudents" class="form-control" value="20" min="1" required>
-        </div>
-
-        <div class="form-group">
-          <label for="description">반 설명</label>
-          <textarea id="description" name="description" class="form-control" rows="3" placeholder="반 운영 계획 및 설명을 입력하세요."></textarea>
-        </div>
-
-        <!-- 강사 배정 영역 (도메인 Enum: MAIN / SUB 매핑) -->
-        <div class="form-group teacher-box">
-          <label>담당 강사 배정</label>
-          <div class="teacher-row">
-            <input type="number" name="teachers[0].teacherId" value="1" class="form-control" placeholder="강사 User ID" style="flex: 1;" required>
-            <select name="teachers[0].roleType" class="form-control" style="flex: 1;">
-              <option value="MAIN">대표/담임 강사 (MAIN)</option>
-              <option value="SUB">부담임/과목 강사 (SUB)</option>
-            </select>
+        <div class="form-grid">
+          <!-- 반 명칭 (2열 전체 차지) -->
+          <div class="form-group full-width">
+            <label for="name">반 명칭<span class="required-star">*</span></label>
+            <input type="text"
+                   id="name"
+                   th:field="*{name}"
+                   th:classappend="${#fields.hasErrors('name')} ? 'field-error-input' : ''"
+                   class="form-input"
+                   placeholder="예: 중등 수학 심화 A반">
+            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-message"></span>
           </div>
+
+          <!-- 대상 학년 -->
+          <div class="form-group">
+            <label for="targetGrade">대상 학년<span class="required-star">*</span></label>
+            <input type="text"
+                   id="targetGrade"
+                   th:field="*{targetGrade}"
+                   th:classappend="${#fields.hasErrors('targetGrade')} ? 'field-error-input' : ''"
+                   class="form-input"
+                   placeholder="예: 중2, 중3, 고1">
+            <span th:if="${#fields.hasErrors('targetGrade')}" th:errors="*{targetGrade}" class="error-message"></span>
+          </div>
+
+          <!-- 수강 정원 -->
+          <div class="form-group">
+            <label for="maxStudents">수강 정원 (명)<span class="required-star">*</span></label>
+            <input type="number"
+                   id="maxStudents"
+                   th:field="*{maxStudents}"
+                   th:classappend="${#fields.hasErrors('maxStudents')} ? 'field-error-input' : ''"
+                   class="form-input"
+                   placeholder="정원 (예: 20)">
+            <span th:if="${#fields.hasErrors('maxStudents')}" th:errors="*{maxStudents}" class="error-message"></span>
+          </div>
+
+          <!-- 반 설명 (2열 전체 차지) -->
+          <div class="form-group full-width">
+            <label for="description">반 상세 설명</label>
+            <textarea id="description"
+                      th:field="*{description}"
+                      class="form-textarea"
+                      rows="3"
+                      placeholder="수업 목표, 진도 및 커리큘럼 특징을 입력해 주세요."></textarea>
+            <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message"></span>
+          </div>
+
+          <!-- 강사 배정 섹션 (2열 전체 차지) -->
+          <div class="form-group full-width">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label style="margin: 0;">담당 강사진 배정<span class="required-star">*</span></label>
+              <button type="button" class="btn" onclick="addTeacherRow()"
+                      style="padding: 4px 10px; font-size: 12px; background: #e2e8f0; border: none; border-radius: 4px; cursor: pointer;">
+                + 강사 추가
+              </button>
+            </div>
+
+            <div id="teacher-list-container" class="teacher-section">
+              <!-- 1번째 기본 강사 행 -->
+              <div class="teacher-row" style="margin-bottom: 8px;">
+                <span class="teacher-badge"><i class="fa-solid fa-user-tie"></i> 강사</span>
+                <select name="teachers[0].teacherId" class="form-select" style="flex: 2;">
+                  <option value="1" selected>김수학 강사 (ID: 1)</option>
+                  <option value="2">이영어 강사 (ID: 2)</option>
+                  <option value="3">박과학 강사 (ID: 3)</option>
+                </select>
+                <select name="teachers[0].roleType" class="form-select" style="flex: 1.5;">
+                  <option value="MAIN" selected>대표/담임 (MAIN)</option>
+                  <option value="SUB">부담임/과목 (SUB)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+        <!-- 하단 버튼 -->
+        <div class="btn-group">
+          <a th:href="@{/classroom/list}" class="btn btn-cancel">취소</a>
+          <button type="submit" class="btn btn-primary">개설 완료</button>
         </div>
 
-        <button type="submit" class="btn-submit">반 개설 완료</button>
       </form>
     </div>
   </main>
 </div>
 
-<!-- 하단 푸터 -->
+<!-- 푸터 -->
 <div th:replace="~{layout/footer}"></div>
+<script>
+  let teacherIndex = 1;
 
+  function addTeacherRow() {
+    const container = document.getElementById('teacher-list-container');
+    const newRow = document.createElement('div');
+    newRow.className = 'teacher-row';
+    newRow.style.marginBottom = '8px';
+    newRow.style.display = 'flex';
+    newRow.style.gap = '12px';
+    newRow.style.alignItems = 'center';
+
+    newRow.innerHTML = `
+                <span class="teacher-badge"><i class="fa-solid fa-user-tie"></i> 강사</span>
+                <select name="teachers[${teacherIndex}].teacherId" class="form-select" style="flex: 2;">
+                    <option value="1">김수학 강사 (ID: 1)</option>
+                    <option value="2" selected>이영어 강사 (ID: 2)</option>
+                    <option value="3">박과학 강사 (ID: 3)</option>
+                </select>
+                <select name="teachers[${teacherIndex}].roleType" class="form-select" style="flex: 1.5;">
+                    <option value="SUB" selected>부담임/과목 (SUB)</option>
+                    <option value="MAIN">대표/담임 (MAIN)</option>
+                </select>
+                <button type="button" onclick="this.parentElement.remove()"
+                        style="padding: 6px 12px; background: #fee2e2; color: #ef4444; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
+                    삭제
+                </button>
+            `;
+
+    container.appendChild(newRow);
+    teacherIndex++;
+  }
+</script>
 </body>
 </html>

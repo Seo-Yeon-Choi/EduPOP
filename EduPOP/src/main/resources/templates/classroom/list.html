@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduPOP - 반 목록 관리</title>
+  <!-- 부트스트랩 5 및 아이콘 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- ✨ SweetAlert2 라이브러리 추가 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <!-- 프로젝트 공통 스타일시트 -->
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <style>
+    body {
+      padding-top: 60px;
+    }
+    .sidebar {
+      position: fixed;
+      top: 60px;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      width: 240px;
+      padding: 0;
+      background-color: #ffffff;
+      border-right: 1px solid #dee2e6;
+      overflow-y: auto;
+    }
+    main.main-content {
+      margin-left: 240px !important;
+      padding: 2rem;
+      min-width: 700px;
+    }
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .table th, .table td {
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .class-link {
+      text-decoration: none;
+      font-weight: 600;
+      color: #0d6efd;
+    }
+    .class-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<!-- 공통 상단 헤더 -->
+<div th:replace="~{layout/header}"></div>
+
+<div class="container-fluid p-0">
+  <div class="d-flex">
+    <!-- 관리자 사이드바 -->
+    <nav class="sidebar">
+      <div th:replace="~{layout/sidebar-admin}"></div>
+    </nav>
+
+    <!-- 본문 컨텐츠 영역 -->
+    <main class="main-content flex-grow-1">
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+          <h2 class="h3 fw-bold mb-1">반 목록 관리</h2>
+          <p class="text-muted mb-0">학원에 개설된 반 현황을 모니터링하고 운영 상태를 관리합니다.</p>
+        </div>
+        <a th:href="@{/classroom/create}" class="btn btn-primary shadow-sm text-nowrap">
+          <i class="bi bi-plus-lg me-1"></i> 신규 반 개설
+        </a>
+      </div>
+
+      <!-- 상태별 필터 탭 & 일괄 종강 액션 버튼 바 -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="btn-group" role="group">
+          <a th:href="@{/classroom/list(status='ALL')}"
+             class="btn btn-sm"
+             th:classappend="${currentStatus == 'ALL' or currentStatus == null ? 'btn-primary' : 'btn-outline-secondary'}">
+            모든 반 보기
+          </a>
+          <a th:href="@{/classroom/list(status='ACTIVE')}"
+             class="btn btn-sm"
+             th:classappend="${currentStatus == 'ACTIVE' ? 'btn-success' : 'btn-outline-secondary'}">
+            운영중인 반만 보기
+          </a>
+          <a th:href="@{/classroom/list(status='CLOSED')}"
+             class="btn btn-sm"
+             th:classappend="${currentStatus == 'CLOSED' ? 'btn-dark' : 'btn-outline-secondary'}">
+            종강된 반만 보기
+          </a>
+        </div>
+
+        <button type="button"
+                id="btnBulkClose"
+                class="btn btn-sm btn-outline-danger"
+                th:if="${currentStatus != 'CLOSED'}"
+                onclick="bulkCloseClassrooms()">
+          <i class="bi bi-check2-square me-1"></i> 선택한 반 일괄 종강
+        </button>
+      </div>
+
+      <!-- 반 목록 테이블 카드 -->
+      <div class="card shadow-sm border-0 mb-4 bg-white">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 text-center">
+              <thead class="table-light">
+              <tr>
+                <th scope="col" style="width: 4%;">
+                  <input type="checkbox" class="form-check-input" id="checkAll" onclick="toggleAllCheckboxes(this)">
+                </th>
+                <th scope="col" style="width: 5%;">No</th>
+                <th scope="col" style="width: 25%;">반 명칭</th>
+                <th scope="col" style="width: 12%;">대상 학년</th>
+                <th scope="col" style="width: 10%;">정원</th>
+                <th scope="col" style="width: 15%;">대표 담임</th>
+                <th scope="col" style="width: 10%;">운영 상태</th>
+                <th scope="col" style="width: 13%;">개설일</th>
+                <th scope="col" style="width: 10%;">관리</th>
+              </tr>
+              </thead>
+              <tbody>
+              <!-- 1) 데이터가 비어있을 때 맞춤 안내 -->
+              <tr th:if="${#lists.isEmpty(classList)}">
+                <td colspan="9" class="py-5 text-muted text-center">
+                  <span th:if="${currentStatus == 'CLOSED'}">종강 처리된 반 내역이 없습니다.</span>
+                  <span th:if="${currentStatus == 'ACTIVE'}">현재 운영 중인 반이 없습니다.</span>
+                  <span th:if="${currentStatus == 'ALL' or currentStatus == null}">
+                    개설된 반 정보가 없습니다. 우측 상단의 <strong>[신규 반 개설]</strong> 버튼을 눌러 등록해 주세요.
+                  </span>
+                </td>
+              </tr>
+
+              <!-- 2) 반 목록 동적 렌더링 -->
+              <tr th:each="classroom, iterStat : ${classList}">
+                <td>
+                  <!-- 💡 개별 체크박스 -->
+                  <input type="checkbox"
+                         class="form-check-input row-checkbox"
+                         th:value="${classroom.classId}"
+                         th:disabled="${classroom.status != null and classroom.status.name() == 'CLOSED'}">
+                </td>
+
+                <td th:text="${iterStat.count}">1</td>
+
+                <td class="text-start ps-4">
+                  <a th:href="@{/classroom/{id}(id=${classroom.classId})}"
+                     class="class-link"
+                     th:text="${classroom.name}">기본반</a>
+                </td>
+
+                <td th:text="${classroom.targetGrade}">중1</td>
+
+                <td>
+                  <span th:text="${classroom.maxStudents}">20</span>명
+                </td>
+
+                <td>
+                  <span th:if="${classroom.mainTeacherName != null}"
+                        th:text="${classroom.mainTeacherName}"
+                        class="fw-medium">강사명</span>
+                  <span th:if="${classroom.mainTeacherName == null}"
+                        class="text-muted fst-italic">미배정</span>
+                </td>
+
+                <td>
+                  <span th:if="${classroom.status != null and classroom.status.name() == 'ACTIVE'}"
+                        class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">운영중</span>
+                  <span th:if="${classroom.status != null and classroom.status.name() == 'CLOSED'}"
+                        class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">종강</span>
+                </td>
+
+                <td th:text="${classroom.createdAt != null ? #temporals.format(classroom.createdAt, 'yyyy-MM-dd') : '-'}">2026-08-21</td>
+
+                <!-- 💡 단건 종강 버튼: data-class-id 속성 및 this 전달로 ID 유실 원천 차단 -->
+                <td>
+                  <button type="button"
+                          class="btn btn-sm btn-outline-danger"
+                          th:if="${classroom.status != null and classroom.status.name() == 'ACTIVE'}"
+                          th:data-class-id="${classroom.classId}"
+                          onclick="handleSingleClose(this)">
+                    종강
+                  </button>
+                  <span th:if="${classroom.status != null and classroom.status.name() == 'CLOSED'}"
+                        class="text-muted small">-</span>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 공통 푸터 -->
+<div th:replace="~{layout/footer}"></div>
+
+<!-- 부트스트랩 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- ✨ SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  // 전체 선택/해제 토글 함수
+  function toggleAllCheckboxes(masterCheckbox) {
+    const checkboxes = document.querySelectorAll('.row-checkbox:not(:disabled)');
+    checkboxes.forEach(cb => {
+      cb.checked = masterCheckbox.checked;
+    });
+  }
+
+  // 💡 단건 종강 처리 (SweetAlert2 적용 및 dataset.classId 추출)
+  function handleSingleClose(btnElement) {
+    const classId = btnElement.dataset.classId;
+
+    if (!classId) {
+      Swal.fire({
+        icon: 'error',
+        title: '오류',
+        text: '반 식별자(ID)를 찾을 수 없습니다.'
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: '종강 처리하시겠습니까?',
+      text: '해당 반이 종강 상태로 변경됩니다.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: '종강 처리',
+      cancelButtonText: '취소'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/classroom/${classId}/status?status=CLOSED`, {
+          method: 'POST'
+        })
+                .then(response => {
+                  if (response.ok) {
+                    Swal.fire({
+                      icon: 'success',
+                      title: '종강 완료',
+                      text: '성공적으로 종강 처리되었습니다.',
+                      timer: 1500,
+                      showConfirmButton: false
+                    }).then(() => {
+                      location.reload();
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: '처리 실패',
+                      text: '상태 변경 중 오류가 발생했습니다. (코드: ' + response.status + ')'
+                    });
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                  Swal.fire({
+                    icon: 'error',
+                    title: '통신 오류',
+                    text: '서버와 통신할 수 없습니다.'
+                  });
+                });
+      }
+    });
+  }
+
+  // 💡 다중 일괄 종강 처리 (SweetAlert2 적용)
+  function bulkCloseClassrooms() {
+    const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+
+    if (checkedBoxes.length === 0) {
+      Swal.fire({
+        icon: 'info',
+        title: '알림',
+        text: '종강 처리할 반을 1개 이상 선택해 주세요.'
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: '선택한 반 일괄 종강',
+      text: `선택하신 ${checkedBoxes.length}개의 반을 모두 종강 처리하시겠습니까?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: '일괄 종강',
+      cancelButtonText: '취소'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const selectedIds = Array.from(checkedBoxes).map(cb => Number(cb.value));
+
+        fetch('/classroom/status/bulk', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            classIds: selectedIds,
+            status: 'CLOSED'
+          })
+        })
+                .then(response => {
+                  if (response.ok) {
+                    Swal.fire({
+                      icon: 'success',
+                      title: '일괄 종강 완료',
+                      text: '선택한 반들이 성공적으로 종강 처리되었습니다.',
+                      timer: 1500,
+                      showConfirmButton: false
+                    }).then(() => {
+                      location.reload();
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: '일괄 처리 실패',
+                      text: '상태 변경 중 오류가 발생했습니다. (코드: ' + response.status + ')'
+                    });
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                  Swal.fire({
+                    icon: 'error',
+                    title: '통신 오류',
+                    text: '서버 통신 중 오류가 발생했습니다.'
+                  });
+                });
+      }
+    });
+  }
+</script>
+</body>
+</html>
