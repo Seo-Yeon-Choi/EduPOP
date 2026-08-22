@@ -8,11 +8,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -107,28 +107,37 @@ public class AuthController {
         //로그인 성공시 세션에 저장
         session.setAttribute("loginUser", loginUser);
 
-        //로그인한 유저의 상태확인
-        if (loginUser.getStatus() == UserStatus.PENDING) {
-            //관리자가 승인 안해준 상태 -> 대기 페이지로
+        //로그인한 유저의 역할, 상태확인
+        //관리자 버튼으로 로그인한 미등록된 유저라면
+        if (loginUser.getStatus() == UserStatus.PENDING && loginUser.getRole() == UserRole.ADMIN) {
+            //관리자 대기 페이지로
+            return "redirect:/adminWaiting";
+            //학생 버튼으로 로그인한 미등록 유저
+        } else if (loginUser.getStatus()==UserStatus.PENDING && loginUser.getRole()==UserRole.STUDENT) {
+            //승인대기 페이지
             return "redirect:/blankPage";
-        } else if (loginUser.getStatus() == UserStatus.ACTIVE) {
+        } else if (loginUser.getStatus()==UserStatus.PENDING && loginUser.getRole()==UserRole.TEACHER) {
+            return "redirect:/blankPage";
+
             //관리자가 승인한 상태 -> 역할 확인 후 해당 페이지로
+        } else if (loginUser.getStatus() == UserStatus.ACTIVE) {
             if (loginUser.getRole() == UserRole.STUDENT) {
-                return "redirect:/main/studentMain";
+                return "/main/studentMain";
             } else if (loginUser.getRole() == UserRole.TEACHER) {
-                return "redirect:/main/teacherMain";
+                return "/main/teacherMain";
             } else if (loginUser.getRole() == UserRole.ADMIN) {
-                return "redirect:/main/adminMain";
+                return "main/adminMain";
             }
         }
     return "redirect:/";
     }
 
+    //학생, 교사 승인 대기 페이지
     @GetMapping("/blankPage")
     public String blankPage(){
         return "main/blankPage";
-
     }
+
 
     // 로그아웃
     @GetMapping("/logout")

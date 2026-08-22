@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 
@@ -27,5 +29,17 @@ public class AcademyService {
                 UserRole.ADMIN,
                 UserStatus.ACTIVE
         );
+    }
+    //학원 조회
+    public List<Academy> getAllAcademies(){
+        return academyMapper.findAllAcademies();
+    }
+    //삭제
+    public void deleteAcademy(Long academy_id){
+        academyMapper.deleteAcademy(academy_id);
+    }
+    //수정
+    public void updateAcademy(Long academy_id, String name, String address, String phone, String business_cer){
+        academyMapper.updateAcademy(academy_id, name, address, phone, business_cer);
     }
 }

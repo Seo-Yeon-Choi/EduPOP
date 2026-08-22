@@ -82,4 +82,48 @@
             status = #{status}
         WHERE user_id = #{user_id}
     </update>
+
+    <!-- PENDING 상태인 유저 목록 조회 -->
+    <select id="findPendingUsers" resultMap="UserResultMap">
+        SELECT user_id,
+               academy_id,
+               login_id,
+               password_hash,
+               name,
+               email,
+               phone,
+               role,
+               status,
+               kakaoId
+        FROM users WHERE status = 'PENDING'
+    </select>
+
+    <!-- 유저 상태를 ACTIVE 등으로 업데이트 -->
+    <update id="updateUserStatus">
+        UPDATE users SET status = #{status}
+                     WHERE user_id = #{user_id}
+    </update>
+
+    <!-- 모든 회원 조회 -->
+    <select id="findAllUsers" resultMap="UserResultMap">
+        SELECT user_id, academy_id, login_id, name, email, role, status, kakaoId
+        FROM users
+    </select>
+
+    <!-- 회원 상태 개별 수정 -->
+    <update id="updateStatus">
+        UPDATE users
+        SET status = #{status}
+        WHERE user_id = #{user_id}
+    </update>
+
+    <!-- 여러 명의 ID를 받아 한 번에 UPDATE 치는 SQL -->
+    <update id="updateUsersStatusBatch">
+        UPDATE users
+        SET status = #{status}
+        WHERE user_id IN
+        <foreach item="id" collection="userIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

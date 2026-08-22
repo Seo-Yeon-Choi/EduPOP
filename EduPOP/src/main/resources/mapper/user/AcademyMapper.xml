@@ -3,10 +3,39 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.EduPOP.repository.user.AcademyMapper">
-
+    <!--저장-->
     <insert id="save" parameterType="com.example.EduPOP.domain.user.Academy" useGeneratedKeys="true" keyProperty="academy_id">
         INSERT INTO academies (name, address, phone, business_cer, created_at, updated_at)
         VALUES (#{name},#{address},#{phone},#{business_cer},NOW(),NOW())
     </insert>
 
+    <!--조회-->
+    <select id="findAllAcademies" resultType="com.example.EduPOP.domain.user.Academy">
+        SELECT academy_id,
+               name,
+               address,
+               phone,
+               business_cer,
+               created_at,
+               updated_at
+        FROM academies
+        ORDER BY created_at DESC
+    </select>
+
+    <!--삭제-->
+    <delete id="deleteAcademy">
+        DELETE FROM academies
+        WHERE academy_id = #{academy_id}
+    </delete>
+
+    <!--수정-->
+    <update id="updateAcademy">
+        UPDATE academies
+        SET name = #{name},
+            address = #{address},
+            phone = #{phone},
+            business_cer = #{business_cer},
+            updated_at = NOW()
+        WHERE academy_id = #{academy_id}
+    </update>
 </mapper>

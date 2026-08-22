@@ -1,7 +1,22 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
-<body>
-<h1>🎉 관리자 메인 페이지에 오신 것을 환영합니다!</h1>
-<p th:text="${session.loginUser.name} + '님, 로그인되었습니다.'"></p>
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 메인 페이지</title>
+    <p th:text="${session.loginUser.name} + '님의 관리자 페이지'"></p>
+
+</head>
+
+<body style="margin: 0; display: flex; flex-direction: column; min-height: 100vh;"><h1>🎉 관리자 메인 페이지에 오신 것을 환영합니다!</h1>
+<hr style="margin: 30px 0;">
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<!-- 몸통 영역 (사이드바 + 메인 콘텐츠) -->
+<div style="display: flex; flex: 1;">
+    <!-- 사이드바 (Sidebar) 불러오기 -->
+    <div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
+</div>
+
 </body>
 </html>

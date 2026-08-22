@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +42,38 @@ public class UserService {
         }
 
         return user;
+    }
+
+    public List<User> getPendingUsers() {
+        return userMapper.findPendingUsers();
+    }
+
+    @Transactional
+    public void approveUser(Long user_id) {
+        userMapper.updateUserStatus(user_id, UserStatus.ACTIVE);
+    }
+
+    // ADMIN을 제외한 모든 회원 목록 가져오기
+    public List<User> getAllUsersExceptAdmin() {
+        List<User> allUsers = userMapper.findAllUsers();
+
+        // 스트림을 이용해 role이 ADMIN이 아닌 유저들만 필터링
+        return allUsers.stream()
+                .filter(user -> user.getRole() != UserRole.ADMIN) // ADMIN이 아닌 것만
+                .toList();
+    }
+
+    // 관리자가 특정 회원의 상태를 직접 변경
+    @Transactional
+    public void updateUserStatusByAdmin(Long user_id, UserStatus status) {
+        userMapper.updateStatus(user_id, status);
+    }
+
+    // 여러 명 일괄 상태 변경
+    @Transactional
+    public void updateUsersStatusBatch(List<Long> userIds, UserStatus status) {
+        if (userIds != null && !userIds.isEmpty()) {
+            userMapper.updateUsersStatusBatch(userIds, status);
+        }
     }
 }

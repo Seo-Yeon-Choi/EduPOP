@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <h2>👥 전체 회원 관리 목록</h2>
+
+    <!-- 상태별 보기 필터 -->
+    <div>
+        <label for="statusFilter" style="font-weight: bold;">상태별 보기: </label>
+        <select id="statusFilter" onchange="filterUsersByStatus()" style="padding: 5px; font-size: 14px;">
+            <option value="ALL">전체 보기</option>
+            <option value="PENDING">PENDING (승인 대기 중)</option>
+            <option value="ACTIVE">ACTIVE (활동 중)</option>
+            <option value="INACTIVE">INACTIVE (비활성)</option>
+            <option value="WITHDRAWN">WITHDRAWN (탈퇴)</option>
+        </select>
+    </div>
+</div>
+
+<!-- 🌟 일괄 상태 변경을 위한 커다란 <form> 태그 -->
+<form th:action="@{/admin/updateStatusBatch}" method="post">
+
+    <!-- 상단 일괄 제어 바 (선택한 회원 일괄 변경 도구) -->
+    <div style="background-color: #f9f9f9; padding: 10px; border: 1px solid #ddd; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+        <span style="font-weight: bold; font-size: 14px;">선택한 회원 일괄 변경:</span>
+
+        <!-- 변경할 상태 선택 드롭다운 -->
+        <select name="status" style="padding: 5px;">
+            <option value="ACTIVE">ACTIVE (활동중)</option>
+            <option value="INACTIVE">INACTIVE (비활성)</option>
+            <option value="PENDING">PENDING (대기중)</option>
+            <option value="WITHDRAWN">WITHDRAWN (탈퇴)</option>
+        </select>
+
+        <!-- 일괄 변경 실행 버튼 -->
+        <button type="submit" style="background-color: green; color: white; padding: 6px 12px; font-weight: bold; cursor: pointer; border: none; border-radius: 4px;">
+            일괄 적용하기
+        </button>
+    </div>
+
+    <table border="1" style="width: 100%; text-align: center;">
+        <thead>
+        <tr>
+            <!-- 🌟 전체 선택을 위한 마스터 체크박스 -->
+            <th style="width: 40px;">
+                <input type="checkbox" id="selectAll" onclick="toggleAll(this)" />
+            </th>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>역할</th>
+            <th>현재 상태</th>
+            <th>개별 상태 변경</th>
+        </tr>
+        </thead>
+        <tbody id="userTableBody">
+        <tr th:each="u : ${allUsers}" th:data-status="${u.status}">
+            <td>
+                <!-- 🌟 서버로 넘어갈 개별 체크박스 (name="userIds") -->
+                <input type="checkbox" name="userIds" th:value="${u.user_id}" class="userCheckbox" />
+            </td>
+            <td th:text="${u.login_id}">아이디</td>
+            <td th:text="${u.name}">이름</td>
+            <td th:text="${u.role}">역할</td>
+            <td th:text="${u.status}" style="font-weight: bold;">상태</td>
+            <td>
+                <!-- 기존 개별 수정 폼 -->
+                <form th:action="@{/admin/updateStatus}" method="post" style="display:inline;">
+                    <input type="hidden" name="user_id" th:value="${u.user_id}" />
+
+                    <select name="status" style="padding: 3px;">
+                        <option value="ACTIVE" th:selected="${u.status.name() == 'ACTIVE'}">ACTIVE</option>
+                        <option value="INACTIVE" th:selected="${u.status.name() == 'INACTIVE'}">INACTIVE</option>
+                        <option value="PENDING" th:selected="${u.status.name() == 'PENDING'}">PENDING</option>
+                        <option value="WITHDRAWN" th:selected="${u.status.name() == 'WITHDRAWN'}">WITHDRAWN</option>
+                    </select>
+
+                    <button type="submit" style="background-color: #007bff; color: white; border: none; padding: 4px 8px; border-radius: 3px;">개별 수정</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+
+<!-- 자바스크립트 (필터링 + 전체 선택 기능) -->
+<script>
+    // 1. 상태별 필터링 함수
+    function filterUsersByStatus() {
+        const selectedStatus = document.getElementById("statusFilter").value;
+        const rows = document.querySelectorAll("#userTableBody tr");
+
+        rows.forEach(row => {
+            const rowStatus = row.getAttribute("data-status");
+
+            if (selectedStatus === "ALL" || rowStatus === selectedStatus) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+
+    // 2. 전체 선택/해제 체크박스 함수
+    function toggleAll(selectAllCheckbox) {
+        const checkboxes = document.querySelectorAll('.userCheckbox');
+        checkboxes.forEach(cb => {
+            // 화면에 보이는(숨겨지지 않은) 행의 체크박스만 선택되게 하면 더 완벽합니다!
+            if (cb.closest('tr').style.display !== 'none') {
+                cb.checked = selectAllCheckbox.checked;
+            }
+        });
+    }
+</script>
+</body>
+</html>
