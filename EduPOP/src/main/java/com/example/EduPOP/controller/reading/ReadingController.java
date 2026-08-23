@@ -15,16 +15,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Controller // 학생과 교사의 독서 관련 웹 요청을 받는 객체로 등록
-@RequiredArgsConstructor // final 필드를 매개변수로 받는 생성자를 자동 생성
+@Controller // 학생과 교사의 독서 관련 웹 요청을 받는 Controller로 Spring에 등록
+@RequiredArgsConstructor // final 필드에 생성자 만들어서 객체로변환
 public class ReadingController {
     private static final String LOGIN_USER_ID =
             "loginUserId"; // 로그인한 사용자 번호를 저장할 세션 이름
 
-    private final ReadingService readingService; // 실제 독서 처리를 Service에 요청하기 위해 주입
 
-
-    @GetMapping("/student/reading") // 학생 독서 메뉴의 감상문 목록 요청 처리
+    // 로그인하지 않은 사용자의 직접 URL 접근 방지 코드
+    private final ReadingService readingService; // 서비스를 객체로만들어서 연결
+    @GetMapping("/student/reading") // 학생 독서감상문 목록 웹페이지
     public String studentReadingList(
             HttpSession session,
             Model model
@@ -45,59 +45,61 @@ public class ReadingController {
     }
 
 
-    @GetMapping("/student/reading-reports/create") // 감상문 작성 화면 요청 처리
+    @GetMapping("/student/reading-reports/create") // 학생 독서감상문 작성 웹페이지
     public String studentReadingReportCreateForm(
-            @RequestParam(
-                    name = "keyword",
-                    required = false,
-                    defaultValue = ""
-            ) String keyword,
 
-            @RequestParam(
-                    name = "bookId",
-                    required = false
-            ) Long selectedBookId,
+    @RequestParam(
+    name = "keyword", // URL들어오는 keyword 값을 아래 keyword 변수에 연결
+    required = false, // URL에 keyword가 없어도 오류 안나게
+    defaultValue = "" // keyword가 없으면 빈 문자열 ""을 기본값으로 사용
+    ) String keyword, // 사용자가 입력한 책 키워드를 저장
 
-            HttpSession session,
-            Model model
+     @RequestParam(
+     name = "bookId", //URL에 들어오는 DB 책ID
+     required = false // bookId가 없어도 오류 없이 작성 웹페이지에 들어올 수 있음
+     ) Long selectedBookId, // 사용자가 선택한 도서의 DB 고유 번호를 저장
+
+     HttpSession session, // 현재 로그인한 사용자 정보를 확인하기 위해 세션을 받음
+     Model model // Controller에서 준비한 값을 HTML에 전달하기 위한 Model을 받음
     ) {
-        Long studentId =
-                getLoginUserId(session); // 세션에서 로그인한 학생 번호 조회
 
-        if (studentId == null) {
-            return "redirect:/login"; // 로그인 정보가 없으면 로그인 화면으로 이동
+        Long studentId =
+                getLoginUserId(session); // 세션에서 현재 로그인한 사용자의 DB 고유 번호를 가져옴
+
+        if (studentId == null) { // 세션에서 로그인한 사용자 번호를 가져오지 못했는지 확인
+            return "redirect:/login"; // 로그인하지 않았다면 로그인 웹페이지로 다시 이동
         }
 
         model.addAttribute(
-                "books",
-                readingService.searchBooks(keyword)
-        ); // 검색어에 해당하는 도서 목록 전달
+                "books", // 웹페이지에서 검색된 책을 books라는 이름으로 사용
+                readingService.searchBooks(keyword) // 검색한 것을 서비스에 보내고 검색된 도서 목록을 받아옴
+        ); // 검색된 책을 Model에 저장
 
         model.addAttribute(
-                "keyword",
-                keyword
-        ); // 입력했던 검색어를 화면에 다시 전달
+                "keyword", // 검색했던 책이름
+                keyword // Controller가 받은 실제 책이름 전달
+        ); // 검색어를 Model에 저장
 
-        model.addAttribute(
-                "selectedBookId",
-                selectedBookId
-        ); // 선택한 도서 번호를 화면에 전달
+        model.addAttribute( // model에 넣어서 HTML에 전달
+                "selectedBookId", // 웹페이지에서 선택된 책 번호
+                selectedBookId // URL에서 받은 실제 선택 책 번호
+        );
 
-        model.addAttribute(
-                "book",
-                new Book()
-        ); // 도서 등록 폼에서 사용할 빈 도서 객체 전달
+        model.addAttribute( // 새 도서 등록 페이지에서 사용할 객체를 전달
+                "book", // 빈 Book 객체
+                new Book() // 아직 값이 들어있지 않은 새로운 Book 객체를 생성
+        ); // 빈 Book 객체를 Model에 저장 완료
 
-        model.addAttribute(
-                "readingReport",
-                new ReadingReport()
-        ); // 감상문 작성 폼에서 사용할 빈 감상문 객체 전달
+        model.addAttribute( // 새 독서감상문 작성 폼에서 사용할 객체를 HTML에 전달
+                "readingReport", // HTML에서 빈 독서감상문 객체를 readingReport라는 이름으로 사용
+                new ReadingReport() // 아직 제목과 내용 등이 없는 새로운 ReadingReport 객체를 생성
+        ); // 빈 ReadingReport 객체를 Model에 저장 완료
 
-        return "student/reading-report/create"; // 학생 감상문 작성 HTML 실행
-    }
+        return "student/reading-report/create"; // student/reading-report/create.html 독서감상문 작성 웹페이지를 보여줌
+    } // 학생 독서감상문 작성 웹페이지 준비 메서드 끝
 
 
-    @PostMapping("/student/reading/books") // 학생이 입력한 새 도서 등록 요청 처리
+    @PostMapping("/student/reading/books") // 학생이 입력한 새 독서 등록
     public String registerBook(
             @ModelAttribute("book") Book book,
             HttpSession session,
