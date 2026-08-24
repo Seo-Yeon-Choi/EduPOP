@@ -3,12 +3,13 @@ package com.example.EduPOP.domain.user;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+
 @Data
 public class User {
-    private Long user_id;
-    private Long academy_id;
-    private String login_id;
-    private String password_hash;
+    private Long userId;
+    private Long academyId;
+    private String loginId;
+    private String passwordHash;
     private String name;
     private String email;
     private String phone;
@@ -16,14 +17,14 @@ public class User {
     private UserRole role;
     private UserStatus status;
 
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
-    private LocalDateTime withdrawn_at;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime withdrawnAt;
 
     private String kakaoId;
     private String kakaoEmail;
     private String kakaoName;
 
-    private String school_grade;
-    private String class_name;
+    private String schoolGrade;
+    private String className;
 }

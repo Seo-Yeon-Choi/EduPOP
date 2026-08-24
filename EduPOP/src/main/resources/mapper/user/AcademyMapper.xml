@@ -3,14 +3,34 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.EduPOP.repository.user.AcademyMapper">
-    <!--저장-->
-    <insert id="save" parameterType="com.example.EduPOP.domain.user.Academy" useGeneratedKeys="true" keyProperty="academy_id">
-        INSERT INTO academies (name, address, phone, business_cer, created_at, updated_at)
-        VALUES (#{name},#{address},#{phone},#{business_cer},NOW(),NOW())
+
+    <insert id="save"
+            parameterType="com.example.EduPOP.domain.user.Academy"
+            useGeneratedKeys="true"
+            keyProperty="academyId">
+
+        INSERT INTO academies (
+            name,
+            address,
+            phone,
+            business_cer,
+            created_at,
+            updated_at
+        )
+        VALUES (
+                   #{name},
+                   #{address},
+                   #{phone},
+                   #{businessCer},
+                   NOW(),
+                   NOW()
+               )
+
     </insert>
 
-    <!--조회-->
-    <select id="findAllAcademies" resultType="com.example.EduPOP.domain.user.Academy">
+    <select id="findAllAcademies"
+            resultType="com.example.EduPOP.domain.user.Academy">
+
         SELECT academy_id,
                name,
                address,
@@ -20,10 +40,12 @@
                updated_at
         FROM academies
         ORDER BY created_at DESC
+
     </select>
 
-    <!-- 특정 학원번호로 조회 -->
-    <select id="findById" resultType="com.example.EduPOP.domain.user.Academy">
+    <select id="findById"
+            resultType="com.example.EduPOP.domain.user.Academy">
+
         SELECT academy_id,
                name,
                address,
@@ -32,31 +54,35 @@
                created_at,
                updated_at
         FROM academies
-        WHERE academy_id = #{academy_id}
+        WHERE academy_id = #{academyId}
+
     </select>
-    <!--수정-->
+
     <update id="updateAcademy">
+
         UPDATE academies
         SET name = #{name},
             address = #{address},
             phone = #{phone},
-            business_cer = #{business_cer},
+            business_cer = #{businessCer},
             updated_at = NOW()
-        WHERE academy_id = #{academy_id}
+        WHERE academy_id = #{academyId}
+
     </update>
 
-    <!--소속 user의 academy_id룰 null로 비운 후 삭제-->
     <update id="clearUserAcademyId">
+
         UPDATE users
         SET academy_id = NULL
-        WHERE academy_id = #{academy_id}
+        WHERE academy_id = #{academyId}
+
     </update>
 
     <delete id="deleteAcademy">
+
         DELETE FROM academies
-        WHERE academy_id = #{academy_id}
+        WHERE academy_id = #{academyId}
+
     </delete>
-
-
 
 </mapper>

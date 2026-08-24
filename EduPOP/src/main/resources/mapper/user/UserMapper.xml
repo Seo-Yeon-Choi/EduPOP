@@ -3,154 +3,218 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.EduPOP.repository.user.UserMapper">
+    <resultMap id="UserResultMap"
+               type="com.example.EduPOP.domain.user.User">
 
-    <resultMap id="UserResultMap" type="com.example.EduPOP.domain.user.User">
-        <result property="user_id" column="user_id"/>
-        <result property="login_id" column="login_id"/>
-        <result property="academy_id" column="academy_id"/>
-        <result property="password_hash" column="password_hash"/>
+        <result property="userId" column="user_id"/>
+        <result property="loginId" column="login_id"/>
+        <result property="academyId" column="academy_id"/>
+        <result property="passwordHash" column="password_hash"/>
         <result property="name" column="name"/>
         <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
         <result property="role" column="role"/>
         <result property="status" column="status"/>
         <result property="kakaoId" column="kakaoId"/>
-        <result property="withdrawn_at" column="withdrawn_at"/>
-        <result property="school_grade" column="school_grade"/>
-        <result property="className" column="className"/>
-        <result property="business_cer" column="business_cer"/>
-
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="withdrawnAt" column="withdrawn_at"/>
+        <result property="schoolGrade" column="school_grade"/>
 
     </resultMap>
 
+    <!-- ID로 회원 조회 -->
+    <select id="findByUserId"
+            parameterType="Long"
+            resultType="com.example.EduPOP.domain.user.User">
 
-    <!-- -->
-    <select id="findById" parameterType="Long" resultType="com.example.EduPOP.domain.user.User">
         SELECT user_id,
-               kakaoId,
-               login_id,
-               academy_id,
-               name,
-               email,
-               role,
-               phone,
-               status,
-               school_grade
+        kakaoId,
+        login_id,
+        academy_id,
+        password_hash,
+        name,
+        email,
+        phone,
+        role,
+        status,
+        created_at,
+        updated_at,
+        withdrawn_at,
+        school_grade
         FROM users
-        WHERE user_id = #{user_id}
+        WHERE user_id = #{userId}
 
     </select>
 
-    <select id="findByKakaoId" parameterType="String" resultType="com.example.EduPOP.domain.user.User">
+    <!-- 카카오 ID로 회원 조회 -->
+    <select id="findByKakaoId"
+            parameterType="String"
+            resultType="com.example.EduPOP.domain.user.User">
+
         SELECT user_id,
-               kakaoId,
-               login_id,
-               academy_id,
-               name,
-               email,
-               role,
-               phone,
-               status,
-               school_grade
+        kakaoId,
+        login_id,
+        academy_id,
+        password_hash,
+        name,
+        email,
+        phone,
+        role,
+        status,
+        created_at,
+        updated_at,
+        withdrawn_at,
+        school_grade
         FROM users
         WHERE kakaoId = #{kakaoId}
+
     </select>
 
-    <select id="findByLoginId" parameterType="String" resultType="com.example.EduPOP.domain.user.User" resultMap="UserResultMap">
+    <!-- 로그인 ID로 회원 조회 -->
+    <select id="findByLoginId"
+            parameterType="String"
+            resultMap="UserResultMap">
+
         SELECT user_id,
-               kakaoId,
-               login_id,
-               academy_id,
-               password_hash,
-               name,
-               email,
-               phone,
-               role,
-               status,
-               school_grade
+        kakaoId,
+        login_id,
+        academy_id,
+        password_hash,
+        name,
+        email,
+        phone,
+        role,
+        status,
+        created_at,
+        updated_at,
+        withdrawn_at,
+        school_grade
         FROM users
-        WHERE login_id = #{login_id}
+        WHERE login_id = #{loginId}
+
     </select>
 
-    <insert id="save" parameterType="com.example.EduPOP.domain.user.User" useGeneratedKeys="true" keyProperty="user_id">
-        INSERT INTO users(
-            academy_id,
-            login_id,
-            password_hash,
-            name,
-            email,
-            phone,
-            role,
-            status,
-            created_at,
-            kakaoId,
-            school_grade
-        ) VALUES (#{academy_id},#{login_id},#{password_hash},
-                  #{name},#{email},#{phone},
-                  #{role},#{status},NOW(),
-                  #{kakaoId},#{school_grade})
+    <!-- 회원 저장 -->
+    <insert id="saveUser"
+            parameterType="com.example.EduPOP.domain.user.User"
+            useGeneratedKeys="true"
+            keyProperty="userId">
+
+        INSERT INTO users (
+        academy_id,
+        login_id,
+        password_hash,
+        name,
+        email,
+        phone,
+        role,
+        status,
+        created_at,
+        kakaoId,
+        school_grade
+        )
+        VALUES (
+        #{academyId},
+        #{loginId},
+        #{passwordHash},
+        #{name},
+        #{email},
+        #{phone},
+        #{role},
+        #{status},
+        NOW(),
+        #{kakaoId},
+        #{schoolGrade}
+        )
+
     </insert>
 
-
-
+    <!-- 학원 ID 및 상태 변경 -->
     <update id="updateAcademyAndStatus">
-        UPDATE users
-        SET academy_id = #{academy_id},
-            role = #{role},
-            status = #{status}
-        WHERE user_id = #{user_id}
-    </update>
 
+        UPDATE users
+        SET academy_id = #{academyId},
+        role = #{role},
+        status = #{status}
+        WHERE user_id = #{userId}
+
+    </update>
 
     <!-- 모든 회원 조회 -->
-    <select id="findAllUsers" resultMap="UserResultMap">
+    <select id="findAllUsers"
+            resultMap="UserResultMap">
+
         SELECT u.user_id,
-               u.academy_id,
-               u.login_id,
-               u.name,
-               u.email,
-               u.phone,
-               u.role,
-               u.status,
-               u.kakaoId,
-               u.school_grade,
-               c.name AS class_name
+        u.academy_id,
+        u.login_id,
+        u.password_hash,
+        u.name,
+        u.email,
+        u.phone,
+        u.role,
+        u.status,
+        u.kakaoId,
+        u.created_at,
+        u.updated_at,
+        u.withdrawn_at,
+        u.school_grade,
+        c.name AS class_name
         FROM users u
-        LEFT JOIN classes c ON u.class_id = c.class_id
+        LEFT JOIN classes c
+        ON u.class_id = c.class_id
+
     </select>
 
-    <!-- 표에서 회원 상태 개별 수정 -->
+    <!-- 회원 상태 개별 수정 -->
     <update id="updateStatus">
-        UPDATE users
-        SET status = #{status},
-            /* 상태가 탈퇴(WITHDRAWN)로 바뀌면 현재 시간을 기록하고, 다른 상태로 바뀌면 날짜를 지움 */
-            withdrawn_at = CASE /* case : 조건 */
-                          WHEN #{status} = 'WITHDRAWN' THEN NOW()
-            ELSE NULL
-            END
-        WHERE user_id = #{user_id}
-    </update>
 
-    <!-- 여러 명의 ID를 받아 한 번에 수정 -->
-    <update id="updateUsersStatusBatch">
         UPDATE users
         SET status = #{status},
+
+        /* 상태가 탈퇴(WITHDRAWN)로 바뀌면 현재 시간을 기록 */
         withdrawn_at = CASE
         WHEN #{status} = 'WITHDRAWN' THEN NOW()
         ELSE NULL
         END
-        WHERE user_id IN /* IN : 조건 */
-        <foreach item="id" collection="userIds" open="(" separator="," close=")">
+
+        WHERE user_id = #{userId}
+
+    </update>
+
+    <!-- 여러 명의 ID를 받아 한 번에 수정 -->
+    <update id="updateUsersStatusBatch">
+
+        UPDATE users
+        SET status = #{status},
+
+        withdrawn_at = CASE
+        WHEN #{status} = 'WITHDRAWN' THEN NOW()
+        ELSE NULL
+        END
+
+        WHERE user_id IN
+
+        <foreach item="id"
+                 collection="userIds"
+                 open="("
+                 separator=","
+                 close=")">
+
             #{id}
-            /* userId에서 id(회원번호)를 하나씩 꺼냄, 커낸 (예:1,2,3)을 {id}자리에 넣음 */
+
         </foreach>
+
     </update>
 
     <!-- 1년 지난 탈퇴(WITHDRAWN) 회원 자동 삭제 -->
     <delete id="deleteOldWithdrawnUsers">
+
         DELETE FROM users
         WHERE status = 'WITHDRAWN'
-          AND withdrawn_at &lt;= DATE_SUB(NOW(), INTERVAL 1 YEAR)
-        <!-- 'DATE_SUB' -> 지금으로부터 ~전 날짜를 계산해주는 기능 -->
-        <!-- '&lt;=' -> '작거나 같다' 기호 -->
+        AND withdrawn_at &lt;= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+
     </delete>
+
 </mapper>
+
