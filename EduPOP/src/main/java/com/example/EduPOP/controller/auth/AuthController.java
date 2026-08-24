@@ -134,7 +134,21 @@ public class AuthController {
 
     //학생, 교사 승인 대기 페이지
     @GetMapping("/blankPage")
-    public String blankPage(){
+    public String blankPage(HttpSession session){
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null){
+            return "redirect:/";
+        }
+
+        if (loginUser.getStatus() == UserStatus.ACTIVE){
+           if (loginUser.getRole() == UserRole.ADMIN){
+               return "redirect:templates/main/adminMain";
+           } else if (loginUser.getRole() == UserRole.STUDENT) {
+               return "redirect:templates/main/studentMain";
+           } else if (loginUser.getRole() == UserRole.TEACHER) {
+               return "redirect:templates/main/teacherMain";
+           }
+        }
         return "main/blankPage";
     }
 

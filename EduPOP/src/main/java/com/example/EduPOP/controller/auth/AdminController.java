@@ -6,6 +6,7 @@ import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.repository.user.AcademyMapper;
 import com.example.EduPOP.service.auth.AcademyService;
 import com.example.EduPOP.service.auth.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,7 +25,6 @@ import java.util.List;
 public class AdminController {
 private final UserService userService;
 private final AcademyService academyService;
-private final AcademyMapper academyMapper;
 
     //관리자 학원등록버튼
     @GetMapping("/adminWaiting")
@@ -40,7 +40,7 @@ private final AcademyMapper academyMapper;
         return "main/adminMain";
     }
 //-------------------------------------------------------------------------------------------------------------------
-
+    //회원 관리
     // 회원 관리 페이지로 이동
     @GetMapping("/admin/users")
     public String adminPage(Model model) {
@@ -73,40 +73,57 @@ private final AcademyMapper academyMapper;
         return "redirect:/admin/users";
     }
 //-------------------------------------------------------------------------------------------------------------------
-
+    //학원 관리
     //전체 학원 조회
     @GetMapping("/admin/academies")
-    public String findAllAcademies(Model model){
-        List<Academy> academies = academyService.getAllAcademies();
-        model.addAttribute("academies", academies);
+    public String findAllAcademies(HttpSession session, Model model){
+        User loginUser = (User) session.getAttribute("loginUser");
+
+        if(loginUser == null || loginUser.getAcademy_id()==null){
+            return "redirect:/";
+        }
+        Academy academy = academyService.getAcademyById(loginUser.getAcademy_id());
+        System.out.println("-------------------------------------------------------------------");
+        System.out.println(loginUser.getAcademy_id());
+        model.addAttribute("academy", academy);
         return "/admin/academies";
     }
-    //학원 삭제
-    @PostMapping("/admin/deleteAcademy")
-    public String deleteAcademy(@RequestParam("academy_id") Long academy_id, RedirectAttributes redirectAttributes) {
-        academyService.deleteAcademy(academy_id);
-        redirectAttributes.addFlashAttribute("message", "학원 정보가 삭제되었습니다.");
-        return "redirect:/admin/academies";
-    }
+
     //학원 수정
     @PostMapping("/admin/updateAcademy")
-    public String updateAcademy(@ModelAttribute Academy academy, RedirectAttributes redirectAttributes) {
-        // 서비스 호출
-        academyService.updateAcademy(
-                academy.getAcademy_id(),
-                academy.getName(),
-                academy.getAddress(),
-                academy.getPhone(),
-                academy.getBusiness_cer()
-        );
-        redirectAttributes.addFlashAttribute("message","회원 정보가 수정되었습니다.");
-        return "redirect:/admin/academies";
+    public String updateAcademy(@ModelAttribute Academy academy,
+                                HttpSession session,
+                                RedirectAttributes rttr ) {
+        System.out.println("🔍 화면에서 넘어온 사업자 번호: " + academy.getBusiness_cer());
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null || loginUser.getAcademy_id() == null) {
+            return "redirect:/";
+        }
+        academy.setAcademy_id(loginUser.getAcademy_id());
+        academyService.updateAcademy(academy);
+        rttr.addFlashAttribute("academy",academy);
+        System.out.println("🔍 화면에서 넘어온 사업자 번호: " + academy.getBusiness_cer());
+        return "redirect:admin/academies?t=" + System.currentTimeMillis();
+    }
+
+
+        //학원 삭제
+        @PostMapping("/admin/deleteAcademy")
+        public String deleteAcademy(HttpSession session) {
+            User loginUser = (User) session.getAttribute("loginUser");
+            if (loginUser == null || loginUser.getAcademy_id() == null) {
+                return "redirect:/";
+            }
+            academyService.deleteAcademy(loginUser.getAcademy_id());
+            session.invalidate();
+            return "redirect:/";
+        }
     }
 
 //-------------------------------------------------------------------------------------------------------------------
     //반 수정
-    @GetMapping("/admin/classes")
-    public String classes(){
-        return "admin/classes";
-    }
-}
+  //  @GetMapping("/admin/classes")
+   // public String classes(){
+    //    return "admin/classes";
+   // }
+

@@ -7,6 +7,7 @@
     <resultMap id="UserResultMap" type="com.example.EduPOP.domain.user.User">
         <result property="user_id" column="user_id"/>
         <result property="login_id" column="login_id"/>
+        <result property="academy_id" column="academy_id"/>
         <result property="password_hash" column="password_hash"/>
         <result property="name" column="name"/>
         <result property="email" column="email"/>
@@ -16,6 +17,7 @@
         <result property="withdrawn_at" column="withdrawn_at"/>
         <result property="school_grade" column="school_grade"/>
         <result property="className" column="className"/>
+        <result property="business_cer" column="business_cer"/>
 
 
     </resultMap>
@@ -26,6 +28,7 @@
         SELECT user_id,
                kakaoId,
                login_id,
+               academy_id,
                name,
                email,
                role,
@@ -41,6 +44,7 @@
         SELECT user_id,
                kakaoId,
                login_id,
+               academy_id,
                name,
                email,
                role,
@@ -55,6 +59,7 @@
         SELECT user_id,
                kakaoId,
                login_id,
+               academy_id,
                password_hash,
                name,
                email,

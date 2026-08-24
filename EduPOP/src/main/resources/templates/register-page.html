@@ -24,7 +24,6 @@
 
         <div class="form-group">
             <label for="name">학원 이름</label>
-            <!-- name 속성은 자바 Academy 클래스의 변수명과 똑같아야 합니다! -->
             <input type="text" id="name" name="name" placeholder="예: 한국정보교육원">
         </div>
 
@@ -48,16 +47,16 @@
 </div>
 
 <script>
-    // 빈칸이 있는지 검사하는 자바스크립트 (보안 요원 역할)
+    // 빈칸이 있는지 검사
     function checkForm() {
         const name = document.getElementById('name').value;
         const address = document.getElementById('address').value;
         const phone = document.getElementById('phone').value;
-        const business_Cer = document.getElementById('business_Cer').value;
+        const business_cer = document.getElementById('business_cer').value;
 
         if (name.trim() === '') {
             alert('학원 이름을 입력해 주세요!');
-            return false; // 전송을 취소합니다.
+            return false;
         }
         if (address.trim() === '') {
             alert('학원 주소를 입력해 주세요!');
@@ -67,12 +66,11 @@
             alert('전화번호를 입력해 주세요!');
             return false;
         }
-        if (business_Cer.trim() === '') {
+        if (business_cer.trim() === '') {
             alert('사업자 등록번호를 입력해 주세요!');
             return false;
         }
 
-        // 모두 다 적혀있다면 정상적으로 서버로 보냅니다.
         return true;
     }
 </script>

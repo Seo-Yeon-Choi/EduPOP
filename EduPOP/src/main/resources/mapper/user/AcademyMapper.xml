@@ -22,12 +22,18 @@
         ORDER BY created_at DESC
     </select>
 
-    <!--삭제-->
-    <delete id="deleteAcademy">
-        DELETE FROM academies
+    <!-- 특정 학원번호로 조회 -->
+    <select id="findById" resultType="com.example.EduPOP.domain.user.Academy">
+        SELECT academy_id,
+               name,
+               address,
+               phone,
+               business_cer,
+               created_at,
+               updated_at
+        FROM academies
         WHERE academy_id = #{academy_id}
-    </delete>
-
+    </select>
     <!--수정-->
     <update id="updateAcademy">
         UPDATE academies
@@ -38,5 +44,19 @@
             updated_at = NOW()
         WHERE academy_id = #{academy_id}
     </update>
+
+    <!--소속 user의 academy_id룰 null로 비운 후 삭제-->
+    <update id="clearUserAcademyId">
+        UPDATE users
+        SET academy_id = NULL
+        WHERE academy_id = #{academy_id}
+    </update>
+
+    <delete id="deleteAcademy">
+        DELETE FROM academies
+        WHERE academy_id = #{academy_id}
+    </delete>
+
+
 
 </mapper>

@@ -1,6 +1,7 @@
 package com.example.EduPOP.service.auth;
 
 import com.example.EduPOP.domain.user.Academy;
+import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.repository.user.AcademyMapper;
@@ -18,11 +19,12 @@ public class AcademyService {
     private final UserMapper userMapper;
     private final AcademyMapper academyMapper;
 
-    @Transactional
+    //학원 등록
     public void registerAcademy(Academy academy, Long user_id){
-        //학원 정보 DB에 저장
+        // 학원 정보 DB에 저장
         academyMapper.save(academy);
-        //방금 생성된 학원번호를 관리자 회원 정보에 업데이트, 상태 ACTIVE로 업데이트
+
+        // 유저의 역할, 상태, 학원 번호를 DB에 업데이트
         userMapper.updateAcademyAndStatus(
                 user_id,
                 academy.getAcademy_id(),
@@ -30,16 +32,37 @@ public class AcademyService {
                 UserStatus.ACTIVE
         );
     }
-    //학원 조회
-    public List<Academy> getAllAcademies(){
-        return academyMapper.findAllAcademies();
+
+    //학원번호로 특정 학원 조회
+    public Academy getAcademyById(Long academy_id){
+        if(academy_id == null){
+            return null;
+        }
+        return academyMapper.findById(academy_id);
     }
-    //삭제
+    //세션 갱신용 최신 유저 정보 조회
+    public User findUserById(Long user_id){
+        return userMapper.findById(user_id);
+    }
+
+    //학원 수정
+    public void updateAcademy(Academy academy){
+        academyMapper.updateAcademy(
+                academy.getAcademy_id(),
+                academy.getName(),
+                academy.getAddress(),
+                academy.getPhone(),
+                academy.getBusiness_cer()
+        );
+    }
+
+    //학원 삭제(user의 academy_id를 null로 비운 후 삭제)
     public void deleteAcademy(Long academy_id){
+        academyMapper.clearUserAcademyId(academy_id);
         academyMapper.deleteAcademy(academy_id);
     }
-    //수정
-    public void updateAcademy(Long academy_id, String name, String address, String phone, String business_cer){
-        academyMapper.updateAcademy(academy_id, name, address, phone, business_cer);
+
+    public List<Academy> getAllAcademies(){
+        return academyMapper.findAllAcademies();
     }
 }

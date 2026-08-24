@@ -6,6 +6,7 @@ import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.repository.user.AcademyMapper;
 import com.example.EduPOP.repository.user.UserMapper;
+import com.example.EduPOP.service.auth.AcademyService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -19,15 +20,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class AcademyController {
 
-    private final AcademyMapper academyMapper;
-    private final UserMapper userMapper;
+    private final AcademyService academyService;
 
     @GetMapping("/register-page")
     public String registerPage(){
         return "register-page";
     }
 
-    @PostMapping("academy/register")
+    //학원 등록 처리
+    @PostMapping("/academy/register")
     public String registerAcademy(
     @RequestParam String name,
     @RequestParam String address,
@@ -36,6 +37,12 @@ public class AcademyController {
     HttpSession session
     )
     {
+        //학원 등록 성공한 user의 role을 관리자로 업데이트
+        //세션에서 로그인한 user정보 가져와서 role Admin, 상태 Active로변경
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) {
+        return "redirect:/login"; // 로그인이 풀려있다면 로그인 페이지로
+    }
         //DB저장
         Academy academy = new Academy();
         academy.setName(name);
@@ -43,29 +50,20 @@ public class AcademyController {
         academy.setPhone(phone);
         academy.setBusiness_cer(business_cer);
 
-        academyMapper.save(academy);
+        // 학원 저장 + 관리자 상태를 ACTIVE로 변경
+        academyService.registerAcademy(academy, loginUser.getUser_id());
+        // DB에서 상태가 ACTIVE로 바뀐 최신 유저 정보를 다시 가져옴
+        User updatedUser = academyService.findUserById(loginUser.getUser_id());
+        // 세션에 들어있던 user 정보를 최신 정보로 갱신
+        session.setAttribute("loginUser", updatedUser);
 
-        //학원 등록 성공한 user의 role을 관리자로 업데이트
-        //세션에서 로그인한 user정보 가져와서 role Admin, 상태 Active로변경
-        User loginUser = (User) session.getAttribute("loginUser");
-        if (loginUser != null){
-            loginUser.setRole(UserRole.ADMIN);
-            loginUser.setStatus(UserStatus.ACTIVE);
-
-        //DB에 있는 user role 업데이트
-        userMapper.updateAcademyAndStatus(
-                loginUser.getUser_id(),
-                academy.getAcademy_id(),
-                UserRole.ADMIN,
-                UserStatus.ACTIVE);
-
-        }
-        return "redirect:/adminMain";
+        return "redirect:/main/adminMain";
     }
 
+    //관리자 메인 페이지
     @GetMapping("/adminMain")
     public String adminPage() {
-        return "/main/adminMain";
+        return "main/adminMain";
     }
 
 }
