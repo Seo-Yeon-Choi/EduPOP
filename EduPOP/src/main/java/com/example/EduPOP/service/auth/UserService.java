@@ -44,14 +44,6 @@ public class UserService {
         return user;
     }
 
-    public List<User> getPendingUsers() {
-        return userMapper.findPendingUsers();
-    }
-
-    @Transactional
-    public void approveUser(Long user_id) {
-        userMapper.updateUserStatus(user_id, UserStatus.ACTIVE);
-    }
 
     // ADMIN을 제외한 모든 회원 목록 가져오기
     public List<User> getAllUsersExceptAdmin() {
@@ -63,9 +55,9 @@ public class UserService {
                 .toList();
     }
 
-    // 관리자가 특정 회원의 상태를 직접 변경
+    // 관리자가 표에서 특정 회원의 상태를 직접 변경
     @Transactional
-    public void updateUserStatusByAdmin(Long user_id, UserStatus status) {
+    public void updateStatus(Long user_id, UserStatus status) {
         userMapper.updateStatus(user_id, status);
     }
 

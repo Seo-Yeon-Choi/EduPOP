@@ -14,6 +14,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
+//회원가입, 로그인, 로그아웃, 로그인시 역할별 화면이동
+
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
@@ -38,21 +40,19 @@ public class AuthController {
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
 
+        //세션에 role null이면 NONE 기본값으로 설정
         String requestedRole = (String) session.getAttribute("requestedRole");
         if (requestedRole == null){
             requestedRole = "NONE";
         }
         user.setRole(UserRole.valueOf(requestedRole));
-
+        //회원 중복체크
         boolean success = userService.registerLocalUser(user);
-
         if (!success) {
             // 중복 -> 회원가입 화면으로 이동 + 실패 메시지
             redirectAttributes.addFlashAttribute("error", "이미 사용 중인 아이디입니다.");
             return "redirect:/signUp";
         }
-
-
         session.removeAttribute("requestedRole");
         // 가입 성공 -> 로그인 화면으로 이동 + 성공 메시지
         redirectAttributes.addFlashAttribute("message", "회원가입이 완료되었습니다. 로그인해주세요.");
@@ -90,8 +90,6 @@ public class AuthController {
         return "LocalLogin";
     }
 
-
-
     // 로그인 화면
     @PostMapping("/login")
     public String loginProcess(@RequestParam String login_id, @RequestParam String password_hash,
@@ -103,7 +101,6 @@ public class AuthController {
             redirectAttributes.addFlashAttribute("error", "존재하지않는 회원입니다. 회원가입 후 로그인해주세요.");
             return "redirect:/signUp";
         }
-
         //로그인 성공시 세션에 저장
         session.setAttribute("loginUser", loginUser);
 

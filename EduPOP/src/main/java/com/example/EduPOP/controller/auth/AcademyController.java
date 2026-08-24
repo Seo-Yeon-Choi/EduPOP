@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+//학원 등록
+
 @Controller
 @RequiredArgsConstructor
 public class AcademyController {
@@ -44,7 +46,7 @@ public class AcademyController {
         academyMapper.save(academy);
 
         //학원 등록 성공한 user의 role을 관리자로 업데이트
-        //세션에서 로그인한 user정보 가져와서 role 변경
+        //세션에서 로그인한 user정보 가져와서 role Admin, 상태 Active로변경
         User loginUser = (User) session.getAttribute("loginUser");
         if (loginUser != null){
             loginUser.setRole(UserRole.ADMIN);

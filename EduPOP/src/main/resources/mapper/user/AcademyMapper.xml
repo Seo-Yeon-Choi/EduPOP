@@ -38,4 +38,5 @@
             updated_at = NOW()
         WHERE academy_id = #{academy_id}
     </update>
+
 </mapper>

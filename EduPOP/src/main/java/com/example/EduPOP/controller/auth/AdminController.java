@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.util.List;
+
+//관리자: 학원 등록, 회원관리(조회,수정,삭제), 학원관리(수정,탈퇴), 반 관리
+
 @Controller
 @RequiredArgsConstructor
 
@@ -29,67 +31,48 @@ private final AcademyMapper academyMapper;
     public String adminWaiting(){
         return "main/adminWaiting";
     }
+//-------------------------------------------------------------------------------------------------------------------
 
     // 관리자 전체회원 관리 페이지
     // 관리자 메인 페이지 이동
     @GetMapping("/main/adminMain")
     public String adminMain() {
-        return "main/adminMain"; // 실제 파일 위치: src/main/resources/templates/main/adminMain.html
+        return "main/adminMain";
     }
+//-------------------------------------------------------------------------------------------------------------------
+
+    // 회원 관리 페이지로 이동
     @GetMapping("/admin/users")
     public String adminPage(Model model) {
-        // PENDING 유저 목록을 서비스에서 가져옴
-        List<User> pendingUsers = userService.getPendingUsers();
+        //유저 목록을 서비스에서 가져옴
         List<User> allUsers = userService.getAllUsersExceptAdmin();
 
         // 모델에 담아서 HTML로 보냄
-        model.addAttribute("pendingUsers", pendingUsers);
         model.addAttribute("allUsers", allUsers);
-
         return "/admin/users"; // 관리자 전체회원 관리 페이지
     }
-    //관리자 회원 상태 수정
+
+    //관리자가 표에서 회원 개별 상태 수정
     @PostMapping("/admin/updateStatus")
     public String updateStatus(@RequestParam("user_id") Long user_id,
-                               @RequestParam("status") UserStatus status,
-                               RedirectAttributes redirectAttributes) {
-        userService.updateUserStatusByAdmin(user_id, status);
-        redirectAttributes.addFlashAttribute("message", "회원 상태가 수정되었습니다.");
-        return "redirect:/main/adminMain";
+                               @RequestParam("status") UserStatus status
+                               ) {
+        userService.updateStatus(user_id, status);
+        return "redirect:/admin/users";
     }
 
-    // 승인 버튼을 눌렀을 때 실행
-    @GetMapping("/admin/approve")
-    public String approveUser(@RequestParam("user_id") Long user_id) {
-        // 유저 상태를 ACTIVE로 변경
-        userService.approveUser(user_id);
-        return "redirect:/main/adminMain";
-    }
-    // 거절 버튼을 눌렀을 때 실행
-    @GetMapping("/admin/reject")
-    public String rejectUser(@RequestParam("user_id") Long user_id, RedirectAttributes redirectAttributes) {
-        // 상태를 바꾸지 않고 그대로 PENDING 유지
-        // '거절됨' 메시지 전달
-        redirectAttributes.addFlashAttribute("message", "가입 승인이 거절되었습니다.");
-        return "redirect:/main/adminMain";
-    }
-
-    // 선택된 회원들 일괄 상태 변경 처리
-    @PostMapping("/admin/updateStatusBatch")
-    public String updateStatusBatch(@RequestParam(value = "userIds", required = false) List<Long> userIds,
-                                    @RequestParam("status") UserStatus status,
-                                    RedirectAttributes redirectAttributes) {
-        if (userIds == null || userIds.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "선택된 회원이 없습니다.");
-            return "redirect:/main/adminMain";
-        }
-
-        // 서비스 호출해서 한 번에 상태 변경
+    // 회원선택 후 일괄 상태 변경 처리
+    @PostMapping("/admin/updateUsersStatusBatch")
+    //개별 상태 변경
+    public String updateUsersStatusBatch(@RequestParam(value = "userIds", required = false)
+                                        List<Long> userIds,
+                                    @RequestParam("status") UserStatus status) {
+        // 한 번에 상태 변경
         userService.updateUsersStatusBatch(userIds, status);
-        redirectAttributes.addFlashAttribute("message", "선택한 회원들의 상태가 일괄 변경되었습니다.");
 
-        return "redirect:/main/adminMain";
+        return "redirect:/admin/users";
     }
+//-------------------------------------------------------------------------------------------------------------------
 
     //전체 학원 조회
     @GetMapping("/admin/academies")
@@ -120,7 +103,8 @@ private final AcademyMapper academyMapper;
         return "redirect:/admin/academies";
     }
 
-
+//-------------------------------------------------------------------------------------------------------------------
+    //반 수정
     @GetMapping("/admin/classes")
     public String classes(){
         return "admin/classes";

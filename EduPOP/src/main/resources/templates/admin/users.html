@@ -6,7 +6,7 @@
 </head>
 <body>
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-    <h2>👥 전체 회원 관리 목록</h2>
+    <h2>👥 승인대기 목록</h2>
 
     <!-- 상태별 보기 필터 -->
     <div>
@@ -22,7 +22,7 @@
 </div>
 
 <!-- 🌟 일괄 상태 변경을 위한 커다란 <form> 태그 -->
-<form th:action="@{/admin/updateStatusBatch}" method="post">
+<form th:action="@{/admin/updateUsersStatusBatch}" method="post">
 
     <!-- 상단 일괄 제어 바 (선택한 회원 일괄 변경 도구) -->
     <div style="background-color: #f9f9f9; padding: 10px; border: 1px solid #ddd; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
