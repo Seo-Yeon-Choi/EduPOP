@@ -5,6 +5,7 @@
     <title>Title</title>
 </head>
 <body>
+
 <!-- 학생 버튼 -->
 <a href="/login/route/student">
     <button style="padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
@@ -24,6 +25,11 @@
         관리자 로그인
     </button>
 </a>
+
+<!-- 회원탈퇴 완료시 띄울 안내창 -->
+<script th:if="${message != null}">
+    alert("[[${message}]]");
+</script>
 
 </body>
 </html>

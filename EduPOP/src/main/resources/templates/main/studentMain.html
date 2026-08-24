@@ -6,5 +6,21 @@
 </head>
 <body>
 <h2>학생페이지</h2>
+
+<!-- 로그아웃 버튼 -->
+<a href="/logout">
+    <button style="background-color: #ff6b6b; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+        로그아웃
+    </button>
+</a>
+
+<!-- 탈퇴 버튼 -->
+<form th:action="@{/user/withdraw}" method="post" onsubmit="return confirm('정말 탈퇴하시겠습니까? 데이터는 1년간 안전하게 보관된 후 완전히 삭제됩니다.');">
+    <button type="submit" style="background-color: red; color: white; padding: 10px; border: none; border-radius: 5px;">
+        회원 탈퇴하기
+    </button>
+</form>
+
+
 </body>
 </html>

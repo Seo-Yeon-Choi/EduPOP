@@ -92,15 +92,35 @@ public class AuthController {
 
     // 로그인 화면
     @PostMapping("/login")
-    public String loginProcess(@RequestParam String login_id, @RequestParam String password_hash,
-    HttpSession session, RedirectAttributes redirectAttributes) {
+    public String loginProcess(@RequestParam String login_id,
+                               @RequestParam String password_hash,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        //로그인한 사람인지, 역할이 뭔지 검사
+        User existingUser = (User) session.getAttribute("loginUser");
+        if(existingUser != null){
+            String roleName = "";
+            if (existingUser.getRole() == UserRole.STUDENT){
+                roleName = "학생";
+            } else if (existingUser.getRole() == UserRole.TEACHER) {
+                roleName = "교사";
+            } else if (existingUser.getRole() == UserRole.ADMIN){
+                roleName = "관리자";
+            }
+            redirectAttributes.addFlashAttribute("message", "이미 " + roleName + " 계정으로 접속 중입니다. 다른 계정으로 접속하려면 먼저 로그아웃을 해주세요!");
+            return "redirect:/";
+        }
 
         User loginUser = userService.login(login_id, password_hash);
         //로그인 실패시
         if (loginUser == null) {
             redirectAttributes.addFlashAttribute("error", "존재하지않는 회원입니다. 회원가입 후 로그인해주세요.");
             return "redirect:/signUp";
+        } else if (loginUser != null && loginUser.getStatus() == UserStatus.WITHDRAWN) {
+            return "redirect:/login?error=withdrawn";
         }
+
+
         //로그인 성공시 세션에 저장
         session.setAttribute("loginUser", loginUser);
 
@@ -148,5 +168,20 @@ public class AuthController {
         return "redirect:/"; // 뷰 직접 반환 대신 redirect (PRG)
     }
 
+    //회원 탈퇴 버튼 누르면
+    @PostMapping ("/user/withdraw")
+    public String withdraw(HttpSession session,
+                           RedirectAttributes redirectAttributes){
+        User loginUser = (User) session.getAttribute("loginUser");
+        //로그인 안 한 사람이 접근 시 login페이지로 보냄
+        if (loginUser == null){
+            return "redirect:/login";
+        }
+        //서비스가 로그인한 회원을 휴지통에 넣음
+        userService.withdrawUser(loginUser.getUser_id());
+        session.removeAttribute("loginUser"); // 세션에서 삭제, 로그아웃시킴
+        redirectAttributes.addFlashAttribute("message","회원 탈퇴가 완료되었습니다. 소중한 정보는 1년간 보관됩니다.");
+        return "redirect:/";
+    }
 
 }

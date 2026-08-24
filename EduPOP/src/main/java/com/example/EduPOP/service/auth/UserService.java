@@ -68,4 +68,12 @@ public class UserService {
             userMapper.updateUsersStatusBatch(userIds, status);
         }
     }
+
+//---------------------------------------------------------------------------------------------------------------------
+    // 회원 탈퇴 (휴지통으로 이동)
+    @Transactional
+    public void withdrawUser(Long user_id) {
+        // 맵퍼가 withdrawn_at 시간 찍어줌
+        userMapper.updateStatus(user_id, UserStatus.WITHDRAWN);
+    }
 }
