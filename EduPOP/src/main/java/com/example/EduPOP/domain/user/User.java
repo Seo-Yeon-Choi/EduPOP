@@ -24,5 +24,6 @@ public class User {
     private String kakaoEmail;
     private String kakaoName;
 
-
+    private String school_grade;
+    private String class_name;
 }

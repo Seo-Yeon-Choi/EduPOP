@@ -26,7 +26,7 @@ public class UserService {
         if (existingUser != null){
            return false;
         }
-        //로그인 시 회원 기본값
+        //로그인 시 회원상태 기본값 PENDING
         user.setStatus(UserStatus.PENDING);
         userMapper.save(user);
         return true;
@@ -42,6 +42,11 @@ public class UserService {
 
         return user;
     }
+
+    public User findById(Long user_id){
+       return userMapper.findById(user_id);
+    }
+
 
 //---------------------------------------------------------------------------------------------------------------------
     // 회원 조회

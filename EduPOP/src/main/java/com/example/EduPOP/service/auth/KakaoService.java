@@ -28,7 +28,7 @@ public class KakaoService {
     private final String REDIRECT_URI = "http://localhost:8080/kakao/callback";
 
     @Transactional
-    public User loginWithKakao(String code){
+    public User loginWithKakao(String code, UserRole role){
         //통신..
         RestTemplate restTemplate = new RestTemplate();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -96,6 +96,9 @@ public class KakaoService {
 
             //처음 온 사람은 역할이 없어서 PENDING 상태
             newUser.setStatus(UserStatus.PENDING);
+            newUser.setRole(role);
+
+
 
             //새로운 회원 저장
             userMapper.save(newUser);

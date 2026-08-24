@@ -31,5 +31,9 @@
     alert("[[${message}]]");
 </script>
 
+<!-- 다른역할 로그인 시도시 띄울 안내창 -->
+<script th:if="${error != null}">
+    alert("[[${error}]]");
+</script>
 </body>
 </html>

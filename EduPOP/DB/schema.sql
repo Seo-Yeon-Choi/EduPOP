@@ -26,10 +26,15 @@ CREATE TABLE users (
                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                        withdrawn_at DATETIME,                      -- 탈퇴 시점 기록 (탈퇴 후 1년 보관 기간 측정용)
+                       kakaoId VARCHAR(150),                       -- 카카오 고유번호
+                       class_id BIGINT,                            -- 소속 학급
 
                        CONSTRAINT uk_users_academy_login UNIQUE (academy_id, login_id),
-                       CONSTRAINT fk_users_academy FOREIGN KEY (academy_id) REFERENCES academies(academy_id)
-);
+                       CONSTRAINT fk_users_academy FOREIGN KEY (academy_id) REFERENCES academies(academy_id),
+                       CONSTRAINT fk_users_classes FOREIGN KEY (class_id) REFERENCES classes(class_id)
+                   );
+
+ALTER TABLE users ADD COLUMN kakaoId VARCHAR(150);
 
 CREATE TABLE parent_students (
                                  parent_student_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -362,3 +367,4 @@ CREATE TABLE student_growth (
 
                                 CONSTRAINT fk_student_growth_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
