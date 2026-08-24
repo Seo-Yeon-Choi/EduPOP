@@ -28,6 +28,15 @@ public interface ReadingMapper {
             @Param("keyword") String keyword
     ); // 제목 또는 저자에 검색어가 포함된 도서 목록 조회
 
+    int countReadingReportsByBookId(
+            @Param("bookId") Long bookId
+    ); // 해당 도서를 사용한 독서감상문 개수 조회
+
+    int deleteBookById(
+            @Param("bookId") Long bookId
+    ); // 도서 번호가 일치하는 도서 삭제
+
+
     String findUserNameById(
             @Param("userId") Long userId
     ); // 학생 또는 교사 번호로 사용자 이름 조회

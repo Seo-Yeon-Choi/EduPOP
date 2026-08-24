@@ -37,7 +37,7 @@
         </h1>
 
         <p class="page-description">
-          도서는 변경할 수 없으며 감상문 제목과 내용만 수정할 수 있습니다.
+          도서는 변경할 수 없으며 독서감상문 제목과 내용만 수정할 수 있습니다.
         </p>
       </div>
 
@@ -67,7 +67,7 @@
       <span th:text="${book.author != null
                             and !#strings.isEmpty(book.author)
                             ? book.author
-                            : '저자 없음'}">
+                            : '저자, 지은이 없음'}">
                 저자
             </span>
     </section>
@@ -86,7 +86,7 @@
           <label class="form-label"
                  for="reportTitle">
 
-            감상문 제목
+            독서감상문 제목
             <span class="optional">선택</span>
           </label>
 
@@ -107,7 +107,7 @@
             <label class="form-label"
                    for="reportContent">
 
-              감상문 내용
+              독서감상문 내용
               <span class="required">필수</span>
             </label>
 

@@ -26,7 +26,7 @@ public class ReadingService {
             String coverImageUrl
     ) {
         String normalizedTitle =
-                requireText(title, "도서 제목을 입력해 주세요."); // 제목 공백 제거 및 필수 입력 확인
+                requireText(title, "읽은 도서 제목을 입력해 주세요."); // 제목 공백 제거 및 필수 입력 확인
 
         String normalizedAuthor =
                 normalizeOptionalText(author); // 저자가 빈 값이면 null로 변환
@@ -35,7 +35,7 @@ public class ReadingService {
                 normalizeOptionalText(coverImageUrl); // 표지 주소가 빈 값이면 null로 변환
 
         validateMaxLength(normalizedTitle, 200, "도서 제목"); // 도서 제목 최대 길이 확인
-        validateMaxLength(normalizedAuthor, 100, "저자"); // 저자 최대 길이 확인
+        validateMaxLength(normalizedAuthor, 100, "지은이, 저자"); // 저자 최대 길이 확인
         validateMaxLength(normalizedCoverImageUrl, 500, "표지 이미지 주소"); // 표지 주소 최대 길이 확인
 
         Book duplicatedBook = readingMapper.findBookByTitleAndAuthor(
@@ -45,7 +45,7 @@ public class ReadingService {
 
         if (duplicatedBook != null) {
             throw new IllegalStateException(
-                    "제목과 저자가 모두 같은 도서가 이미 등록되어 있습니다."
+                    "도서 제목과 지은이, 저자가 모두 같은 도서가 이미 등록되어 있습니다."
             );
         }
 
@@ -57,7 +57,7 @@ public class ReadingService {
         int insertedCount = readingMapper.insertBook(book); // 도서 정보를 DB에 등록
 
         if (insertedCount != 1 || book.getBookId() == null) {
-            throw new IllegalStateException("도서 등록에 실패했습니다.");
+            throw new IllegalStateException("도서 정상 등록에 실패했습니다.");
         }
 
         return book; // 자동 생성된 도서 번호가 포함된 객체 반환
@@ -84,6 +84,35 @@ public class ReadingService {
         return readingMapper.searchBooksByKeyword(
                 normalizedKeyword
         ); // 제목 또는 저자로 도서 검색
+    }
+
+    @Transactional // 사용되지 않은 도서를 DB에서 삭제
+    public void deleteBook(Long bookId) {
+        validateId(bookId, "도서 번호"); // 올바른 도서 번호인지 확인
+
+        getBook(bookId); // 삭제할 도서가 실제로 존재하는지 확인
+
+        int readingReportCount =
+                readingMapper.countReadingReportsByBookId(
+                        bookId
+                ); // 해당 도서를 사용한 독서감상문 개수 조회
+
+        if (readingReportCount > 0) {
+            throw new IllegalStateException(
+                    "독서감상문에 사용 중인 도서는 삭제할 수 없습니다."
+            );
+        }
+
+        int deletedCount =
+                readingMapper.deleteBookById(
+                        bookId
+                ); // 사용되지 않은 도서를 DB에서 삭제
+
+        if (deletedCount != 1) {
+            throw new IllegalStateException(
+                    "도서 삭제에 실패했습니다."
+            );
+        }
     }
 
 
@@ -122,7 +151,7 @@ public class ReadingService {
         validateMaxLength(
                 normalizedTitle,
                 200,
-                "감상문 제목"
+                "독서 감상문 제목"
         ); // 감상문 제목 최대 길이 확인
 
         ReadingReport readingReport =
@@ -250,7 +279,7 @@ public class ReadingService {
 
         if (feedbackCount > 0) {
             throw new IllegalStateException(
-                    "교사 첨삭이 등록된 감상문은 수정할 수 없습니다."
+                    "교사 Feedback이 등록된 감상문은 수정할 수 없습니다."
             );
         }
 
@@ -263,7 +292,7 @@ public class ReadingService {
         validateMaxLength(
                 normalizedTitle,
                 200,
-                "감상문 제목"
+                "독서감상문 제목"
         ); // 감상문 제목 최대 길이 확인
 
         savedReport.setTitle(normalizedTitle); // 수정할 감상문 제목 저장
@@ -299,7 +328,7 @@ public class ReadingService {
 
         if (feedbackCount > 0) {
             throw new IllegalStateException(
-                    "교사 첨삭이 등록된 감상문은 삭제할 수 없습니다."
+                    "교사 Feedback이 등록된 감상문은 삭제할 수 없습니다."
             );
         }
 
@@ -345,13 +374,13 @@ public class ReadingService {
         String normalizedContent =
                 requireText(
                         content,
-                        "첨삭 내용을 입력해 주세요."
+                        "Feedback 내용을 입력해 주세요."
                 ); // 첨삭 내용 공백 제거 및 필수 입력 확인
 
         validateMaxLength(
                 normalizedContent,
                 1000,
-                "첨삭 내용"
+                "Feedback 내용"
         ); // 첨삭 내용 최대 길이 확인
 
         ReadingFeedback savedFeedback =
@@ -384,7 +413,7 @@ public class ReadingService {
                     || newFeedback.getFeedbackId() == null) {
 
                 throw new IllegalStateException(
-                        "첨삭 등록에 실패했습니다."
+                        "Feedback 등록에 실패했습니다."
                 );
             }
 
@@ -396,7 +425,7 @@ public class ReadingService {
                 teacherId
         )) {
             throw new IllegalStateException(
-                    "다른 교사가 작성한 첨삭은 수정할 수 없습니다."
+                    "다른 교사가 작성한 Feedback은 수정할 수 없습니다."
             );
         }
 
@@ -411,7 +440,7 @@ public class ReadingService {
 
         if (updatedCount != 1) {
             throw new IllegalStateException(
-                    "첨삭 수정에 실패했습니다."
+                    "Feedback 수정에 실패했습니다."
             );
         }
     }
@@ -423,18 +452,18 @@ public class ReadingService {
         String normalizedContent =
                 requireText(
                         content,
-                        "감상문 내용을 입력해 주세요."
+                        "독서감상문 내용을 입력해 주세요."
                 ); // 감상문 내용 공백 제거 및 필수 입력 확인
 
         if (normalizedContent.length() < 50) {
             throw new IllegalArgumentException(
-                    "감상문 내용은 50자 이상 입력해 주세요."
+                    "독서감상문 내용은 50자 이상 입력해 주세요."
             );
         }
 
         if (normalizedContent.length() > 10000) {
             throw new IllegalArgumentException(
-                    "감상문 내용은 10000자 이하로 입력해 주세요."
+                    "독서감상문 내용은 10000자 이하로 입력해 주세요."
             );
         }
 

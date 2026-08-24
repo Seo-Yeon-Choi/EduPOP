@@ -1,0 +1,208 @@
+db 테스트
+USE edupop; -- edupop 데이터베이스 사용
+
+
+-- =====================================================
+-- 1. 테스트 학원 등록
+-- 이미 같은 이름의 테스트 학원이 있으면 다시 등록하지 않음
+-- =====================================================
+
+INSERT INTO academies (
+    name,         -- 학원 이름
+    address,      -- 학원 주소
+    phone,        -- 학원 전화번호
+    business_cer  -- 사업자등록증 테스트 주소
+)
+SELECT
+    '독서 기능 테스트 학원',
+    '테스트 주소',
+    '02-0000-0000',
+    'test-business-certificate'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM academies
+    WHERE name = '독서 기능 테스트 학원'
+);
+
+
+-- 등록된 테스트 학원 번호 저장
+SET @academy_id = (
+    SELECT academy_id
+    FROM academies
+    WHERE name = '독서 기능 테스트 학원'
+    ORDER BY academy_id
+    LIMIT 1
+);
+
+
+-- =====================================================
+-- 2. 테스트 교사 등록
+-- =====================================================
+
+INSERT INTO users (
+    academy_id,    -- 소속 학원 번호
+    login_id,      -- 로그인 아이디
+    password_hash, -- 테스트 비밀번호 값
+    name,          -- 교사 이름
+    email,         -- 교사 이메일
+    phone,         -- 교사 전화번호
+    role,          -- 사용자 역할
+    status         -- 계정 상태
+)
+SELECT
+    @academy_id,
+    'reading_teacher_test',
+    'TEST_ONLY',
+    '테스트 교사',
+    'reading_teacher@test.com',
+    '010-1111-1111',
+    'TEACHER',
+    'ACTIVE'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM users
+    WHERE academy_id = @academy_id
+      AND login_id = 'reading_teacher_test'
+);
+
+
+-- 등록된 테스트 교사 번호 저장
+SET @teacher_id = (
+    SELECT user_id
+    FROM users
+    WHERE academy_id = @academy_id
+      AND login_id = 'reading_teacher_test'
+    LIMIT 1
+);
+
+
+-- =====================================================
+-- 3. 테스트 학생 등록
+-- =====================================================
+
+INSERT INTO users (
+    academy_id,    -- 소속 학원 번호
+    login_id,      -- 로그인 아이디
+    password_hash, -- 테스트 비밀번호 값
+    name,          -- 학생 이름
+    email,         -- 학생 이메일
+    phone,         -- 학생 전화번호
+    role,          -- 사용자 역할
+    status         -- 계정 상태
+)
+SELECT
+    @academy_id,
+    'reading_student_test',
+    'TEST_ONLY',
+    '테스트 학생',
+    'reading_student@test.com',
+    '010-2222-2222',
+    'STUDENT',
+    'ACTIVE'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM users
+    WHERE academy_id = @academy_id
+      AND login_id = 'reading_student_test'
+);
+
+
+-- 등록된 테스트 학생 번호 저장
+SET @student_id = (
+    SELECT user_id
+    FROM users
+    WHERE academy_id = @academy_id
+      AND login_id = 'reading_student_test'
+    LIMIT 1
+);
+
+
+-- =====================================================
+-- 4. 테스트 반 등록
+-- =====================================================
+
+INSERT INTO classes (
+    academy_id,   -- 소속 학원 번호
+    name,         -- 반 이름
+    target_grade, -- 대상 학년
+    max_students, -- 최대 학생 수
+    status,       -- 반 운영 상태
+    description   -- 반 설명
+)
+SELECT
+    @academy_id,
+    '독서 기능 테스트반',
+    '테스트 학년',
+    30,
+    'ACTIVE',
+    '독서 기능 확인을 위한 테스트반'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM classes
+    WHERE academy_id = @academy_id
+      AND name = '독서 기능 테스트반'
+);
+
+
+-- 등록된 테스트 반 번호 저장
+SET @class_id = (
+    SELECT class_id
+    FROM classes
+    WHERE academy_id = @academy_id
+      AND name = '독서 기능 테스트반'
+    ORDER BY class_id
+    LIMIT 1
+);
+
+
+-- =====================================================
+-- 5. 테스트 반과 교사 연결
+-- =====================================================
+
+INSERT INTO class_teachers (
+    class_id,  -- 반 번호
+    teacher_id,-- 교사 번호
+    role_type  -- 담당 교사 종류
+)
+SELECT
+    @class_id,
+    @teacher_id,
+    'MAIN'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM class_teachers
+    WHERE class_id = @class_id
+      AND teacher_id = @teacher_id
+);
+
+
+-- =====================================================
+-- 6. 테스트 반과 학생 연결
+-- =====================================================
+
+INSERT INTO class_students (
+    class_id,  -- 반 번호
+    student_id,-- 학생 번호
+    status     -- 학생의 반 소속 상태
+)
+SELECT
+    @class_id,
+    @student_id,
+    'ACTIVE'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM class_students
+    WHERE class_id = @class_id
+      AND student_id = @student_id
+);
+
+
+-- =====================================================
+-- 7. 최종 생성 결과 확인
+-- =====================================================
+
+SELECT
+    @academy_id AS academy_id, -- 테스트 학원 번호
+    @class_id AS class_id,     -- 테스트 반 번호
+    @teacher_id AS teacher_id, -- 테스트 교사 번호
+    @student_id AS student_id; -- 테스트 학생 번호

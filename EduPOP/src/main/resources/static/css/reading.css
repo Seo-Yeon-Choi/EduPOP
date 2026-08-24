@@ -90,11 +90,20 @@
 .book-select-card {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: space-between;
+    gap: 8px;
     padding: 12px;
     border: 1px solid #dfe3e8;
     border-radius: 9px;
     background: #fff;
+}
+
+.book-select-main {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    flex: 1;
+    gap: 12px;
     cursor: pointer;
 }
 
@@ -148,6 +157,25 @@
 .book-select-info span {
     color: #6b7280;
     font-size: 12px;
+}
+.book-delete-form {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.book-delete-button {
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #dc2626;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.book-delete-button:hover {
+    background: #fef2f2;
 }
 
 /* 새 도서 등록 영역 */

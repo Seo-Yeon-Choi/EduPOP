@@ -79,6 +79,30 @@
 
     </select>
 
+    <!-- 해당 도서를 사용한 독서감상문 개수 조회 -->
+    <select id="countReadingReportsByBookId"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM reading_reports
+        WHERE book_id = #{bookId}
+
+    </select>
+
+
+    <!-- 도서 번호가 일치하고 감상문에서 사용되지 않은 도서만 삭제 -->
+    <delete id="deleteBookById">
+
+        DELETE FROM books
+        WHERE book_id = #{bookId}
+        AND NOT EXISTS (
+        SELECT 1
+        FROM reading_reports
+        WHERE reading_reports.book_id = books.book_id
+        )
+
+    </delete>
+
 
     <!-- 사용자 번호로 학생 또는 교사 이름 조회 -->
     <select id="findUserNameById"
@@ -177,7 +201,7 @@
     </select>
 
 
-    <!-- 특정 학생이 작성한 감상문을 등록된 순서대로 조회 -->
+    <!-- 특정 학생이 작성한 감상문을 최신 등록순으로 조회 -->
     <select id="findReadingReportsByStudentId"
             resultType="com.example.EduPOP.domain.reading.ReadingReport">
 
@@ -191,7 +215,7 @@
         updated_at
         FROM reading_reports
         WHERE student_id = #{studentId}
-        ORDER BY reading_report_id ASC
+        ORDER BY reading_report_id DESC
 
     </select>
 
