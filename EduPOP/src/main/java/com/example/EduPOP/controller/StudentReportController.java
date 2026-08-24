@@ -1,5 +1,6 @@
 package com.example.EduPOP.controller;
 
+import com.example.EduPOP.domain.report.StudentReport;
 import com.example.EduPOP.service.StudentReportService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,58 +17,80 @@ public class StudentReportController {
         this.studentReportService = studentReportService;
     }
 
-
     // ==========================================
     // 1. 이번 달 나의 회고 (4가지 항목) 자동 저장 API
     // ==========================================
 
     @PatchMapping("/{reportId}/proudest-moment")
     public String updateProudestMoment(@PathVariable Long reportId, @RequestBody ProudestRequest request) {
-        // ★ 핵심: 이제 웨이터가 주방장에게 직접 데이터를 넘겨주며 일을 시킵니다!
+        // 1. 주방장에게 저장을 시킵니다 (이때 *** 필터링 작동!)
         studentReportService.updateProudestMoment(reportId, request.getProudestMoment());
-        return "칭찬하고 싶은 점이 진짜로 DB에 저장되었습니다!";
+
+        // 2. 필터링된 깨끗한 데이터를 DB에서 다시 꺼내서 화면(JS)으로 던져줍니다!
+        StudentReport report = studentReportService.getReport(reportId);
+        return report.getProudestMoment();
     }
 
     @PatchMapping("/{reportId}/habit-to-improve")
     public String updateHabitToImprove(@PathVariable Long reportId, @RequestBody HabitRequest request) {
-
-        // ★ CCTV 설치: 화면에서 보낸 데이터가 여기까지 잘 왔는지 콘솔창에 찍어봅니다!
-        System.out.println("★★★ 프론트에서 넘어온 글씨: " + request.getHabitToImprove());
-
         studentReportService.updateHabitToImprove(reportId, request.getHabitToImprove());
-        return "고치고 싶은 점(Problem)이 DB에 저장되었습니다!";
+
+        StudentReport report = studentReportService.getReport(reportId);
+        return report.getHabitToImprove();
     }
 
     @PatchMapping("/{reportId}/self-feedback")
     public String updateSelfFeedback(@PathVariable Long reportId, @RequestBody FeedbackRequest request) {
         studentReportService.updateSelfFeedback(reportId, request.getSelfFeedback());
-        return "셀프 피드백(Feedback)이 DB에 저장되었습니다!";
+
+        StudentReport report = studentReportService.getReport(reportId);
+        return report.getSelfFeedback();
     }
 
     @PatchMapping("/{reportId}/next-resolution")
     public String updateNextResolution(@PathVariable Long reportId, @RequestBody ResolutionRequest request) {
         studentReportService.updateNextResolution(reportId, request.getNextResolution());
-        return "다음 달 목표(Try)가 DB에 저장되었습니다!";
+
+        StudentReport report = studentReportService.getReport(reportId);
+        return report.getNextResolution();
     }
 
     // ==========================================
-    // 2. 만족도 별점 & 기분 저장 API
+    // 2. 만족도 별점 & 기분 저장 API (비속어 필터링 적용 반환)
     // ==========================================
     @PatchMapping("/{reportId}/mood-and-score")
-    public String updateMoodAndScore(@PathVariable Long reportId, @RequestBody MoodScoreRequest request) {
-        // ★ 웨이터가 드디어 주방장에게 진짜로 일을 시킵니다!
+    public MoodScoreRequest updateMoodAndScore(@PathVariable Long reportId, @RequestBody MoodScoreRequest request) {
+        // 1. 주방장에게 저장을 시킵니다 (이때 기분에 비속어가 있으면 *** 처리됨)
         studentReportService.updateMoodAndScore(reportId, request.getMonthlyMood(), request.getSelfEffortScore());
-        return "기분과 만족도가 DB에 성공적으로 저장되었습니다.";
+
+        // 2. DB에서 필터링이 끝난 최신 리포트를 다시 꺼내옵니다.
+        StudentReport report = studentReportService.getReport(reportId);
+
+        // 3. 화면(JS)이 알아먹기 쉽게 다시 DTO 상자에 담아서(JSON) 던져줍니다!
+        MoodScoreRequest response = new MoodScoreRequest();
+        response.setMonthlyMood(report.getMonthlyMood());
+        response.setSelfEffortScore(report.getSelfEffortScore());
+
+        return response; // 스프링이 알아서 JSON 형태로 변환해 줍니다!
     }
 
     // ==========================================
-    // 3. 아는 개념 & 모르는 개념 저장 API
+    // 3. 아는 개념 & 모르는 개념 저장 API (비속어 필터링 적용 반환)
     // ==========================================
     @PatchMapping("/{reportId}/learning-concepts")
-    public String updateLearningConcepts(@PathVariable Long reportId, @RequestBody ConceptRequest request) {
-        // ★ 주방장에게 두 가지 개념 데이터를 모두 넘겨줍니다!
+    public ConceptRequest updateLearningConcepts(@PathVariable Long reportId, @RequestBody ConceptRequest request) {
+        // 1. 주방장에게 저장을 시킵니다 (이때 비속어가 있으면 *** 처리됨)
         studentReportService.updateLearningConcepts(reportId, request.getKnownConcepts(), request.getUnknownConcepts());
-        return "학습 개념이 DB에 성공적으로 저장되었습니다.";
+
+        // 2. DB에서 최신 리포트 꺼내오기
+        StudentReport report = studentReportService.getReport(reportId);
+
+        // 3. 화면에 돌려줄 DTO 상자에 안전한(***) 데이터 담기
+        ConceptRequest response = new ConceptRequest();
+        response.setKnownConcepts(report.getKnownConcepts());
+        response.setUnknownConcepts(report.getUnknownConcepts());
+
+        return response;
     }
 
 
