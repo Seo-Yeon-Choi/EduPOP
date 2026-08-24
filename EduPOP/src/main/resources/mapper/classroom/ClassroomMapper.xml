@@ -68,13 +68,13 @@
     <!-- 등록 된 반 리스트 가져오기 -->
     <select id="findAllByAcademyId" resultType="com.example.EduPOP.controller.classroom.dto.ClassroomListResponse">
         SELECT
-            c.class_id AS clssId,
-            c.name AS name,
-            c.target_grade AS targetGrade,
-            c.max_students AS maxStudents,
-            c.status AS status,
-            c.created_at AS createdAt,
-            u.name AS mainTeacherName
+        c.class_id AS classId,
+        c.name AS name,
+        c.target_grade AS targetGrade,
+        c.max_students AS maxStudents,
+        c.status AS status,
+        c.created_at AS createdAt,
+        u.name AS mainTeacherName
         FROM classes c
         LEFT JOIN class_teachers ct ON c.class_id = ct.class_id AND ct.role_type = 'MAIN'
         LEFT JOIN users u ON ct.teacher_id = u.user_id
@@ -84,5 +84,154 @@
         </if>
         ORDER BY c.class_id DESC
     </select>
+
+    <!-- 반 상세 기본 정보 조회 -->
+    <select id="findById" resultType="com.example.EduPOP.controller.classroom.dto.ClassroomDetailResponse">
+        SELECT
+            class_id AS classId,
+            academy_id AS academyId,
+            name AS name,
+            target_grade AS targetGrade,
+            max_students AS maxStudents,
+            status AS status,
+            description AS description,
+            created_at AS createdAt
+        FROM classes
+        WHERE class_id = #{classId}
+    </select>
+
+    <!-- 반에 배정된 강사 목록 조회 -->
+    <select id="findTeachersByClassId" resultType="com.example.EduPOP.controller.classroom.dto.ClassroomDetailResponse$TeacherInfo">
+        SELECT
+            ct.teacher_id AS teacherId,
+            u.name AS name,
+            ct.role_type AS roleType
+        FROM class_teachers ct
+                 JOIN users u ON ct.teacher_id = u.user_id
+        WHERE ct.class_id = #{classId}
+        ORDER BY CASE WHEN ct.role_type = 'MAIN' THEN 1 ELSE 2 END
+    </select>
+
+    <!-- 반 기본 정보 수정 -->
+    <update id="updateClass">
+        UPDATE classes
+        SET name = #{name},
+            target_grade = #{targetGrade},
+            max_students = #{maxStudents},
+            status = #{status},
+            description = #{description},
+            updated_at = NOW()
+        WHERE class_id = #{classId}
+    </update>
+
+    <!-- 강사 중복 배정 여부 확인 -->
+    <select id="countClassTeacher" resultType="int">
+        SELECT COUNT(*)
+        FROM class_teachers
+        WHERE class_id = #{classId} AND teacher_id = #{teacherId}
+    </select>
+
+    <!-- 강사 매핑 삭제 -->
+    <delete id="deleteClassTeacher">
+        DELETE FROM class_teachers
+        WHERE class_id = #{classId} AND teacher_id = #{teacherId}
+    </delete>
+
+    <!-- 학원 소속 강사 목록 조회 -->
+    <select id="findTeachersByAcademyId" resultType="com.example.EduPOP.controller.classroom.dto.ClassroomDetailResponse$TeacherInfo">
+        SELECT
+            user_id AS teacherId,
+            name AS name
+        FROM users
+        WHERE academy_id = #{academyId}
+          AND role = 'TEACHER'
+        ORDER BY name ASC
+    </select>
+
+    <!-- 반에 소속된 학생 목록 조회 -->
+    <select id="findStudentsByClassId" resultType="com.example.EduPOP.controller.classroom.dto.ClassroomDetailResponse$StudentInfo">
+        SELECT
+            cs.student_id AS studentId,
+            u.name AS name,
+            u.school_grade AS grade,
+            u.phone AS phone,
+            cs.enrolled_at AS enrolledAt
+        FROM class_students cs
+                 JOIN users u ON cs.student_id = u.user_id
+        WHERE cs.class_id = #{classId}
+        ORDER BY u.name ASC, cs.student_id ASC
+    </select>
+
+    <!-- 현재 반의 수강생 수 조회 -->
+    <select id="countStudentsByClassId" resultType="int">
+        SELECT COUNT(*) FROM class_students WHERE class_id = #{classId}
+    </select>
+
+    <!-- 특정 학생의 반 중복 배정 여부 확인 -->
+    <select id="existsClassStudent" resultType="int">
+        SELECT COUNT(*) FROM class_students WHERE class_id = #{classId} AND student_id = #{studentId}
+    </select>
+
+    <!-- 반 수강생 매핑 등록 -->
+    <insert id="insertClassStudent">
+        INSERT INTO class_students (class_id, student_id, enrolled_at)
+        VALUES (#{classId}, #{studentId}, NOW())
+    </insert>
+
+    <!-- 반 수강생 매핑 삭제(퇴원) -->
+    <delete id="deleteClassStudent">
+        DELETE FROM class_students
+        WHERE class_id = #{classId} AND student_id = #{studentId}
+    </delete>
+
+    <!-- 학원 소속 전체 학생 풀 조회 (학년 및 전화번호 포함) -->
+    <select id="findStudentPoolByAcademyId" resultType="com.example.EduPOP.controller.classroom.dto.ClassroomDetailResponse$StudentInfo">
+        SELECT
+        u.user_id AS studentId,
+        u.name AS name,
+        u.phone AS phone,
+        u.school_grade AS grade,
+        COALESCE(MAX(c.name), 'NONE') AS currentClassName
+        FROM users u
+        LEFT JOIN class_students cs ON u.user_id = cs.student_id
+        LEFT JOIN classes c ON cs.class_id = c.class_id AND c.status = 'ACTIVE'
+        WHERE u.academy_id = #{academyId}
+        AND u.role = 'STUDENT'
+        <!-- 현재 반에 이미 배정된 학생은 대기 풀(왼쪽)에서 제외 -->
+        AND u.user_id NOT IN (
+        SELECT COALESCE(student_id, 0)
+        FROM class_students
+        WHERE class_id = #{classId}
+        )
+        GROUP BY u.user_id, u.name, u.phone, u.school_grade
+        ORDER BY u.name ASC, u.user_id ASC
+    </select>
+
+    <!-- 현재 반의 기존 수강생 전체 비우기 -->
+    <delete id="deleteAllStudentsByClassId">
+        DELETE FROM class_students
+        WHERE class_id = #{classId}
+    </delete>
+
+    <!-- 전반 대상 학생들의 기존 소속 반 매핑 일괄 삭제 -->
+    <delete id="deleteOtherClassMapping">
+        <if test="studentIds != null and studentIds.size() > 0">
+            DELETE FROM class_students
+            WHERE student_id IN
+            <foreach collection="studentIds" item="studentId" open="(" separator="," close=")">
+                #{studentId}
+            </foreach>
+        </if>
+    </delete>
+
+    <!-- 새로운 수강생 목록 일괄 삽입 -->
+    <insert id="batchInsertStudents">
+        INSERT INTO class_students (class_id, student_id, enrolled_at)
+        VALUES
+        <foreach collection="studentIds" item="studentId" separator=",">
+            (#{classId}, #{studentId}, NOW())
+        </foreach>
+    </insert>
+
 
 </mapper>

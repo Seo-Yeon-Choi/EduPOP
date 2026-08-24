@@ -21,6 +21,7 @@ CREATE TABLE users (
                        name VARCHAR(50) NOT NULL,                  -- 사용자 실명
                        email VARCHAR(150),                         -- 이메일 주소
                        phone VARCHAR(30),                          -- 전화번호
+                       school_grade VARCHAR(20) NULL,               -- 학년
                        role VARCHAR(20) NOT NULL,                  -- ADMIN, TEACHER, STUDENT, PARENT
                        status VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, ACTIVE, INACTIVE, WITHDRAWN
                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

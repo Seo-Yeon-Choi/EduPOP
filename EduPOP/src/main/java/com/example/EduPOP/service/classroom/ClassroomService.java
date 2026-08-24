@@ -1,7 +1,9 @@
 package com.example.EduPOP.service.classroom;
 
 import com.example.EduPOP.controller.classroom.dto.ClassroomCreateRequest;
+import com.example.EduPOP.controller.classroom.dto.ClassroomDetailResponse;
 import com.example.EduPOP.controller.classroom.dto.ClassroomListResponse;
+import com.example.EduPOP.controller.classroom.dto.ClassroomUpdateRequest;
 import com.example.EduPOP.domain.classroom.ClassTeacher;
 import com.example.EduPOP.domain.classroom.Classroom;
 import com.example.EduPOP.repository.classroom.ClassroomMapper;
@@ -79,15 +81,8 @@ public class ClassroomService {
      * 단건 반 상태 변경
      */
     @Transactional
-    public void updateStatus(Long classId, String statusName) {
-        if (classId == null || statusName == null) {
-            throw new IllegalArgumentException("필수 파라미터가 누락되었습니다.");
-        }
-
-        // 잘못된 문자열이 들어오면 여기서 걸러냄 (안전장치)
-        Classroom.ClassStatus status = Classroom.ClassStatus.valueOf(statusName.trim().toUpperCase());
-
-        // DB에는 순수 대문자 문자열("CLOSED")로 전달
+    public void updateStatus(Long classId, Classroom.ClassStatus status) {
+        // 매퍼 호출 (매퍼에는 classId와 status.name() 전달)
         classroomMapper.updateStatus(classId, status.name());
     }
 
@@ -95,22 +90,143 @@ public class ClassroomService {
      * 다중 반 상태 일괄 변경
      */
     @Transactional
-    public void updateStatusesBulk(List<Long> classIds, String statusName) {
-        // 필수 파라미터 누락 검증
-        if (classIds == null || classIds.isEmpty() || statusName == null || statusName.trim().isEmpty()) {
-            throw new IllegalArgumentException("선택된 반이 없거나 상태값이 올바르지 않습니다.");
+    public void updateStatusesBulk(List<Long> classIds, Classroom.ClassStatus status) {
+        if (classIds == null || classIds.isEmpty()) {
+            return;
+        }
+        classroomMapper.updateStatusesBulk(classIds, status.name());
+    }
+
+    /**
+     * 특정 반 상세 정보
+     */
+    public ClassroomDetailResponse findById(Long classId) {
+        ClassroomDetailResponse detail = classroomMapper.findById(classId);
+        if (detail == null) {
+            throw new IllegalArgumentException("반 정보를 찾을 수 없습니다.");
+        }
+        // 강사 목록 조립
+        detail.setTeachers(classroomMapper.findTeachersByClassId(classId));
+        // 💡 학생 목록 조립
+        detail.setStudents(classroomMapper.findStudentsByClassId(classId));
+        return detail;
+    }
+
+    /**
+     *  반 기본 정보 수정
+     */
+    @Transactional
+    public void updateClass(Long classId, ClassroomUpdateRequest request) {
+        // 수정할 반이 실제 존재하는지 먼저 확인
+        ClassroomDetailResponse existingClass = classroomMapper.findById(classId);
+        if (existingClass == null) {
+            throw new IllegalArgumentException("수정 대상 반이 존재하지 않습니다. ID: " + classId);
         }
 
-        // 도메인 Enum 유효성 검증 (오타 방지 및 대문자 정규화)
-        Classroom.ClassStatus classStatus;
-        try {
-            classStatus = Classroom.ClassStatus.valueOf(statusName.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("지원하지 않는 반 상태값입니다: " + statusName);
+        // DB 업데이트 수행
+        classroomMapper.updateClass(
+                classId,
+                request.getName(),
+                request.getTargetGrade(),
+                request.getMaxStudents(),
+                request.getStatus().name(),
+                request.getDescription()
+        );
+    }
+
+    /**
+     *  강사 신규 추가 배정 (중복 방지 검증 포함)
+     */
+    @Transactional
+    public void addTeacher(Long classId, Long teacherId, Classroom.TeacherRoleType roleType) {
+        // 1) 이미 해당 반에 배정된 강사인지 중복 확인
+        int count = classroomMapper.countClassTeacher(classId, teacherId);
+        if (count > 0) {
+            throw new IllegalArgumentException("이미 해당 반에 배정되어 있는 강사입니다.");
         }
 
-        // 검증된 Enum의 정확한 문자열 이름("ACTIVE", "CLOSED")으로 Mapper 호출
-        classroomMapper.updateStatusesBulk(classIds, classStatus.name());
+        // 2) 매핑 객체 생성 및 INSERT
+        ClassTeacher classTeacher = new ClassTeacher();
+        classTeacher.setClassId(classId);
+        classTeacher.setTeacherId(teacherId);
+        classTeacher.setRoleType(roleType != null ? roleType : Classroom.TeacherRoleType.SUB);
+
+        classroomMapper.insertClassTeacher(classTeacher);
+    }
+
+    /**
+     *  강사 배정 해제
+     */
+    @Transactional
+    public void removeTeacher(Long classId, Long teacherId) {
+        classroomMapper.deleteClassTeacher(classId, teacherId);
+    }
+
+    /**
+     *  학원에 소속된 강사 전체 목록 조회 (반 배정용 드롭다운 풀)
+     */
+    public List<ClassroomDetailResponse.TeacherInfo> findTeachersByAcademyId(Long academyId) {
+        return classroomMapper.findTeachersByAcademyId(academyId);
+    }
+
+    /**
+     *  수강생 신규 등록 (정원 초과 및 중복 검증)
+     */
+    @Transactional
+    public void addStudent(Long classId, Long studentId) {
+        ClassroomDetailResponse classroom = classroomMapper.findById(classId);
+        if (classroom == null) {
+            throw new IllegalArgumentException("존재하지 않는 반입니다.");
+        }
+
+        // 1) 정원 초과 검증
+        int currentStudentCount = classroomMapper.countStudentsByClassId(classId);
+        if (currentStudentCount >= classroom.getMaxStudents()) {
+            throw new IllegalStateException("수강 정원(" + classroom.getMaxStudents() + "명)을 초과하여 등록할 수 없습니다.");
+        }
+
+        // 2) 중복 등록 검증
+        if (classroomMapper.existsClassStudent(classId, studentId) > 0) {
+            throw new IllegalArgumentException("이미 해당 반에 등록되어 있는 학생입니다.");
+        }
+
+        // 3) 학생 배정
+        classroomMapper.insertClassStudent(classId, studentId);
+    }
+
+    /**
+     *  수강생 퇴원 / 반 배정 제외
+     */
+    @Transactional
+    public void removeStudent(Long classId, Long studentId) {
+        classroomMapper.deleteClassStudent(classId, studentId);
+    }
+
+    // 학생 풀 조회 시 classId도 함께 전달
+    public List<ClassroomDetailResponse.StudentInfo> findStudentPool(Long academyId, Long classId) {
+        return classroomMapper.findStudentPoolByAcademyId(academyId, classId);
+    }
+
+    //  수강생 일괄 동기화 (전반 시 이전 반 소속 말끔히 삭제)
+    @Transactional
+    public void syncStudents(Long classId, List<Long> studentIds) {
+        // 1. 반 정보 조회 후 정원 체크 (프론트 조작 방어)
+        ClassroomDetailResponse classroom = classroomMapper.findById(classId);
+        if (studentIds != null && classroom.getMaxStudents() != null && studentIds.size() > classroom.getMaxStudents()) {
+            throw new IllegalArgumentException("수강 정원(" + classroom.getMaxStudents() + "명)을 초과할 수 없습니다.");
+        }
+
+        // 2. 현재 반 비우기
+        classroomMapper.deleteAllStudentsByClassId(classId);
+
+        // 3. 타 반 소속 제거 및 재배정
+        if (studentIds != null && !studentIds.isEmpty()) {
+            classroomMapper.deleteOtherClassMapping(studentIds);
+            classroomMapper.batchInsertStudents(classId, studentIds);
+        }
     }
 
 }
+
+
+

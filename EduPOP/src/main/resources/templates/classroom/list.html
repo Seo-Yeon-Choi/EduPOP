@@ -7,9 +7,9 @@
   <!-- 부트스트랩 5 및 아이콘 CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- ✨ SweetAlert2 라이브러리 추가 -->
+  <!-- SweetAlert2 (Confirm 다이얼로그 전용) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  <!-- 프로젝트 공통 스타일시트 -->
+  <!-- 공통 스타일시트 -->
   <link rel="stylesheet" th:href="@{/css/common.css}">
   <style>
     body {
@@ -30,23 +30,52 @@
     main.main-content {
       margin-left: 240px !important;
       padding: 2rem;
-      min-width: 700px;
+      min-width: 800px;
     }
-    .table-responsive {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+
+    /* 💡 [모던 UI] 글래스모피즘 플로팅 토스트 카드 */
+    .toast-container {
+      z-index: 1200;
     }
-    .table th, .table td {
+    .custom-modern-toast {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(222, 226, 230, 0.8) !important;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+      border-radius: 16px !important;
+      min-width: 320px;
+    }
+    .toast-icon-wrapper {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .toast-icon-success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    .toast-icon-error {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+
+    /* 💡 테이블 줄바꿈 방지 및 세로 찌그러짐 원천 차단 */
+    .table-custom th,
+    .table-custom td {
+      white-space: nowrap !important;
       vertical-align: middle;
+    }
+    .class-name-cell {
+      display: inline-block;
+      max-width: 260px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
-    }
-    .class-link {
-      text-decoration: none;
-      font-weight: 600;
-      color: #0d6efd;
-    }
-    .class-link:hover {
-      text-decoration: underline;
     }
   </style>
 </head>
@@ -54,6 +83,22 @@
 
 <!-- 공통 상단 헤더 -->
 <div th:replace="~{layout/header}"></div>
+
+<!-- 💡 [모던 UI] 트렌디 플로팅 토스트 알림창 -->
+<div class="toast-container position-fixed top-0 end-0 p-3 pt-5 mt-3">
+  <div id="actionToast" class="toast custom-modern-toast border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex align-items-center p-3">
+      <div id="toastIconWrapper" class="toast-icon-wrapper toast-icon-success me-3">
+        <i id="toastIcon" class="bi bi-check-lg fs-5"></i>
+      </div>
+      <div class="flex-grow-1">
+        <div id="toastTitle" class="fw-bold text-dark mb-0" style="font-size: 0.92rem;">완료되었습니다</div>
+        <div id="toastMessage" class="text-secondary small">성공적으로 처리되었습니다.</div>
+      </div>
+      <button type="button" class="btn-close ms-2" data-bs-dismiss="toast" aria-label="Close" style="font-size: 0.75rem;"></button>
+    </div>
+  </div>
+</div>
 
 <div class="container-fluid p-0">
   <div class="d-flex">
@@ -64,129 +109,145 @@
 
     <!-- 본문 컨텐츠 영역 -->
     <main class="main-content flex-grow-1">
+      <!-- 상단 헤더 바 -->
       <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
         <div>
           <h2 class="h3 fw-bold mb-1">반 목록 관리</h2>
-          <p class="text-muted mb-0">학원에 개설된 반 현황을 모니터링하고 운영 상태를 관리합니다.</p>
+          <p class="text-muted mb-0">학원에 개설된 반 정보를 조회하고, 운영 상태 변경 및 상세 정보를 관리합니다.</p>
         </div>
-        <a th:href="@{/classroom/create}" class="btn btn-primary shadow-sm text-nowrap">
-          <i class="bi bi-plus-lg me-1"></i> 신규 반 개설
-        </a>
+        <div>
+          <a th:href="@{/classroom/create}" class="btn btn-primary px-3 shadow-sm d-flex align-items-center gap-1">
+            <i class="bi bi-plus-lg"></i> 신규 반 개설
+          </a>
+        </div>
       </div>
 
-      <!-- 상태별 필터 탭 & 일괄 종강 액션 버튼 바 -->
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="btn-group" role="group">
-          <a th:href="@{/classroom/list(status='ALL')}"
-             class="btn btn-sm"
-             th:classappend="${currentStatus == 'ALL' or currentStatus == null ? 'btn-primary' : 'btn-outline-secondary'}">
-            모든 반 보기
-          </a>
-          <a th:href="@{/classroom/list(status='ACTIVE')}"
-             class="btn btn-sm"
-             th:classappend="${currentStatus == 'ACTIVE' ? 'btn-success' : 'btn-outline-secondary'}">
-            운영중인 반만 보기
-          </a>
-          <a th:href="@{/classroom/list(status='CLOSED')}"
-             class="btn btn-sm"
-             th:classappend="${currentStatus == 'CLOSED' ? 'btn-dark' : 'btn-outline-secondary'}">
-            종강된 반만 보기
-          </a>
-        </div>
+      <!-- 상단 검색 및 상태 필터 바 -->
+      <div class="card border-0 shadow-sm mb-4 bg-white rounded-3">
+        <div class="card-body p-3">
+          <div class="row g-2 align-items-center justify-content-between">
+            <!-- 좌측: 상태 탭 필터 -->
+            <div class="col-auto d-flex gap-2">
+              <a th:href="@{/classroom/list(status='ALL')}"
+                 class="btn btn-sm"
+                 th:classappend="${currentStatus == null or currentStatus == 'ALL'} ? 'btn-primary' : 'btn-outline-secondary'">
+                전체
+              </a>
+              <a th:href="@{/classroom/list(status='ACTIVE')}"
+                 class="btn btn-sm"
+                 th:classappend="${currentStatus == 'ACTIVE'} ? 'btn-success' : 'btn-outline-secondary'">
+                운영중
+              </a>
+              <a th:href="@{/classroom/list(status='CLOSED')}"
+                 class="btn btn-sm"
+                 th:classappend="${currentStatus == 'CLOSED'} ? 'btn-secondary' : 'btn-outline-secondary'">
+                종강
+              </a>
+            </div>
 
-        <button type="button"
-                id="btnBulkClose"
-                class="btn btn-sm btn-outline-danger"
-                th:if="${currentStatus != 'CLOSED'}"
-                onclick="bulkCloseClassrooms()">
-          <i class="bi bi-check2-square me-1"></i> 선택한 반 일괄 종강
-        </button>
+            <!-- 우측: 반 명칭 및 담임 강사 실시간 검색 -->
+            <div class="col-md-4 col-12">
+              <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                <input type="text" id="classSearchInput" class="form-control border-start-0"
+                       placeholder="반 명칭 또는 담임 강사명 검색..."
+                       onkeyup="filterClassList(this.value)">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 반 목록 테이블 카드 -->
-      <div class="card shadow-sm border-0 mb-4 bg-white">
+      <div class="card border-0 shadow-sm bg-white rounded-3 overflow-hidden">
+        <!-- 상단 일괄 작업 액션 바 -->
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold text-secondary small">선택한 반 일괄 변경:</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="handleBulkStatus('ACTIVE')">
+              운영중 전환
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="handleBulkStatus('CLOSED')">
+              종강 처리
+            </button>
+          </div>
+          <span class="text-muted small">
+                        총 <b class="text-primary" th:text="${#lists.size(classList)}">0</b>개 반
+                    </span>
+        </div>
+
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-hover mb-0 text-center">
+            <table class="table table-hover table-custom mb-0 text-center" id="classListTable">
               <thead class="table-light">
               <tr>
-                <th scope="col" style="width: 4%;">
-                  <input type="checkbox" class="form-check-input" id="checkAll" onclick="toggleAllCheckboxes(this)">
+                <th style="width: 45px;">
+                  <input class="form-check-input" type="checkbox" id="checkAllClass" onchange="toggleCheckAll(this.checked)">
                 </th>
-                <th scope="col" style="width: 5%;">No</th>
-                <th scope="col" style="width: 25%;">반 명칭</th>
-                <th scope="col" style="width: 12%;">대상 학년</th>
-                <th scope="col" style="width: 10%;">정원</th>
-                <th scope="col" style="width: 15%;">대표 담임</th>
-                <th scope="col" style="width: 10%;">운영 상태</th>
-                <th scope="col" style="width: 13%;">개설일</th>
-                <th scope="col" style="width: 10%;">관리</th>
+                <th style="width: 70px;">No</th>
+                <th class="text-start" style="min-width: 180px;">반 명칭</th>
+                <th style="width: 100px;">대상 학년</th>
+                <th style="width: 130px;">대표 담임</th>
+                <th style="width: 90px;">정원</th>
+                <th style="width: 100px;">상태</th>
+                <th style="width: 120px;">개설일</th>
+                <th style="width: 150px;">관리</th>
               </tr>
               </thead>
               <tbody>
-              <!-- 1) 데이터가 비어있을 때 맞춤 안내 -->
               <tr th:if="${#lists.isEmpty(classList)}">
-                <td colspan="9" class="py-5 text-muted text-center">
-                  <span th:if="${currentStatus == 'CLOSED'}">종강 처리된 반 내역이 없습니다.</span>
-                  <span th:if="${currentStatus == 'ACTIVE'}">현재 운영 중인 반이 없습니다.</span>
-                  <span th:if="${currentStatus == 'ALL' or currentStatus == null}">
-                    개설된 반 정보가 없습니다. 우측 상단의 <strong>[신규 반 개설]</strong> 버튼을 눌러 등록해 주세요.
-                  </span>
-                </td>
+                <td colspan="9" class="py-5 text-muted">등록된 반이 없습니다.</td>
               </tr>
-
-              <!-- 2) 반 목록 동적 렌더링 -->
-              <tr th:each="classroom, iterStat : ${classList}">
+              <tr th:each="cls : ${classList}" class="class-row-item">
                 <td>
-                  <!-- 💡 개별 체크박스 -->
-                  <input type="checkbox"
-                         class="form-check-input row-checkbox"
-                         th:value="${classroom.classId}"
-                         th:disabled="${classroom.status != null and classroom.status.name() == 'CLOSED'}">
+                  <input class="form-check-input class-checkbox" type="checkbox" th:value="${cls.classId}">
                 </td>
-
-                <td th:text="${iterStat.count}">1</td>
-
-                <td class="text-start ps-4">
-                  <a th:href="@{/classroom/{id}(id=${classroom.classId})}"
-                     class="class-link"
-                     th:text="${classroom.name}">기본반</a>
+                <td class="text-muted small" th:text="${cls.classId}">1</td>
+                <td class="text-start fw-bold">
+                  <a th:href="@{/classroom/{id}(id=${cls.classId})}"
+                     class="text-decoration-none text-dark hover-primary class-name-cell"
+                     th:text="${cls.name}"
+                     th:title="${cls.name}">
+                    수학 심화반
+                  </a>
                 </td>
-
-                <td th:text="${classroom.targetGrade}">중1</td>
-
                 <td>
-                  <span th:text="${classroom.maxStudents}">20</span>명
+                  <span class="badge bg-light text-dark border px-2 py-1" th:text="${cls.targetGrade}">중1</span>
                 </td>
-
-                <td>
-                  <span th:if="${classroom.mainTeacherName != null}"
-                        th:text="${classroom.mainTeacherName}"
-                        class="fw-medium">강사명</span>
-                  <span th:if="${classroom.mainTeacherName == null}"
-                        class="text-muted fst-italic">미배정</span>
+                <td class="teacher-name-cell">
+                  <span th:if="${cls.mainTeacherName != null}" class="fw-semibold text-primary" th:text="${cls.mainTeacherName}">홍길동</span>
+                  <span th:if="${cls.mainTeacherName == null}" class="text-muted small">미지정</span>
                 </td>
-
                 <td>
-                  <span th:if="${classroom.status != null and classroom.status.name() == 'ACTIVE'}"
-                        class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">운영중</span>
-                  <span th:if="${classroom.status != null and classroom.status.name() == 'CLOSED'}"
+                  <span th:text="${cls.maxStudents}">30</span>명
+                </td>
+                <td>
+                                    <span th:if="${cls.status != null and cls.status.name() == 'ACTIVE'}"
+                                          class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">운영중</span>
+                  <span th:if="${cls.status != null and cls.status.name() == 'CLOSED'}"
                         class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">종강</span>
                 </td>
-
-                <td th:text="${classroom.createdAt != null ? #temporals.format(classroom.createdAt, 'yyyy-MM-dd') : '-'}">2026-08-21</td>
-
-                <!-- 💡 단건 종강 버튼: data-class-id 속성 및 this 전달로 ID 유실 원천 차단 -->
+                <td class="text-muted small" th:text="${#temporals.format(cls.createdAt, 'yyyy-MM-dd')}">2026-08-24</td>
                 <td>
-                  <button type="button"
-                          class="btn btn-sm btn-outline-danger"
-                          th:if="${classroom.status != null and classroom.status.name() == 'ACTIVE'}"
-                          th:data-class-id="${classroom.classId}"
-                          onclick="handleSingleClose(this)">
-                    종강
-                  </button>
-                  <span th:if="${classroom.status != null and classroom.status.name() == 'CLOSED'}"
-                        class="text-muted small">-</span>
+                  <div class="btn-group btn-group-sm">
+                    <a th:href="@{/classroom/{id}(id=${cls.classId})}" class="btn btn-outline-primary">
+                      관리
+                    </a>
+                    <button th:if="${cls.status != null and cls.status.name() == 'ACTIVE'}"
+                            type="button"
+                            class="btn btn-outline-danger"
+                            th:onclick="|handleChangeStatus(${cls.classId}, 'CLOSED')|">
+                      종강
+                    </button>
+                    <button th:if="${cls.status != null and cls.status.name() == 'CLOSED'}"
+                            type="button"
+                            class="btn btn-outline-success"
+                            th:onclick="|handleChangeStatus(${cls.classId}, 'ACTIVE')|">
+                      재개
+                    </button>
+                  </div>
                 </td>
               </tr>
               </tbody>
@@ -201,140 +262,141 @@
 <!-- 공통 푸터 -->
 <div th:replace="~{layout/footer}"></div>
 
-<!-- 부트스트랩 JS -->
+<!-- 스크립트 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- ✨ SweetAlert2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  // 전체 선택/해제 토글 함수
-  function toggleAllCheckboxes(masterCheckbox) {
-    const checkboxes = document.querySelectorAll('.row-checkbox:not(:disabled)');
-    checkboxes.forEach(cb => {
-      cb.checked = masterCheckbox.checked;
+  // 💡 [모던 UI] 화이트 카드 토스트 알림 헬퍼
+  function showToast(message, isSuccess = true, title = null) {
+    const toastEl = document.getElementById('actionToast');
+    const toastTitle = document.getElementById('toastTitle');
+    const toastMsg = document.getElementById('toastMessage');
+    const toastIcon = document.getElementById('toastIcon');
+    const toastIconWrapper = document.getElementById('toastIconWrapper');
+
+    toastTitle.innerText = title || (isSuccess ? '완료되었습니다' : '오류 발생');
+    toastMsg.innerText = message;
+
+    if (isSuccess) {
+      toastIconWrapper.className = 'toast-icon-wrapper toast-icon-success me-3';
+      toastIcon.className = 'bi bi-check-lg fs-5';
+    } else {
+      toastIconWrapper.className = 'toast-icon-wrapper toast-icon-error me-3';
+      toastIcon.className = 'bi bi-exclamation-triangle-fill fs-5';
+    }
+
+    const toast = new bootstrap.Toast(toastEl, { delay: 2500 });
+    toast.show();
+  }
+
+  // 💡 미니멀 모던 Confirm 모달 스타일
+  const ConfirmModal = Swal.mixin({
+    customClass: {
+      popup: 'rounded-4 shadow-lg border-0 p-4',
+      title: 'fs-5 fw-bold text-dark pt-2',
+      htmlContainer: 'text-muted small',
+      confirmButton: 'btn btn-primary px-4 py-2 rounded-3 fw-bold mx-1 shadow-sm',
+      cancelButton: 'btn btn-light border px-4 py-2 rounded-3 fw-bold mx-1'
+    },
+    buttonsStyling: false
+  });
+
+  // 💡 세션 토스트 복원
+  window.addEventListener('DOMContentLoaded', () => {
+    const pendingToast = sessionStorage.getItem('pendingToast');
+    if (pendingToast) {
+      showToast(pendingToast, true);
+      sessionStorage.removeItem('pendingToast');
+    }
+  });
+
+  // 💡 1. 반 목록 실시간 즉시 검색 필터
+  function filterClassList(keyword) {
+    const term = keyword.toLowerCase().trim();
+    const rows = document.querySelectorAll('#classListTable tbody .class-row-item');
+
+    rows.forEach(row => {
+      const nameCell = row.querySelector('.class-name-cell')?.innerText.toLowerCase() || '';
+      const teacherCell = row.querySelector('.teacher-name-cell')?.innerText.toLowerCase() || '';
+
+      if (nameCell.includes(term) || teacherCell.includes(term)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
     });
   }
 
-  // 💡 단건 종강 처리 (SweetAlert2 적용 및 dataset.classId 추출)
-  function handleSingleClose(btnElement) {
-    const classId = btnElement.dataset.classId;
+  // 💡 2. 체크박스 전체 선택 토글
+  function toggleCheckAll(isChecked) {
+    const checkboxes = document.querySelectorAll('#classListTable tbody .class-row-item:not([style*="display: none"]) .class-checkbox');
+    checkboxes.forEach(cb => cb.checked = isChecked);
+  }
 
-    if (!classId) {
-      Swal.fire({
-        icon: 'error',
-        title: '오류',
-        text: '반 식별자(ID)를 찾을 수 없습니다.'
-      });
-      return;
-    }
+  // 💡 3. 단일 반 종강 / 재개 처리
+  function handleChangeStatus(classId, status) {
+    const actionText = status === 'CLOSED' ? '종강' : '운영 재개';
 
-    Swal.fire({
-      title: '종강 처리하시겠습니까?',
-      text: '해당 반이 종강 상태로 변경됩니다.',
-      icon: 'warning',
+    ConfirmModal.fire({
+      title: `반을 ${actionText} 처리하시겠습니까?`,
+      text: status === 'CLOSED' ? '종강 처리 시 신규 학생 배정이 제한될 수 있습니다.' : '반 운영을 다시 시작합니다.',
+      icon: status === 'CLOSED' ? 'warning' : 'question',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: '종강 처리',
+      confirmButtonText: actionText,
       cancelButtonText: '취소'
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`/classroom/${classId}/status?status=CLOSED`, {
-          method: 'POST'
+        fetch(`/classroom/${classId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: status })
         })
-                .then(response => {
-                  if (response.ok) {
-                    Swal.fire({
-                      icon: 'success',
-                      title: '종강 완료',
-                      text: '성공적으로 종강 처리되었습니다.',
-                      timer: 1500,
-                      showConfirmButton: false
-                    }).then(() => {
-                      location.reload();
-                    });
+                .then(async res => {
+                  if (res.ok) {
+                    sessionStorage.setItem('pendingToast', `${actionText} 처리가 완료되었습니다.`);
+                    location.reload();
                   } else {
-                    Swal.fire({
-                      icon: 'error',
-                      title: '처리 실패',
-                      text: '상태 변경 중 오류가 발생했습니다. (코드: ' + response.status + ')'
-                    });
+                    const errorMsg = await res.text();
+                    showToast(errorMsg || '상태 변경 중 오류가 발생했습니다.', false);
                   }
-                })
-                .catch(error => {
-                  console.error('Error:', error);
-                  Swal.fire({
-                    icon: 'error',
-                    title: '통신 오류',
-                    text: '서버와 통신할 수 없습니다.'
-                  });
                 });
       }
     });
   }
 
-  // 💡 다중 일괄 종강 처리 (SweetAlert2 적용)
-  function bulkCloseClassrooms() {
-    const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
-
+  // 💡 4. 선택된 반 다중 일괄 상태 변경
+  function handleBulkStatus(status) {
+    const checkedBoxes = Array.from(document.querySelectorAll('#classListTable tbody .class-checkbox:checked'));
     if (checkedBoxes.length === 0) {
-      Swal.fire({
-        icon: 'info',
-        title: '알림',
-        text: '종강 처리할 반을 1개 이상 선택해 주세요.'
-      });
+      showToast('변경할 반을 먼저 선택해 주세요.', false, '선택 필요');
       return;
     }
 
-    Swal.fire({
-      title: '선택한 반 일괄 종강',
-      text: `선택하신 ${checkedBoxes.length}개의 반을 모두 종강 처리하시겠습니까?`,
+    const classIds = checkedBoxes.map(cb => Number(cb.value));
+    const actionText = status === 'CLOSED' ? '일괄 종강' : '일괄 운영 전환';
+
+    ConfirmModal.fire({
+      title: `선택한 ${classIds.length}개 반을 ${actionText}하시겠습니까?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: '일괄 종강',
+      confirmButtonText: actionText,
       cancelButtonText: '취소'
     }).then((result) => {
       if (result.isConfirmed) {
-        const selectedIds = Array.from(checkedBoxes).map(cb => Number(cb.value));
-
         fetch('/classroom/status/bulk', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            classIds: selectedIds,
-            status: 'CLOSED'
-          })
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ classIds: classIds, status: status })
         })
-                .then(response => {
-                  if (response.ok) {
-                    Swal.fire({
-                      icon: 'success',
-                      title: '일괄 종강 완료',
-                      text: '선택한 반들이 성공적으로 종강 처리되었습니다.',
-                      timer: 1500,
-                      showConfirmButton: false
-                    }).then(() => {
-                      location.reload();
-                    });
+                .then(async res => {
+                  if (res.ok) {
+                    sessionStorage.setItem('pendingToast', `${classIds.length}개 반이 ${actionText}되었습니다.`);
+                    location.reload();
                   } else {
-                    Swal.fire({
-                      icon: 'error',
-                      title: '일괄 처리 실패',
-                      text: '상태 변경 중 오류가 발생했습니다. (코드: ' + response.status + ')'
-                    });
+                    const errorMsg = await res.text();
+                    showToast(errorMsg || '일괄 변경 처리 실패', false);
                   }
-                })
-                .catch(error => {
-                  console.error('Error:', error);
-                  Swal.fire({
-                    icon: 'error',
-                    title: '통신 오류',
-                    text: '서버 통신 중 오류가 발생했습니다.'
-                  });
                 });
       }
     });
