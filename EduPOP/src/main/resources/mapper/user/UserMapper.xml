@@ -13,6 +13,8 @@
         <result property="role" column="role"/>
         <result property="status" column="status"/>
         <result property="kakaoId" column="kakaoId"/>
+        <result property="withdrawn_at" column="withdrawn_at"/>
+
     </resultMap>
 
 
@@ -93,17 +95,36 @@
     <!-- 표에서 회원 상태 개별 수정 -->
     <update id="updateStatus">
         UPDATE users
-        SET status = #{status}
+        SET status = #{status},
+            /* 상태가 탈퇴(WITHDRAWN)로 바뀌면 현재 시간을 기록하고, 다른 상태로 바뀌면 날짜를 지움 */
+            withdrawn_at = CASE /* case : 조건 */
+                          WHEN #{status} = 'WITHDRAWN' THEN NOW()
+            ELSE NULL
+            END
         WHERE user_id = #{user_id}
     </update>
 
-    <!-- 여러 명의 ID를 받아 한 번에 UPDATE 치는 SQL -->
+    <!-- 여러 명의 ID를 받아 한 번에 수정 -->
     <update id="updateUsersStatusBatch">
         UPDATE users
-        SET status = #{status}
-        WHERE user_id IN
+        SET status = #{status},
+        withdrawn_at = CASE
+        WHEN #{status} = 'WITHDRAWN' THEN NOW()
+        ELSE NULL
+        END
+        WHERE user_id IN /* IN : 조건 */
         <foreach item="id" collection="userIds" open="(" separator="," close=")">
             #{id}
+            /* userId에서 id(회원번호)를 하나씩 꺼냄, 커낸 (예:1,2,3)을 {id}자리에 넣음 */
         </foreach>
     </update>
+
+    <!-- 1년 지난 탈퇴(WITHDRAWN) 회원 자동 삭제 -->
+    <delete id="deleteOldWithdrawnUsers">
+        DELETE FROM users
+        WHERE status = 'WITHDRAWN'
+          AND withdrawn_at &lt;= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+        <!-- 'DATE_SUB' -> 지금으로부터 ~전 날짜를 계산해주는 기능 -->
+        <!-- '&lt;=' -> '작거나 같다' 기호 -->
+    </delete>
 </mapper>

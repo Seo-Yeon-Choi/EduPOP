@@ -30,6 +30,9 @@ public interface UserMapper {
     void updateStatus(@Param("user_id") Long user_id, @Param("status") UserStatus status);
 
     void updateUsersStatusBatch(@Param("userIds") List<Long> userIds, @Param("status") UserStatus status);
+
+    // withdrawn 회원 1년 자동삭제
+    void deleteOldWithdrawnUsers();
 }
 
 
