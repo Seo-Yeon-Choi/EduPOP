@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduPOP - 응시 결과 확인</title>
+
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/student-exam-result-list.css}">
+
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="result-list-container">
+
+    <div class="result-list-header">
+
+        <div>
+            <h1>응시 결과 확인</h1>
+            <p>지금까지 응시한 시험과 복습 결과를 확인할 수 있습니다.</p>
+        </div>
+
+    </div>
+    <div class="result-filter">
+
+        <form th:action="@{/student/exams/results}"
+              method="get">
+
+            <input type="date"
+                   name="date"
+                   th:value="${selectedDate}">
+
+            <button type="submit">
+                조회
+            </button>
+
+            <a th:href="@{/student/exams/results}">
+                전체 보기
+            </a>
+
+        </form>
+
+    </div>
+
+    <!-- 결과가 없는 경우 -->
+    <div th:if="${#lists.isEmpty(results)}" class="empty-result">
+        아직 응시한 시험 결과가 없습니다.
+    </div>
+
+    <!-- 결과 목록 -->
+    <div class="result-list" th:unless="${#lists.isEmpty(results)}">
+
+        <div class="result-card" th:each="result : ${results}">
+
+            <div class="result-card-info">
+
+                <div class="result-title-row">
+
+                    <h2 th:text="${result.examTitle}">시험 제목</h2>
+
+                    <span th:if="${result.resultType == 'DAILY_REVIEW'}" class="result-type review">오늘의 복습</span>
+                    <span th:if="${result.resultType == 'EXAM' and result.attemptType != 'REVIEW'}" class="result-type exam">시험</span>
+                    <span th:if="${result.resultType == 'EXAM' and result.attemptType == 'REVIEW'}" class="result-type review">복습</span>
+
+                </div>
+
+                <div class="result-meta">
+
+                    <span>
+                        점수
+                        <strong th:text="${result.totalScore}">0</strong>
+                        /
+                        <span th:text="${result.maxScore}">0</span>
+                    </span>
+
+                    <span>
+                        정답
+                        <strong th:text="${result.correctCount}">0</strong>
+                        /
+                        <span th:text="${result.totalQuestionCount}">0</span>
+                    </span>
+
+                    <span th:if="${result.submittedAt != null}"
+                          th:text="${#temporals.format(
+                              result.submittedAt,
+                              'yyyy-MM-dd HH:mm'
+                          )}">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="result-card-action">
+
+                <!-- 일반 시험 / 기존 복습 결과 -->
+                <a th:if="${result.resultType == 'EXAM'}"
+                   th:href="@{/student/exams/attempts/{attemptId}/result(
+                   attemptId=${result.attemptId},
+                    from='list'
+                    )}">
+                    결과 보기
+                </a>
+
+                <!-- 오늘의 복습 결과 -->
+                <a th:if="${result.resultType == 'DAILY_REVIEW'}"
+                   th:href="@{/student/exams/today-review/{dailyReviewAttemptId}/result(
+                    dailyReviewAttemptId=${result.dailyReviewAttemptId},
+                    from='list'
+                    )}">
+                    결과 보기
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="pagination"
+         th:if="${paging.totalCount > 0}">
+
+        <a th:if="${paging.hasPrevious}"
+           th:href="@{/student/exams/results(
+            page=${paging.currentPage - 1},
+            date=${selectedDate}
+       )}">
+            이전
+        </a>
+
+
+        <a th:each="pageNum :
+            ${#numbers.sequence(
+                paging.startPage,
+                paging.endPage
+            )}"
+
+           th:href="@{/student/exams/results(
+            page=${pageNum},
+            date=${selectedDate}
+       )}"
+
+           th:text="${pageNum}"
+
+           th:classappend="${pageNum == paging.currentPage}
+            ? 'active'">
+        </a>
+
+
+        <a th:if="${paging.hasNext}"
+           th:href="@{/student/exams/results(
+            page=${paging.currentPage + 1},
+            date=${selectedDate}
+       )}">
+            다음
+        </a>
+
+    </div>
+</main>
+
+</body>
+</html>

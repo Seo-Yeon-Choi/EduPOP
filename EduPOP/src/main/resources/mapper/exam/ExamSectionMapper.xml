@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.EduPOP.repository.exam.ExamSectionMapper">
+
+    <insert id="insert" parameterType="ExamSection" useGeneratedKeys="true" keyProperty="sectionId">
+
+        INSERT INTO exam_sections
+        (
+        exam_id,
+        section_type,
+        section_name,
+        max_score,
+        sort_order
+        )
+
+        VALUES
+        (
+        #{examId},
+        #{sectionType},
+        #{sectionName},
+        #{maxScore},
+        #{sortOrder}
+        )
+
+    </insert>
+
+    <select id="findByExamId" resultType="ExamSection">
+
+        SELECT *
+        FROM exam_sections
+
+        WHERE exam_id = #{examId}
+
+        ORDER BY sort_order
+
+    </select>
+
+</mapper>

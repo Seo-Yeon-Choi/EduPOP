@@ -131,6 +131,7 @@ CREATE TABLE exam_questions (
                                 score DECIMAL(7,2) NOT NULL DEFAULT 5.00,           -- 문항 배점
                                 correct_answer TEXT,                                -- 정답 번호 또는 텍스트
                                 question_text TEXT NOT NULL,                        -- 문제 지문/본문
+                                passage TEXT,
                                 sort_order INT NOT NULL DEFAULT 1,
                                 source_question_id BIGINT,                          -- [서연] 나선형 복습 퀘스트 원본 참조 (Self-FK)
 
