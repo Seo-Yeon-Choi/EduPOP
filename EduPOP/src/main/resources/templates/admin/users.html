@@ -6,7 +6,17 @@
 </head>
 <body>
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-    <h2>👥 승인대기 목록</h2>
+    <h2>👥 전체회원 목록</h2>
+    <div style="display: flex; gap: 15px; align-items: center;">
+    <!-- 역할별 보기 필터 -->
+    <div>
+        <label for="roleFilter" style="font-weight: bold;">역할별 보기: </label>
+        <select id="roleFilter" onchange="filterUsers()" style="padding: 5px; font-size: 14px; margin-right: 20px;">
+            <option value="ALL">전체 보기</option>
+            <option value="STUDENT">학생 (STUDENT)</option>
+            <option value="TEACHER">교사 (TEACHER)</option>
+        </select>
+    </div>
 
     <!-- 상태별 보기 필터 -->
     <div>
@@ -20,8 +30,9 @@
         </select>
     </div>
 </div>
+</div>
 
-<!-- 🌟 일괄 상태 변경을 위한 커다란 <form> 태그 -->
+<!-- 일괄 상태 변경을 위한 <form> 태그 -->
 <form th:action="@{/admin/updateUsersStatusBatch}" method="post">
 
     <!-- 상단 일괄 제어 바 (선택한 회원 일괄 변경 도구) -->
@@ -45,7 +56,7 @@
     <table border="1" style="width: 100%; text-align: center;">
         <thead>
         <tr>
-            <!-- 🌟 전체 선택을 위한 마스터 체크박스 -->
+            <!-- 전체 선택을 위한 체크박스 -->
             <th style="width: 40px;">
                 <input type="checkbox" id="selectAll" onclick="toggleAll(this)" />
             </th>
@@ -57,9 +68,19 @@
         </tr>
         </thead>
         <tbody id="userTableBody">
-        <tr th:each="u : ${allUsers}" th:data-status="${u.status}">
+
+        <!-- 역할보기를 위한 반복문 -->
+        <tr th:each="u : ${allUsers}"
+            th:data-status="${u.status}"
+            th:data-role="${u.role}">
+
+            <!-- 상태보기를 위한 반복문 -->
+        <tr th:each="u : ${allUsers}"
+            th:data-status="${u.status.name()}"
+            th:data-role="${u.role.name()}">
+
             <td>
-                <!-- 🌟 서버로 넘어갈 개별 체크박스 (name="userIds") -->
+                <!-- 개별 체크박스 (name="userIds") -->
                 <input type="checkbox" name="userIds" th:value="${u.user_id}" class="userCheckbox" />
             </td>
             <td th:text="${u.login_id}">아이디</td>
@@ -88,23 +109,35 @@
 
 <!-- 자바스크립트 (필터링 + 전체 선택 기능) -->
 <script>
-    // 1. 상태별 필터링 함수
-    function filterUsersByStatus() {
-        const selectedStatus = document.getElementById("statusFilter").value;
-        const rows = document.querySelectorAll("#userTableBody tr");
+    // 상태별 필터링 함수
+    function filterUsers() {
+        const selectedStatus = document.getElementById("statusFilter").value; //상태필터
+        const selectedRole = document.getElementById("roleFilter").value; //역할필터
 
-        rows.forEach(row => {
+        const rows = document.querySelectorAll("#userTableBody tr");//표의 모든 줄 가져오기
+
+        rows.forEach(row => { //가져온 줄의 상태,역할 확인
             const rowStatus = row.getAttribute("data-status");
+            const rowRole = row.getAttribute("data-role");
 
-            if (selectedStatus === "ALL" || rowStatus === selectedStatus) {
+            // 전체보기거나 상태가 똑같은지 검사
+            const statusMatch = (selectedStatus === "ALL" || rowStatus === selectedStatus);
+            // 전체보기거나 역할이 똑같은지 검사
+            const roleMatch = (selectedRole === "ALL" || rowRole === selectedRole);
+            //전체보기거나 전체보기와 상태,역할이 똑같으면 화면에 보여줌
+            if (statusMatch && roleMatch) {
                 row.style.display = "";
+                //다른 목록은 화면에서 가림
             } else {
                 row.style.display = "none";
             }
         });
+        // 필터를 바꾸면 전체 선택 체크박스 초기화
+        document.getElementById("selectAll").checked = false;
+        toggleAll(document.getElementById("selectAll"));
     }
 
-    // 2. 전체 선택/해제 체크박스 함수
+    // 전체 선택/해제 체크박스 함수
     function toggleAll(selectAllCheckbox) {
         const checkboxes = document.querySelectorAll('.userCheckbox');
         checkboxes.forEach(cb => {

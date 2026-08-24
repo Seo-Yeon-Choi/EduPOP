@@ -26,7 +26,6 @@ public class UserService {
         if (existingUser != null){
            return false;
         }
-
         //로그인 시 회원 기본값
         user.setStatus(UserStatus.PENDING);
         userMapper.save(user);
@@ -44,7 +43,8 @@ public class UserService {
         return user;
     }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+    // 회원 조회
     // ADMIN을 제외한 모든 회원 목록 가져오기
     public List<User> getAllUsersExceptAdmin() {
         List<User> allUsers = userMapper.findAllUsers();

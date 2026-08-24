@@ -10,7 +10,7 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    User findById(@Param("user_id") Long user_id);
+//    User findById(@Param("user_id") Long user_id);
     User findByKakaoId(@Param("kakaoId") String kakaoId);
     User findByLoginId(@Param("login_id") String login_id);
 

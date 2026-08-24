@@ -17,18 +17,18 @@
 
 
     <!-- -->
-    <select id="findById" parameterType="Long" resultType="com.example.EduPOP.domain.user.User">
-        SELECT user_id,
-               kakaoId,
-               login_id,
-               name,
-               email,
-               role,
-               status
-        FROM users
-        WHERE user_id = #{user_id}
+<!--    <select id="findById" parameterType="Long" resultType="com.example.EduPOP.domain.user.User">-->
+<!--        SELECT user_id,-->
+<!--               kakaoId,-->
+<!--               login_id,-->
+<!--               name,-->
+<!--               email,-->
+<!--               role,-->
+<!--               status-->
+<!--        FROM users-->
+<!--        WHERE user_id = #{user_id}-->
 
-    </select>
+<!--    </select>-->
 
     <select id="findByKakaoId" parameterType="String" resultType="com.example.EduPOP.domain.user.User">
         SELECT user_id,
