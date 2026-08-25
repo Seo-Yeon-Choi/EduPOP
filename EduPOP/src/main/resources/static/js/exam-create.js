@@ -64,6 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const addWordButton =
         document.getElementById("addWordButton");
 
+    const examTypeSelect =
+        document.getElementById("examType");
+
+
     // ============================
     // 객관식 / 주관식
     // ============================
@@ -955,5 +959,20 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     );
+
+    function updateExamTypeDisplay() {
+        const isWordExam = examTypeSelect.value === "WORD";
+
+        normalExamSection.style.display = isWordExam ? "none" : "block";
+        wordExamSection.style.display = isWordExam ? "block" : "none";
+
+        // 단어 시험이면 문제 추가 버튼 숨김
+        addQuestionButton.style.display = isWordExam ? "none" : "inline-flex";
+    }
+
+    examTypeSelect.addEventListener("change", updateExamTypeDisplay);
+
+    // 화면을 처음 열었을 때도 현재 선택값을 적용
+    updateExamTypeDisplay();
 
 });
