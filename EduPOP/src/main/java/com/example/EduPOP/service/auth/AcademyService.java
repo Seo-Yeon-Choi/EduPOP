@@ -24,7 +24,7 @@ public class AcademyService {
         // 학원 정보 DB에 저장
         academyMapper.save(academy);
 
-        // 유저의 역할, 상태, 학원 번호를 DB에 업데이트
+        // 유저의 역할, 상태, 학원 번호를 DB에 업데이트 : 여기서 관리자 ACTIVE, academyId 매칭
         userMapper.updateAcademyAndStatus(
                 userId,
                 academy.getAcademyId(),

@@ -31,9 +31,21 @@ public class AuthController {
 
     // 회원가입 화면
     @GetMapping("/signUp")
-    public String signUpPage(Model model) {
-        List<Academy> academies = academyService.getAllAcademies();
-        model.addAttribute("academies", academies);
+    public String signUpPage(Model model,
+                             HttpSession session) {
+        //요청받은 역할을 세션에 저장, null일시 기본값 NONE
+       String requestedRole = (String) session.getAttribute("requestedRole");
+       if (requestedRole == null) {
+           requestedRole = "NONE";
+       }
+
+       //관리자 가입이 아닐 시 학원선택 목록 안 뜸
+        if (!"ADMIN".equals(requestedRole)) {
+            List<Academy> academies = academyService.getAllAcademies();
+            model.addAttribute("academies", academies);
+        }
+        //관리자 가입이라면
+        model.addAttribute("requestedRole",requestedRole);
         return "signUp";
     }
 
