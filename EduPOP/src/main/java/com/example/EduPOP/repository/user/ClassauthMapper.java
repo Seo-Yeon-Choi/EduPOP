@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 @Mapper
-public interface ClassMapper {
+public interface ClassauthMapper {
 //학급 조회
     //관리자 학원의 학급목록 조회
     List<AcademyClass> findClassesByAcademyId(

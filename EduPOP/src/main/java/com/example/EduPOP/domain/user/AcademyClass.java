@@ -9,7 +9,7 @@ public class AcademyClass {
     private Long classId;
     private Long academyId;
     private String name;
-    private Integer targetGrade;
+    private String targetGrade;
     private Integer maxStudents;
     private String status;
     private String description;

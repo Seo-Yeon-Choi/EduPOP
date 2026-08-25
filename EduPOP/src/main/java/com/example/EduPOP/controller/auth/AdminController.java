@@ -2,14 +2,13 @@
 
 import com.example.EduPOP.domain.user.*;
 import com.example.EduPOP.service.auth.AcademyService;
-import com.example.EduPOP.service.auth.ClassService;
+import com.example.EduPOP.service.auth.ClassauthService;
 import com.example.EduPOP.service.auth.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class AdminController {
 
     private final UserService userService;
     private final AcademyService academyService;
-    private final ClassService classService;
+    private final ClassauthService classauthService;
 
     //관리자 학원등록버튼
     @GetMapping("/adminWaiting")
@@ -133,7 +132,7 @@ public class AdminController {
             return "redirect:/";
         }
         Long academyId = loginUser.getAcademyId();
-        List<AcademyClass> academyClasses = classService.findClassesByAcademyId(academyId);
+        List<AcademyClass> academyClasses = classauthService.findClassesByAcademyId(academyId);
 
         model.addAttribute("academyClasses", academyClasses);
         return "admin/classes";
@@ -150,7 +149,7 @@ public class AdminController {
             return "redirect:/";
         }
         Long academyId = loginUser.getAcademyId();
-        ClassDetail classDetail = classService.findClassById(classId,academyId);
+        ClassDetail classDetail = classauthService.findClassById(classId,academyId);
         if (classDetail == null){
             return "redirect:/admin/classes";
         }
@@ -170,7 +169,7 @@ public class AdminController {
         }
 
         classInfo.setAcademyId(loginUser.getAcademyId());
-        classService.updateClass(classInfo);
+        classauthService.updateClass(classInfo);
 
         return "redirect:/admin/classes/"
                 + classInfo.getClassId();
@@ -190,7 +189,7 @@ public class AdminController {
             return "redirect:/";
         }
 
-        classService.deleteClass(
+        classauthService.deleteClass(
                 classId,
                 loginUser.getAcademyId()
         );

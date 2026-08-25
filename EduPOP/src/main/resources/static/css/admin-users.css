@@ -1,0 +1,464 @@
+.user-manage-container {
+    margin-left: 240px;
+
+    min-height: 100vh;
+
+    padding: 104px 36px 50px;
+
+    background: #f7f8fa;
+
+    box-sizing: border-box;
+}
+
+
+/* ==============================
+   상단 제목 + 필터
+============================== */
+
+.user-manage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    gap: 24px;
+
+    margin-bottom: 28px;
+}
+
+.user-manage-header h1 {
+    margin: 0 0 8px;
+
+    font-size: 28px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.user-manage-header p {
+    margin: 0;
+
+    font-size: 14px;
+
+    color: #777777;
+}
+
+
+/* ==============================
+   필터
+============================== */
+
+.filter-area {
+    display: flex;
+    align-items: center;
+
+    gap: 16px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 13px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    color: #444444;
+}
+
+.filter-group select {
+    height: 38px;
+
+    padding: 0 34px 0 12px;
+
+    border: 1px solid #dfe2e7;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    font-size: 13px;
+
+    color: #333333;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+.filter-group select:focus {
+    border-color: #4f6ef7;
+
+    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.08);
+}
+
+
+/* ==============================
+   일괄 상태 변경
+============================== */
+
+.batch-control {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+    padding: 14px 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.batch-title {
+    margin-right: 4px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    color: #333333;
+}
+
+.batch-control select {
+    height: 38px;
+
+    padding: 0 12px;
+
+    border: 1px solid #dfe2e7;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    font-size: 13px;
+
+    color: #333333;
+
+    outline: none;
+}
+
+.batch-control select:focus {
+    border-color: #4f6ef7;
+}
+
+.batch-button {
+    height: 38px;
+
+    padding: 0 18px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #4f6ef7;
+
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.2s ease,
+            transform 0.2s ease;
+}
+
+.batch-button:hover {
+    background: #405ee8;
+
+    transform: translateY(-1px);
+}
+
+
+/* ==============================
+   테이블 카드
+============================== */
+
+.table-card {
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+
+    overflow: hidden;
+}
+
+.table-scroll {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+/* ==============================
+   회원 테이블
+============================== */
+
+.user-table {
+    width: 100%;
+
+    min-width: 1150px;
+
+    border-collapse: collapse;
+
+    font-size: 13px;
+}
+
+.user-table thead {
+    background: #f5f6fa;
+}
+
+.user-table th {
+    padding: 14px 12px;
+
+    border-bottom: 1px solid #e3e5e8;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    text-align: center;
+
+    color: #444444;
+}
+
+.user-table td {
+    padding: 14px 12px;
+
+    border-bottom: 1px solid #eeeeee;
+
+    text-align: center;
+
+    color: #444444;
+
+    vertical-align: middle;
+}
+
+.user-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.user-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.user-table tbody tr:hover {
+    background: #fafbff;
+}
+
+.checkbox-column {
+    width: 44px;
+}
+
+
+/* ==============================
+   체크박스
+============================== */
+
+.user-table input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+
+    accent-color: #4f6ef7;
+
+    cursor: pointer;
+}
+
+
+/* ==============================
+   역할 표시
+============================== */
+
+.role-badge {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 72px;
+
+    padding: 5px 9px;
+
+    background: #eef1ff;
+
+    border-radius: 20px;
+
+    color: #4f6ef7;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* ==============================
+   상태 표시
+============================== */
+
+.status-badge {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 82px;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.status-active {
+    background: #eaf8ef;
+
+    color: #248a49;
+}
+
+.status-pending {
+    background: #fff7df;
+
+    color: #b07800;
+}
+
+.status-inactive {
+    background: #f0f1f3;
+
+    color: #666666;
+}
+
+.status-withdrawn {
+    background: #fff0f0;
+
+    color: #d84343;
+}
+
+
+/* ==============================
+   개별 상태 변경
+============================== */
+
+.individual-update-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 7px;
+}
+
+.individual-update-form select {
+    height: 34px;
+
+    padding: 0 8px;
+
+    border: 1px solid #dfe2e7;
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    font-size: 12px;
+
+    color: #333333;
+
+    outline: none;
+}
+
+.individual-update-form select:focus {
+    border-color: #4f6ef7;
+}
+
+.individual-update-button {
+    height: 34px;
+
+    padding: 0 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #4f6ef7;
+
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition: background-color 0.2s ease;
+}
+
+.individual-update-button:hover {
+    background: #405ee8;
+}
+
+
+/* ==============================
+   반응형
+============================== */
+
+@media (max-width: 1100px) {
+
+    .user-manage-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-area {
+        width: 100%;
+
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 900px) {
+
+    .user-manage-container {
+        margin-left: 0;
+
+        padding: 90px 20px 40px;
+    }
+}
+
+@media (max-width: 650px) {
+
+    .user-manage-container {
+        padding: 86px 14px 30px;
+    }
+
+    .user-manage-header h1 {
+        font-size: 24px;
+    }
+
+    .filter-area {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        justify-content: space-between;
+    }
+
+    .filter-group select {
+        flex: 1;
+    }
+
+    .batch-control {
+        flex-wrap: wrap;
+    }
+
+    .batch-title {
+        width: 100%;
+    }
+}

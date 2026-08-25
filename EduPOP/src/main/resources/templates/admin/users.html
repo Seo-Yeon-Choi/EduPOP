@@ -1,243 +1,236 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>전체 회원 관리</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduPOP - 전체 회원 관리</title>
+
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-users.css}">
 </head>
 
 <body>
 
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+<div th:replace="~{layout/header :: header}"></div>
 
-    <h2>👥 전체회원 목록</h2>
+<div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
 
-    <div style="display: flex; gap: 15px; align-items: center;">
+<main class="user-manage-container">
 
-        <!-- 역할별 보기 필터 -->
+    <div class="user-manage-header">
+
         <div>
-            <label for="roleFilter" style="font-weight: bold;">
-                역할별 보기:
-            </label>
-
-            <select id="roleFilter"
-                    onchange="filterUsers()"
-                    style="padding: 5px; font-size: 14px; margin-right: 20px;">
-
-                <option value="ALL">전체 보기</option>
-                <option value="STUDENT">학생 (STUDENT)</option>
-                <option value="TEACHER">교사 (TEACHER)</option>
-
-            </select>
+            <h1>전체 회원 관리</h1>
+            <p>학생과 교사의 계정 상태 및 소속 정보를 관리합니다.</p>
         </div>
 
-        <!-- 상태별 보기 필터 -->
-        <div>
-            <label for="statusFilter" style="font-weight: bold;">
-                상태별 보기:
-            </label>
+        <div class="filter-area">
 
-            <select id="statusFilter"
-                    onchange="filterUsers()"
-                    style="padding: 5px; font-size: 14px;">
+            <div class="filter-group">
+                <label for="roleFilter">역할별 보기</label>
 
-                <option value="ALL">전체 보기</option>
-                <option value="PENDING">PENDING (승인 대기 중)</option>
+                <select id="roleFilter"
+                        onchange="filterUsers()">
+
+                    <option value="ALL">전체 보기</option>
+                    <option value="STUDENT">학생</option>
+                    <option value="TEACHER">교사</option>
+
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="statusFilter">상태별 보기</label>
+
+                <select id="statusFilter"
+                        onchange="filterUsers()">
+
+                    <option value="ALL">전체 보기</option>
+                    <option value="PENDING">승인 대기</option>
+                    <option value="ACTIVE">활동 중</option>
+                    <option value="INACTIVE">비활성</option>
+                    <option value="WITHDRAWN">탈퇴</option>
+
+                </select>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <form th:action="@{/admin/updateUsersStatusBatch}"
+          method="post">
+
+        <div class="batch-control">
+
+            <span class="batch-title">
+                선택한 회원 일괄 변경
+            </span>
+
+            <select name="status">
+
                 <option value="ACTIVE">ACTIVE (활동 중)</option>
                 <option value="INACTIVE">INACTIVE (비활성)</option>
+                <option value="PENDING">PENDING (대기 중)</option>
                 <option value="WITHDRAWN">WITHDRAWN (탈퇴)</option>
 
             </select>
+
+            <button type="submit"
+                    class="batch-button">
+
+                일괄 적용
+
+            </button>
+
         </div>
 
-    </div>
-</div>
+
+        <div class="table-card">
+
+            <div class="table-scroll">
+
+                <table class="user-table">
+
+                    <thead>
+
+                    <tr>
+
+                        <th class="checkbox-column">
+                            <input type="checkbox"
+                                   id="selectAll"
+                                   onclick="toggleAll(this)">
+                        </th>
+
+                        <th>아이디</th>
+                        <th>이름</th>
+                        <th>학년</th>
+                        <th>전화번호</th>
+                        <th>이메일</th>
+                        <th>클래스</th>
+                        <th>역할</th>
+                        <th>현재 상태</th>
+                        <th>개별 상태 변경</th>
+
+                    </tr>
+
+                    </thead>
 
 
-<!-- 일괄 상태 변경 -->
-<form th:action="@{/admin/updateUsersStatusBatch}" method="post">
+                    <tbody id="userTableBody">
 
-    <!-- 상단 일괄 제어 바 -->
-    <div style="background-color: #f9f9f9;
-                padding: 10px;
-                border: 1px solid #ddd;
-                margin-bottom: 10px;
-                display: flex;
-                align-items: center;
-                gap: 10px;">
+                    <tr th:each="u : ${allUsers}"
+                        th:data-status="${u.status.name()}"
+                        th:data-role="${u.role.name()}">
 
-        <span style="font-weight: bold; font-size: 14px;">
-            선택한 회원 일괄 변경:
-        </span>
+                        <td>
+                            <input type="checkbox"
+                                   name="userIds"
+                                   th:value="${u.userId}"
+                                   class="userCheckbox">
+                        </td>
 
-        <!-- 변경할 상태 선택 -->
-        <select name="status" style="padding: 5px;">
+                        <td th:text="${u.loginId}">
+                            아이디
+                        </td>
 
-            <option value="ACTIVE">ACTIVE (활동중)</option>
-            <option value="INACTIVE">INACTIVE (비활성)</option>
-            <option value="PENDING">PENDING (대기중)</option>
-            <option value="WITHDRAWN">WITHDRAWN (탈퇴)</option>
+                        <td th:text="${u.name}">
+                            이름
+                        </td>
 
-        </select>
+                        <td th:text="${u.schoolGrade}">
+                            학년
+                        </td>
 
-        <button type="submit"
-                style="background-color: green;
-                       color: white;
-                       padding: 6px 12px;
-                       font-weight: bold;
-                       cursor: pointer;
-                       border: none;
-                       border-radius: 4px;">
+                        <td th:text="${u.phone}">
+                            전화번호
+                        </td>
 
-            일괄 적용하기
+                        <td th:text="${u.email}">
+                            이메일
+                        </td>
 
-        </button>
+                        <td th:text="${u.className != null ? u.className : '미배정'}">
+                            반 이름
+                        </td>
 
-    </div>
+                        <td>
+                            <span class="role-badge"
+                                  th:text="${u.role}">
+                                역할
+                            </span>
+                        </td>
 
+                        <td>
+                            <span class="status-badge"
+                                  th:classappend="' status-' + ${u.status.name().toLowerCase()}"
+                                  th:text="${u.status}">
+                                상태
+                            </span>
+                        </td>
 
-    <table border="1"
-           style="width: 100%; text-align: center;">
+                        <td>
 
-        <thead>
+                            <form th:action="@{/admin/updateStatus}"
+                                  method="post"
+                                  class="individual-update-form">
 
-        <tr>
+                                <input type="hidden"
+                                       name="userId"
+                                       th:value="${u.userId}">
 
-            <!-- 전체 선택 -->
-            <th style="width: 40px;">
-                <input type="checkbox"
-                       id="selectAll"
-                       onclick="toggleAll(this)" />
-            </th>
+                                <select name="status">
 
-            <th>아이디</th>
-            <th>이름</th>
-            <th>학년</th>
-            <th>전화번호</th>
-            <th>이메일</th>
-            <th>클래스</th>
-            <th>역할</th>
-            <th>현재 상태</th>
-            <th>개별 상태 변경</th>
+                                    <option value="ACTIVE"
+                                            th:selected="${u.status.name() == 'ACTIVE'}">
+                                        ACTIVE
+                                    </option>
 
-        </tr>
+                                    <option value="INACTIVE"
+                                            th:selected="${u.status.name() == 'INACTIVE'}">
+                                        INACTIVE
+                                    </option>
 
-        </thead>
+                                    <option value="PENDING"
+                                            th:selected="${u.status.name() == 'PENDING'}">
+                                        PENDING
+                                    </option>
 
+                                    <option value="WITHDRAWN"
+                                            th:selected="${u.status.name() == 'WITHDRAWN'}">
+                                        WITHDRAWN
+                                    </option>
 
-        <tbody id="userTableBody">
+                                </select>
 
-        <!-- 회원 목록 -->
-        <tr th:each="u : ${allUsers}"
-            th:data-status="${u.status.name()}"
-            th:data-role="${u.role.name()}">
+                                <button type="submit"
+                                        class="individual-update-button">
+                                    수정
+                                </button>
 
-            <td>
+                            </form>
 
-                <!-- 개별 체크박스 -->
-                <input type="checkbox"
-                       name="userIds"
-                       th:value="${u.userId}"
-                       class="userCheckbox" />
+                        </td>
 
-            </td>
+                    </tr>
 
-            <td th:text="${u.loginId}">
-                아이디
-            </td>
+                    </tbody>
 
-            <td th:text="${u.name}">
-                이름
-            </td>
+                </table>
 
-            <td th:text="${u.schoolGrade}">
-                학년
-            </td>
+            </div>
 
-            <td th:text="${u.phone}">
-                전화번호
-            </td>
+        </div>
 
-            <td th:text="${u.email}">
-                이메일
-            </td>
+    </form>
 
-            <td th:text="${u.className != null ? u.className : '미배정'}">
-                반 이름
-            </td>
-
-            <td th:text="${u.role}">
-                역할
-            </td>
-
-            <td th:text="${u.status}"
-                style="font-weight: bold;">
-                상태
-            </td>
-
-            <td>
-
-                <!-- 개별 수정 -->
-                <form th:action="@{/admin/updateStatus}"
-                      method="post"
-                      style="display:inline;">
-
-                    <input type="hidden"
-                           name="userId"
-                           th:value="${u.userId}" />
-
-                    <select name="status"
-                            style="padding: 3px;">
-
-                        <option value="ACTIVE"
-                                th:selected="${u.status.name() == 'ACTIVE'}">
-                            ACTIVE
-                        </option>
-
-                        <option value="INACTIVE"
-                                th:selected="${u.status.name() == 'INACTIVE'}">
-                            INACTIVE
-                        </option>
-
-                        <option value="PENDING"
-                                th:selected="${u.status.name() == 'PENDING'}">
-                            PENDING
-                        </option>
-
-                        <option value="WITHDRAWN"
-                                th:selected="${u.status.name() == 'WITHDRAWN'}">
-                            WITHDRAWN
-                        </option>
-
-                    </select>
-
-                    <button type="submit"
-                            style="background-color: #007bff;
-                                   color: white;
-                                   border: none;
-                                   padding: 4px 8px;
-                                   border-radius: 3px;">
-
-                        개별 수정
-
-                    </button>
-
-                </form>
-
-            </td>
-
-        </tr>
-
-        </tbody>
-
-    </table>
-
-</form>
+</main>
 
 
-<!-- JavaScript -->
 <script>
 
-    // 상태/역할 필터링
     function filterUsers() {
 
         const selectedStatus =
@@ -258,26 +251,20 @@
                 row.getAttribute("data-role");
 
             const statusMatch =
-                (selectedStatus === "ALL" ||
-                    rowStatus === selectedStatus);
+                selectedStatus === "ALL" ||
+                rowStatus === selectedStatus;
 
             const roleMatch =
-                (selectedRole === "ALL" ||
-                    rowRole === selectedRole);
+                selectedRole === "ALL" ||
+                rowRole === selectedRole;
 
-            if (statusMatch && roleMatch) {
-
-                row.style.display = "";
-
-            } else {
-
-                row.style.display = "none";
-
-            }
+            row.style.display =
+                statusMatch && roleMatch
+                    ? ""
+                    : "none";
 
         });
 
-        // 필터 변경 시 전체 선택 초기화
         document.getElementById("selectAll").checked = false;
 
         toggleAll(
@@ -286,7 +273,6 @@
     }
 
 
-    // 전체 선택 / 해제
     function toggleAll(selectAllCheckbox) {
 
         const checkboxes =

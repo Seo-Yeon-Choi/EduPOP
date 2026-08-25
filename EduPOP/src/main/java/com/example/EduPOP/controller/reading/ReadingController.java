@@ -3,6 +3,7 @@ package com.example.EduPOP.controller.reading;
 import com.example.EduPOP.domain.reading.Book;
 import com.example.EduPOP.domain.reading.ReadingFeedback;
 import com.example.EduPOP.domain.reading.ReadingReport;
+import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.service.reading.ReadingService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,6 @@ import java.util.Map;
 @Controller // 학생과 교사의 독서 관련 웹 요청을 받는 Controller
 @RequiredArgsConstructor // final 필드에 생성자 만들어서 객체로변환
 public class ReadingController {
-    private static final String LOGIN_USER_ID =
-            "loginUserId"; // 로그인한 사용자 번호를 저장할 세션 이름
-
 
     // 로그인하지 않은 사용자의 직접 URL 접근 방지 코드--------------------------------------
     private final ReadingService readingService; // 서비스를 객체로만들어서 연결
@@ -726,28 +724,14 @@ public class ReadingController {
     }
 
 
-    private Long getLoginUserId(
-            HttpSession session
-    ) {
-        Object loginUserId =
-                session.getAttribute(
-                        LOGIN_USER_ID
-                ); // 세션에서 로그인한 사용자 번호 조회
+    private Long getLoginUserId(HttpSession session) {
 
-        if (loginUserId instanceof Number number) {
-            return number.longValue(); // 숫자 형태의 사용자 번호를 Long으로 변환
+        User loginUser = (User) session.getAttribute("loginUser");
+
+        if (loginUser == null) {
+            return null;
         }
 
-        if (loginUserId instanceof String text) {
-            try {
-                return Long.valueOf(text); // 문자열 사용자 번호를 Long으로 변환
-
-            } catch (NumberFormatException ignored) {
-                return null; // 숫자로 변환할 수 없으면 로그인 정보 없음으로 처리
-            }
-        }
-
-        return null; // 세션에 사용자 번호가 없으면 null 반환
+        return loginUser.getUserId();
     }
 }
-

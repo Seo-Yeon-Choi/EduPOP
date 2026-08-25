@@ -1,0 +1,301 @@
+.pending-container {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 104px 24px 40px;
+
+    background: #f7f8fa;
+
+    box-sizing: border-box;
+}
+
+
+/* ==============================
+   승인 대기 카드
+============================== */
+
+.pending-card {
+    width: 100%;
+    max-width: 520px;
+
+    padding: 44px 40px;
+
+    background: #ffffff;
+
+    border: 1px solid #e6e8eb;
+    border-radius: 18px;
+
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+
+    text-align: center;
+
+    box-sizing: border-box;
+}
+
+
+/* ==============================
+   아이콘
+============================== */
+
+.pending-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 68px;
+    height: 68px;
+
+    margin: 0 auto 18px;
+
+    background: #fff7df;
+
+    border-radius: 50%;
+
+    font-size: 32px;
+}
+
+
+/* ==============================
+   제목
+============================== */
+
+.pending-label {
+    margin: 0 0 8px;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 1.4px;
+
+    color: #d99a00;
+}
+
+.pending-card h1 {
+    margin: 0 0 22px;
+
+    font-size: 28px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+
+/* ==============================
+   사용자 환영 영역
+============================== */
+
+.user-welcome {
+    margin-bottom: 26px;
+}
+
+.user-welcome h3 {
+    margin: 0 0 10px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #333333;
+}
+
+.user-welcome p {
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 1.7;
+
+    color: #777777;
+}
+
+
+/* ==============================
+   승인 상태 안내
+============================== */
+
+.pending-info {
+    margin-bottom: 28px;
+    padding: 20px;
+
+    background: #fafafa;
+
+    border: 1px solid #eeeeee;
+    border-radius: 10px;
+
+    text-align: left;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 14px;
+}
+
+.info-title {
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #444444;
+}
+
+.status-badge {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 6px 12px;
+
+    background: #fff3cd;
+
+    border-radius: 20px;
+
+    color: #a36d00;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.pending-description {
+    margin: 0;
+
+    padding-top: 14px;
+
+    border-top: 1px solid #e8e8e8;
+
+    font-size: 13px;
+    line-height: 1.6;
+
+    color: #777777;
+}
+
+
+/* ==============================
+   계정 버튼
+============================== */
+
+.account-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.account-buttons form {
+    margin: 0;
+}
+
+.logout-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 120px;
+    height: 42px;
+
+    padding: 0 18px;
+
+    background: #4f6ef7;
+
+    border: 1px solid #4f6ef7;
+    border-radius: 8px;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    box-sizing: border-box;
+
+    transition:
+            background-color 0.2s ease,
+            transform 0.2s ease;
+}
+
+.logout-button:hover {
+    background: #405ee8;
+
+    transform: translateY(-1px);
+}
+
+.withdraw-button {
+    min-width: 120px;
+    height: 42px;
+
+    padding: 0 18px;
+
+    border: 1px solid #ffbaba;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #e54848;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease;
+}
+
+.withdraw-button:hover {
+    background: #fff2f2;
+
+    border-color: #ff8e8e;
+}
+
+
+/* ==============================
+   탈퇴 안내
+============================== */
+
+.withdraw-warning {
+    margin: 18px 0 0;
+
+    padding-top: 16px;
+
+    border-top: 1px solid #eeeeee;
+
+    font-size: 12px;
+    line-height: 1.6;
+
+    color: #999999;
+}
+
+
+/* ==============================
+   반응형
+============================== */
+
+@media (max-width: 600px) {
+
+    .pending-container {
+        padding: 90px 16px 30px;
+    }
+
+    .pending-card {
+        padding: 34px 22px;
+    }
+
+    .pending-card h1 {
+        font-size: 24px;
+    }
+
+    .account-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .logout-button,
+    .withdraw-button {
+        width: 100%;
+    }
+}

@@ -3,7 +3,7 @@ package com.example.EduPOP.service.auth;
 import com.example.EduPOP.domain.user.AcademyClass;
 import com.example.EduPOP.domain.user.ClassDetail;
 import com.example.EduPOP.domain.user.StudentInfo;
-import com.example.EduPOP.repository.user.ClassMapper;
+import com.example.EduPOP.repository.user.ClassauthMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,8 +11,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ClassService {
-    private final ClassMapper classMapper;
+public class ClassauthService {
+    private final ClassauthMapper classMapper;
 
     //학급 목록
     //클래스 테이블에서 academyId 찾아서 정렬

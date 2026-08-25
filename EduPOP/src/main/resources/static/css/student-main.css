@@ -1,0 +1,387 @@
+.student-main-container {
+    margin-left: 240px;
+
+    min-height: 100vh;
+
+    padding: 104px 40px 50px;
+
+    background: #f7f8fa;
+
+    box-sizing: border-box;
+}
+
+
+/* ==============================
+   환영 영역
+============================== */
+
+.student-welcome {
+    max-width: 1050px;
+
+    margin-bottom: 30px;
+    padding: 32px;
+
+    background: #ffffff;
+
+    border: 1px solid #e6e8eb;
+    border-radius: 16px;
+
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.welcome-label {
+    margin: 0 0 8px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    color: #4f6ef7;
+}
+
+.student-welcome h1 {
+    margin: 0 0 12px;
+
+    font-size: 28px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.welcome-description {
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 1.7;
+
+    color: #777777;
+}
+
+
+/* ==============================
+   메뉴 영역
+============================== */
+
+.student-menu-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(300px, 1fr));
+
+    gap: 20px;
+
+    max-width: 1050px;
+
+    margin-bottom: 32px;
+}
+
+.student-menu-card {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    min-height: 135px;
+
+    padding: 25px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+
+    text-decoration: none;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+
+    box-sizing: border-box;
+
+    transition:
+            transform 0.2s ease,
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background-color 0.2s ease;
+}
+
+.student-menu-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #4f6ef7;
+
+    background: #fafbff;
+
+    box-shadow: 0 8px 20px rgba(79, 110, 247, 0.1);
+}
+
+
+/* ==============================
+   메뉴 아이콘
+============================== */
+
+.menu-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 58px;
+    height: 58px;
+
+    margin-right: 18px;
+
+    flex-shrink: 0;
+
+    background: #eef1ff;
+
+    border-radius: 14px;
+
+    font-size: 27px;
+}
+
+
+/* ==============================
+   메뉴 내용
+============================== */
+
+.menu-content {
+    flex: 1;
+}
+
+.menu-content h2 {
+    margin: 0 0 8px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.menu-content p {
+    margin: 0;
+
+    font-size: 13px;
+    line-height: 1.6;
+
+    color: #777777;
+}
+
+.menu-arrow {
+    margin-left: 14px;
+
+    font-size: 28px;
+
+    color: #aaaaaa;
+
+    transition:
+            transform 0.2s ease,
+            color 0.2s ease;
+}
+
+.student-menu-card:hover .menu-arrow {
+    transform: translateX(3px);
+
+    color: #4f6ef7;
+}
+
+
+/* ==============================
+   계정 관리 영역
+============================== */
+
+.account-area {
+    width: 100%;
+    max-width: 1050px;
+
+    padding: 28px 30px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+
+    box-sizing: border-box;
+}
+
+.account-header {
+    margin-bottom: 20px;
+}
+
+.account-header h2 {
+    margin: 0 0 8px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.account-header p {
+    margin: 0;
+
+    font-size: 13px;
+
+    color: #777777;
+}
+
+
+/* ==============================
+   계정 버튼
+============================== */
+
+.account-buttons {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.account-buttons form {
+    margin: 0;
+}
+
+.logout-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 110px;
+    height: 42px;
+
+    padding: 0 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe2e7;
+    border-radius: 8px;
+
+    color: #444444;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    box-sizing: border-box;
+
+    transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease;
+}
+
+.logout-button:hover {
+    background: #f5f6f8;
+
+    border-color: #c9cdd3;
+}
+
+
+/* ==============================
+   회원 탈퇴 버튼
+============================== */
+
+.withdraw-button {
+    min-width: 120px;
+    height: 42px;
+
+    padding: 0 18px;
+
+    border: 1px solid #ffbaba;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #e54848;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease;
+}
+
+.withdraw-button:hover {
+    background: #fff2f2;
+
+    border-color: #ff8f8f;
+
+    color: #d93636;
+}
+
+.withdraw-warning {
+    margin: 18px 0 0;
+
+    padding-top: 16px;
+
+    border-top: 1px solid #eeeeee;
+
+    font-size: 12px;
+    line-height: 1.6;
+
+    color: #999999;
+}
+
+
+/* ==============================
+   반응형
+============================== */
+
+@media (max-width: 900px) {
+
+    .student-main-container {
+        margin-left: 0;
+
+        padding: 90px 20px 40px;
+    }
+
+    .student-menu-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .student-main-container {
+        padding: 86px 16px 30px;
+    }
+
+    .student-welcome {
+        padding: 24px 20px;
+    }
+
+    .student-welcome h1 {
+        font-size: 24px;
+    }
+
+    .student-menu-card {
+        padding: 20px;
+    }
+
+    .menu-icon {
+        width: 50px;
+        height: 50px;
+
+        margin-right: 14px;
+
+        font-size: 23px;
+    }
+
+    .account-area {
+        padding: 24px 20px;
+    }
+
+    .account-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .logout-button,
+    .withdraw-button {
+        width: 100%;
+    }
+}

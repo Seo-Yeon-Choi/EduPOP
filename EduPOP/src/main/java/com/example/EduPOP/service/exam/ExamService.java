@@ -26,6 +26,9 @@ public class ExamService {
         return examMapper.findAll();
     }
 
+    public List<Exam> getExamListByTeacher(Long teacherId) {
+        return examMapper.findByTeacherId(teacherId);
+    }
     /**
      * 시험 생성
      */

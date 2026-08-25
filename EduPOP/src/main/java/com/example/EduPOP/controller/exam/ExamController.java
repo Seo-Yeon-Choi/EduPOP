@@ -2,10 +2,13 @@ package com.example.EduPOP.controller.exam;
 
 import com.example.EduPOP.domain.exam.Exam;
 import com.example.EduPOP.domain.exam.ExamQuestion;
+import com.example.EduPOP.domain.user.User;
+import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.service.classroom.ClassService;
 import com.example.EduPOP.service.exam.ExamQuestionParseService;
 import com.example.EduPOP.service.exam.ExamService;
 import com.example.EduPOP.service.exam.PdfTextExtractService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,9 +35,21 @@ public class ExamController {
     // =========================================
 
     @GetMapping
-    public String examList(Model model) {
+    public String examList(
+            HttpSession session,
+            Model model
+    ) {
 
-        model.addAttribute("exams", examService.getExamList());
+        Long teacherId = getLoginTeacherId(session);
+
+        if (teacherId == null) {
+            return "redirect:/LocalLogin";
+        }
+
+        model.addAttribute(
+                "exams",
+                examService.getExamListByTeacher(teacherId)
+        );
 
         return "layout/exam/list";
     }
@@ -44,14 +59,21 @@ public class ExamController {
     // =========================================
 
     @GetMapping("/create")
-    public String createPage(Model model) {
-        /*
-         * 현재 테스트용
-         * 추후 로그인 세션에서 teacherId 가져오기
-         */
-        Long teacherId = 1L;
+    public String createPage(
+            HttpSession session,
+            Model model
+    ) {
 
-        model.addAttribute("classes", classService.getClassesByTeacher(teacherId));
+        Long teacherId = getLoginTeacherId(session);
+
+        if (teacherId == null) {
+            return "redirect:/LocalLogin";
+        }
+
+        model.addAttribute(
+                "classes",
+                classService.getClassesByTeacher(teacherId)
+        );
 
         return "layout/exam/create";
     }
@@ -62,22 +84,24 @@ public class ExamController {
 
     @PostMapping
     @ResponseBody
-    public Long createExam(@RequestBody Exam exam) {
-        /*
-         * 현재 테스트용
-         * 추후 세션에서 가져오기
-         */
-        Long teacherId = 1L;
+    public Long createExam(
+            @RequestBody Exam exam,
+            HttpSession session
+    ) {
+
+        Long teacherId = getLoginTeacherId(session);
+
+        if (teacherId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
 
         exam.setTeacherId(teacherId);
 
         System.out.println("classId = " + exam.getClassId());
-
         System.out.println("teacherId = " + exam.getTeacherId());
 
         return examService.createExam(exam);
     }
-
     // =========================================
     // PDF 문제 추출
     // =========================================
@@ -116,5 +140,21 @@ public class ExamController {
         // =====================================
 
         return examQuestionParseService.parseNormalExam(text);
+    }
+
+    private Long getLoginTeacherId(HttpSession session) {
+
+        User loginUser =
+                (User) session.getAttribute("loginUser");
+
+        if (loginUser == null) {
+            return null;
+        }
+
+        if (loginUser.getRole() != UserRole.TEACHER) {
+            return null;
+        }
+
+        return loginUser.getUserId();
     }
 }
