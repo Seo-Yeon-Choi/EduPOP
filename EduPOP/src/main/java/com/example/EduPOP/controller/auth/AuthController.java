@@ -1,20 +1,26 @@
 package com.example.EduPOP.controller.auth;
 
+import com.example.EduPOP.domain.user.Academy;
 import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.domain.user.UserStatus;
+import com.example.EduPOP.service.auth.AcademyService;
 import com.example.EduPOP.service.auth.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
 
+    private  final AcademyService academyService;
     private final UserService userService;
 
     // 기본 도메인 요청 시 로그인 페이지로 이동
@@ -25,7 +31,9 @@ public class AuthController {
 
     // 회원가입 화면
     @GetMapping("/signUp")
-    public String signUpPage() {
+    public String signUpPage(Model model) {
+        List<Academy> academies = academyService.getAllAcademies();
+        model.addAttribute("academies", academies);
         return "signUp";
     }
 
@@ -35,17 +43,18 @@ public class AuthController {
             @ModelAttribute User user,
             HttpSession session,
             RedirectAttributes redirectAttributes
-    ) {
+    ) {//세션에 요청받은 역할 넣음
         String requestedRole = (String) session.getAttribute("requestedRole");
-
+        // 요청이 없다면 역할 기본값 none
         if (requestedRole == null) {
             requestedRole = "NONE";
         }
-
+        // 요청이 있다면 회원을 역할을 요청받은 역할로 지정
         user.setRole(UserRole.valueOf(requestedRole));
 
+        //회원 저장 성공여부
         boolean success = userService.registerLocalUser(user);
-
+        //중복으로 저장에 실패했을시
         if (!success) {
             redirectAttributes.addFlashAttribute(
                     "error",
@@ -53,9 +62,9 @@ public class AuthController {
             );
             return "redirect:/signUp";
         }
-
+        // 저장 성공시 요청받은 역할 세션 날림
         session.removeAttribute("requestedRole");
-
+        // 저장 성공 시 가입 완료
         redirectAttributes.addFlashAttribute(
                 "message",
                 "회원가입이 완료되었습니다. 로그인해주세요."
@@ -63,7 +72,7 @@ public class AuthController {
 
         return "redirect:/LocalLogin";
     }
-
+//--------------------------------------------------------------------------------------------------
     // 학생 로그인
     @GetMapping("/login/route/student")
     public String studentLoginPage(HttpSession session) {
@@ -133,6 +142,7 @@ public class AuthController {
         return "redirect:/";
     }
 
+//--------------------------------------------------------------------------------------
     // 학생, 교사 승인 대기 페이지
     @GetMapping("/blankPage")
     public String blankPage(HttpSession session) {
@@ -144,17 +154,17 @@ public class AuthController {
 
         if (loginUser.getStatus() == UserStatus.ACTIVE) {
             if (loginUser.getRole() == UserRole.ADMIN) {
-                return "redirect:templates/main/adminMain";
+                return "redirect:main/adminMain";
             } else if (loginUser.getRole() == UserRole.STUDENT) {
-                return "redirect:templates/main/studentMain";
+                return "redirect:main/studentMain";
             } else if (loginUser.getRole() == UserRole.TEACHER) {
-                return "redirect:templates/main/teacherMain";
+                return "redirect:main/teacherMain";
             }
         }
 
         return "main/blankPage";
     }
-
+//--------------------------------------------------------------------------------
     // 로그아웃
     @GetMapping("/logout")
     public String logout(
@@ -197,5 +207,68 @@ public class AuthController {
 
         return "redirect:/";
     }
+//--------------------------------------------------------------------------------------
+    //카카오 회원 로그인 후 학원 선택
+    @GetMapping("/selectAcademy")
+    public String selectAcademy(Model model){
+        //모든 학원을 가져와서 model에 담음
+        List<Academy> academies = academyService.getAllAcademies();
+        model.addAttribute("academies", academies);
+        return "/selectAcademy";
+    }
+
+    //카카오 회원이 학원 선택 후
+    @PostMapping("/selectAcademy")
+    public String selectAcademy(@RequestParam Long academyId,
+                                HttpSession session){
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null){
+            return "redirect:/";
+        }
+
+        //로그인한 유저의 학원 번호 DB 업데이트
+        userService.updateAcademyId(
+                loginUser.getUserId(),
+                academyId
+        );
+        //로그인한 유저의 학원 번호 세션 업데이트
+        loginUser.setAcademyId(academyId);
+        session.setAttribute("loginUser", loginUser);
+
+        // PENDING 상태
+        if (loginUser.getStatus() == UserStatus.PENDING) {
+            if (loginUser.getRole() == UserRole.ADMIN) {
+                return "redirect:/adminWaiting";
+            }
+            return "redirect:/blankPage";
+        }
+
+
+        // ACTIVE 상태
+        if (loginUser.getStatus() == UserStatus.ACTIVE) {
+            if (loginUser.getRole() == UserRole.STUDENT) {
+                return "redirect:main/studentMain";
+            }
+            if (loginUser.getRole() == UserRole.TEACHER) {
+                return "redirect:main/teacherMain";
+            }
+            if (loginUser.getRole() == UserRole.ADMIN) {
+                return "redirect:main/adminMain";
+            }
+        }
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/main/studentMain")
+    public String studentMain(){
+        return "main/studentMain";
+    }
+
+    @GetMapping("/main/teacherMain")
+    public String teacherMain(){
+        return "main/teacherMain";
+    }
+
 }
 

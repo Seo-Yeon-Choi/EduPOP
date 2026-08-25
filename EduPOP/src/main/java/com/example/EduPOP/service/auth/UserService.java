@@ -52,16 +52,21 @@ public class UserService {
     }
 
     // 회원 조회
-    // ADMIN을 제외한 모든 회원 목록 가져오기
-    public List<User> getAllUsersExceptAdmin() {
+//    // ADMIN을 제외한 모든 회원 목록 가져오기
+//    public List<User> getAllUsersExceptAdmin() {
+//
+//        List<User> allUsers =
+//                userMapper.findAllUsers();
+//
+//        // ADMIN이 아닌 유저들만 필터링
+//        return allUsers.stream()
+//                .filter(user -> user.getRole() != UserRole.ADMIN)
+//                .toList();
+//    }
 
-        List<User> allUsers =
-                userMapper.findAllUsers();
-
-        // ADMIN이 아닌 유저들만 필터링
-        return allUsers.stream()
-                .filter(user -> user.getRole() != UserRole.ADMIN)
-                .toList();
+    //학원Id로 조회
+    public List<User> getUsersAcademyId(Long academyId){
+        return userMapper.findUserByAcademyId(academyId);
     }
 
     // 관리자가 표에서 특정 회원의 상태를 직접 변경
@@ -96,5 +101,11 @@ public class UserService {
                 UserStatus.WITHDRAWN
         );
     }
+
+    // kakao회원이 학원 선택 후 academyID 추가해줌
+    public void updateAcademyId(Long userId, Long academyId){
+        userMapper.updateAcademyId(userId, academyId);
+    }
+
 }
 
