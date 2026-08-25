@@ -338,7 +338,8 @@ CREATE TABLE parent_reports (
                                 CONSTRAINT fk_parent_reports_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
                                 CONSTRAINT fk_parent_reports_creator FOREIGN KEY (created_by) REFERENCES users(user_id)
 );
-
+ALTER TABLE parent_reports
+    ADD COLUMN radar_chart_data TEXT;
 
 -- =========================================================================================
 -- [도메인 8] 활동 로그 & 캐릭터 성장 도메인

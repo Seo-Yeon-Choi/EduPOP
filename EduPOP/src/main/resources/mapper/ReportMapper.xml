@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.EduPOP.mapper.ReportMapper">
+
+    <select id="getMonthlyReportMetrics" resultType="com.example.EduPOP.dto.ReportMetricsDTO">
+        SELECT
+            -- [1. 기본 정보]
+            u.name AS studentName,
+            a.name AS academyName,
+            c.name AS className,
+            (SELECT name FROM users WHERE user_id = #{teacherId}) AS teacherName,
+
+            -- [2. 성과 지표] : 해당 월의 월말평가 본인 점수
+            (SELECT ea.total_score
+             FROM exam_attempts ea
+                      JOIN exams e ON ea.exam_id = e.exam_id
+             WHERE ea.student_id = #{studentId} AND e.exam_type = 'MONTHLY'
+               AND e.exam_date BETWEEN #{periodStart} AND #{periodEnd} LIMIT 1) AS monthlyExamScore,
+
+            -- [2. 성과 지표] : 해당 월말평가를 치른 같은 반 학생들의 평균 점수
+            (SELECT AVG(ea2.total_score)
+             FROM exam_attempts ea2
+             WHERE ea2.exam_id = (
+                 SELECT e.exam_id FROM exam_attempts ea
+                                           JOIN exams e ON ea.exam_id = e.exam_id
+                 WHERE ea.student_id = #{studentId} AND e.exam_type = 'MONTHLY'
+                   AND e.exam_date BETWEEN #{periodStart} AND #{periodEnd} LIMIT 1
+             )) AS classAverageScore,
+
+            -- [3. 학습 태도 지표] : 기간 내 독서 이력 수 및 오답 극복 활동 수
+            (SELECT COUNT(*) FROM reading_reports
+             WHERE student_id = #{studentId} AND created_at BETWEEN #{periodStart} AND #{periodEnd}) AS booksReadCount,
+
+            (SELECT COUNT(*) FROM activity_logs
+             WHERE student_id = #{studentId} AND activity_type = 'OVERCOME_WRONG'
+               AND created_at BETWEEN #{periodStart} AND #{periodEnd}) AS overcomeWrongCount,
+
+            -- [3. 취약 유형] : 기간 내 오답이 가장 많은 문제 유형 태그 추출
+            (SELECT eq.question_type_tag
+             FROM exam_answers ans
+                      JOIN exam_questions eq ON ans.question_id = eq.question_id
+                      JOIN exam_attempts ea ON ans.attempt_id = ea.attempt_id
+                      JOIN exams e ON ea.exam_id = e.exam_id
+             WHERE ea.student_id = #{studentId} AND ans.is_correct = false
+               AND e.exam_date BETWEEN #{periodStart} AND #{periodEnd}
+             GROUP BY eq.question_type_tag
+             ORDER BY COUNT(*) DESC LIMIT 1) AS topWeakTypeTag
+
+        FROM users u
+                 JOIN academies a ON u.academy_id = a.academy_id
+                 JOIN class_students cs ON u.user_id = cs.student_id
+                 JOIN classes c ON cs.class_id = c.class_id
+        WHERE u.user_id = #{studentId}
+        LIMIT 1
+    </select>
+
+</mapper>

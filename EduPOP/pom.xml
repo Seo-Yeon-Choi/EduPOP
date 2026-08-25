@@ -32,6 +32,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>io.github.vaneproject</groupId>
+			<artifactId>badwordfiltering</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jdbc</artifactId>
 		</dependency>
