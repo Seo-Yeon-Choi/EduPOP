@@ -129,11 +129,25 @@ public class AdminController {
     public String classes(HttpSession session,
                           Model model){
         User loginUser = (User) session.getAttribute("loginUser");
+
+        System.out.println("로그인 유저 = " + loginUser);
+
         if(loginUser == null || loginUser.getAcademyId() == null){
             return "redirect:/";
         }
+
+        System.out.println("관리자 academyId = " + loginUser.getAcademyId());
+
+        if (loginUser.getAcademyId() == null) {
+            System.out.println("academyId가 null");
+            return "redirect:/";
+        }
+
         Long academyId = loginUser.getAcademyId();
         List<AcademyClass> academyClasses = classService.findClassesByAcademyId(academyId);
+
+        System.out.println("조회된 학급 수 = " + academyClasses.size());
+        System.out.println("조회된 학급 = " + academyClasses);
 
         model.addAttribute("academyClasses", academyClasses);
         return "admin/classes";

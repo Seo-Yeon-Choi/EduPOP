@@ -10,9 +10,8 @@
             class_id,
             academy_id,
             name,
-            target_grade,
-            max_students,
-            status,
+            COALESCE(target_grade, 0) AS targetGrade,
+            COALESCE(max_students, 0) AS maxStudents,
             description,
             created_at,
             updated_at
@@ -29,7 +28,6 @@
             name,
             target_grade,
             max_students,
-            status,
             description,
             created_at,
             updated_at
@@ -70,7 +68,7 @@
 
 
     <!-- 학생 명단 -->
-    <select id="findStudents"
+    <select id="findStudent"
             resultType="com.example.EduPOP.domain.user.StudentInfo">
 
         SELECT
@@ -97,7 +95,6 @@
             name = #{name},
             target_grade = #{targetGrade},
             max_students = #{maxStudents},
-            status = #{status},
             description = #{description},
             updated_at = NOW()
         WHERE class_id = #{classId}
