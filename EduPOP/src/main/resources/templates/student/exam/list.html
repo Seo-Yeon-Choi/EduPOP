@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>시험 목록</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/common.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/student-exam.css}">
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="exam-list-container">
+    <section class="today-review-card">
+
+        <div class="today-review-info">
+
+        <span class="today-review-label">
+            TODAY
+        </span>
+
+            <h2>오늘의 복습</h2>
+
+            <p>최근 3일 동안 틀린 문제를
+                다시 풀어보세요.
+            </p>
+
+            <strong>
+                총
+                <span th:text="${todayReviewCount}">
+                0
+            </span>
+                문제
+            </strong>
+
+        </div>
+
+        <div class="today-review-action">
+            <a th:if="${todayReviewCount > 0}" th:href="@{/student/exams/today-review}">오늘의 복습 시작</a>
+
+            <span th:if="${todayReviewCount == 0}">오늘 복습할 문제가 없습니다.</span>
+        </div>
+    </section>
+
+    <div class="exam-filter">
+
+        <form th:action="@{/student/exams}"
+              method="get">
+
+            <input type="date"
+                   name="date"
+                   th:value="${selectedDate}">
+
+            <button type="submit">
+                조회
+            </button>
+
+            <a th:href="@{/student/exams}">
+                전체 보기
+            </a>
+
+        </form>
+
+    </div>
+
+    <h1>시험 / 복습</h1>
+
+    <div class="exam-card" th:each="exam : ${exams}">
+        <div class="exam-info">
+
+            <h2 th:text="${exam.title}">시험 제목</h2>
+
+            <span th:text="${exam.examType}">WORD</span>
+            <span th:if="${exam.examDate != null}" th:text="${exam.examDate}"></span>
+
+        </div>
+        <div class="exam-action">
+
+            <a th:if="${exam.examType == 'WORD'}"
+               th:href="@{/student/exams/{id}/take(id=${exam.examId})}"
+               class="exam-button">
+
+                시험 응시
+
+            </a>
+
+            <a th:if="${exam.examType != 'WORD'
+                       and exam.wrongCount != null
+                       and exam.wrongCount > 0}"
+               th:href="@{/student/exams/{id}/review(id=${exam.examId})}"
+               class="review-button">
+
+                복습하기
+                (<span th:text="${exam.wrongCount}"></span>)
+
+            </a>
+
+            <span th:if="${exam.examType != 'WORD'
+                          and (exam.wrongCount == null
+                          or exam.wrongCount == 0)}">
+
+                복습할 오답 없음
+
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="pagination"
+         th:if="${paging.totalCount > 0}">
+
+        <a th:if="${paging.hasPrevious}"
+           th:href="@{/student/exams(
+            page=${paging.currentPage - 1},
+            date=${selectedDate}
+       )}">
+            이전
+        </a>
+
+
+        <a th:each="pageNum :
+            ${#numbers.sequence(
+                paging.startPage,
+                paging.endPage
+            )}"
+
+           th:href="@{/student/exams(
+            page=${pageNum},
+            date=${selectedDate}
+       )}"
+
+           th:text="${pageNum}"
+
+           th:classappend="${pageNum == paging.currentPage}
+            ? 'active'">
+        </a>
+
+
+        <a th:if="${paging.hasNext}"
+           th:href="@{/student/exams(
+            page=${paging.currentPage + 1},
+            date=${selectedDate}
+       )}">
+            다음
+        </a>
+
+    </div>
+
+</main>
+
+</body>
+</html>

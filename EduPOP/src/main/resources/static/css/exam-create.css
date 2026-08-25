@@ -1,0 +1,318 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f7f8fa;
+    font-family: Arial, "Noto Sans KR", sans-serif;
+    color: #222;
+}
+
+.page-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* Sidebar */
+
+.sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: white;
+    border-right: 1px solid #e6e8eb;
+    padding: 28px 20px;
+}
+
+.sidebar-logo {
+    font-size: 25px;
+    font-weight: 800;
+    margin-bottom: 40px;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar-menu a {
+    padding: 13px 16px;
+    text-decoration: none;
+    color: #555;
+    border-radius: 8px;
+}
+
+.sidebar-menu a:hover {
+    background: #f0f2f5;
+}
+
+
+/* Main */
+
+.exam-container {
+    margin-left: 240px !important;
+    padding: 94px 60px 45px !important;
+
+    width: calc(100% - 240px);
+    min-height: 100vh;
+}
+
+
+/* Header */
+
+.exam-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.exam-header h1 {
+    margin: 0 0 8px;
+}
+
+.exam-header p {
+    margin: 0;
+    color: #888;
+}
+
+
+/* PDF */
+
+.pdf-button {
+    padding: 11px 17px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.pdf-info {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.pdf-info button {
+    border: none;
+    background: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+
+/* Card */
+
+.exam-info-card,
+.question-card {
+    background: white;
+    border: 1px solid #e3e5e8;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 25px;
+}
+
+.exam-info-card h2,
+.question-card h2 {
+    margin-top: 0;
+}
+
+
+/* Exam info */
+
+.exam-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+
+/* Form */
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d9dde3;
+    border-radius: 7px;
+    font: inherit;
+}
+
+textarea {
+    resize: vertical;
+}
+
+
+/* Question header */
+
+.question-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.question-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.question-tab {
+    padding: 9px 18px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.question-tab.active {
+    background: #333;
+    color: white;
+}
+
+
+/* meta */
+
+.question-meta {
+    display: grid;
+    grid-template-columns: 140px 140px 1fr;
+    gap: 15px;
+}
+
+
+/* Choice */
+
+.choice-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.choice-header button {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.choice-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.choice-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f0f1f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.remove-choice {
+    border: none;
+    background: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Word */
+.word-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.word-row input {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.remove-word-button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Actions */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.secondary-button,
+.primary-button {
+    padding: 12px 23px;
+    border: none;
+    border-radius: 7px;
+    background: #333;
+    color: white;
+    cursor: pointer;
+}
+
+/* Question */
+.question-navigation {
+    margin-bottom: 24px;
+}
+
+.question-number-list {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.question-number-button {
+    width: 38px;
+    height: 38px;
+
+    border: 1px solid #d9dde3;
+    border-radius: 8px;
+
+    background: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.question-number-button:hover {
+    background: #f2f3f5;
+}
+
+.question-number-button.active {
+    background: #333;
+    color: white;
+    border-color: #333;
+}
