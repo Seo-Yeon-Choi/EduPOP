@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduPOP - 시험지 만들기</title>
+
+    <link rel="stylesheet" th:href="@{/css/exam-create.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+</head>
+
+<body>
+
+<div class="page-layout">
+
+    <!-- HEADER -->
+    <div th:replace="~{layout/header :: header}"></div>
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar-teacher :: sidebar}"></div>
+
+    <!-- MAIN -->
+    <main class="exam-container">
+
+        <!-- 시험지 만들기 HEADER -->
+        <header class="exam-header">
+            <div>
+                <h1>시험지 만들기</h1>
+                <p>시험 정보를 입력하고 문제를 추가하세요.</p>
+            </div>
+
+            <label for="pdfFile" class="pdf-button">
+                + PDF 파일 추가
+            </label>
+        </header>
+
+        <!-- PDF -->
+        <input type="file" id="pdfFile" accept=".pdf,application/pdf" hidden>
+
+        <div id="pdfFileInfo" class="pdf-info hidden">
+            <span id="pdfFileName"></span>
+            <button type="button" id="removePdf">×</button>
+        </div>
+
+        <!-- 시험 기본 정보 -->
+        <section class="exam-info-card">
+
+            <h2>시험 기본 정보</h2>
+
+            <div class="exam-info-grid">
+
+                <div class="form-group">
+                    <label for="classId">대상 반</label>
+
+                    <select id="classId">
+                        <option value="">반을 선택하세요</option>
+
+                        <option th:each="classItem : ${classes}"
+                                th:value="${classItem.classId}"
+                                th:text="|${classItem.name} (${classItem.targetGrade})|">
+                            중등 심화 A반 (중2)
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="examTitle">시험명</label>
+                    <input type="text"
+                           id="examTitle"
+                           placeholder="예: 8월 월말 평가">
+                </div>
+
+                <div class="form-group">
+                    <label for="examType">시험 종류</label>
+
+                    <select id="examType">
+                        <option value="WORD">단어 시험</option>
+                        <option value="MONTHLY">월말 평가</option>
+                        <option value="REVIEW">복습 시험</option>
+                        <option value="OTHER">기타</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="examMode">시험 방식</label>
+
+                    <select id="examMode">
+                        <option value="PAPER">종이 시험</option>
+                        <option value="ONLINE">온라인 시험</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="examDate">시험일</label>
+                    <input type="date" id="examDate">
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 문제 입력 -->
+        <section id="normalExamSection">
+
+            <!-- 문제 번호 목록 -->
+            <div class="question-navigation">
+                <div id="questionNumberList" class="question-number-list">
+                    <!-- JS에서 1, 2, 3... 생성 -->
+                </div>
+            </div>
+
+            <!-- 문제 입력 HEADER -->
+            <div class="question-card-header">
+
+                <h2>문제 입력</h2>
+
+                <div class="question-tabs">
+                    <button type="button" class="question-tab active" data-type="MULTIPLE_CHOICE">객관식</button>
+                    <button type="button" class="question-tab" data-type="SHORT_ANSWER">주관식</button>
+                </div>
+
+            </div>
+
+            <input type="hidden" id="questionType" value="MULTIPLE_CHOICE">
+
+            <!-- 문제 번호 / 배점 / 유형 태그 -->
+            <div class="question-meta">
+                <div class="form-group">
+                    <label for="questionNumber">문제 번호</label>
+                    <input type="number" id="questionNumber" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="score">배점</label>
+                    <input type="number" id="score" value="5" min="0" step="0.5">
+                </div>
+
+                <div class="form-group">
+                    <label for="questionTypeTag">문제 유형 태그</label>
+                    <input type="text" id="questionTypeTag" placeholder="예: GRAMMAR_RELATIVE">
+                </div>
+            </div>
+
+            <!-- 문제 -->
+            <div class="form-group">
+                <label for="questionText">문제</label>
+                <textarea id="questionText" rows="3" placeholder="문제를 입력하세요."></textarea>
+            </div>
+
+            <!-- 지문 -->
+            <div class="form-group">
+                <label for="passage">지문</label>
+                <textarea id="passage" rows="7" placeholder="지문이 있다면 입력하세요."></textarea>
+            </div>
+
+            <!-- 객관식 선지 -->
+            <div id="choiceSection">
+                <div class="choice-header">
+                    <label>보기</label>
+
+                    <button type="button" id="addChoiceButton">+ 선지 추가</button>
+                </div>
+
+                <div id="choiceList">
+                    <div class="choice-item">
+                        <span class="choice-number">1</span>
+                        <input type="text" class="choice-input" placeholder="선지를 입력하세요.">
+                        <button type="button" class="remove-choice">×</button>
+                    </div>
+
+                    <div class="choice-item">
+                        <span class="choice-number">2</span>
+                        <input type="text" class="choice-input" placeholder="선지를 입력하세요.">
+                        <button type="button" class="remove-choice">×</button>
+                    </div>
+
+                    <div class="choice-item">
+                        <span class="choice-number">3</span>
+                        <input type="text" class="choice-input" placeholder="선지를 입력하세요.">
+                        <button type="button" class="remove-choice">×</button>
+                    </div>
+
+                    <div class="choice-item">
+                        <span class="choice-number">4</span>
+                        <input type="text" class="choice-input" placeholder="선지를 입력하세요.">
+                        <button type="button" class="remove-choice">×</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 정답 -->
+            <div class="form-group answer-area">
+                <label for="correctAnswer">정답</label>
+                <input type="text" id="correctAnswer" placeholder="객관식: 정답 번호 / 주관식: 정답 텍스트">
+            </div>
+
+            <!-- 버튼 -->
+            <div class="form-actions">
+
+                <button type="button" id="addQuestionButton" class="primary-button">문제 추가</button>
+
+                <button type="button" id="saveExamButton" class="primary-button">시험지 등록</button>
+
+            </div>
+
+        </section>
+        <!-- 단어 시험 입력 -->
+        <section id="wordExamSection" style="display: none;">
+
+            <h3>단어 목록</h3>
+
+            <div id="wordList">
+                <div class="word-row">
+                    <input type="text" class="word-input" placeholder="영단어">
+                    <input type="text" class="meaning-input" placeholder="뜻">
+                    <button type="button" class="remove-word-button">삭제</button>
+                </div>
+            </div>
+
+            <button type="button" id="addWordButton">+ 단어 추가</button>
+        </section>
+    </main>
+
+</div>
+
+<script th:src="@{/js/exam-create.js}"></script>
+
+</body>
+</html>

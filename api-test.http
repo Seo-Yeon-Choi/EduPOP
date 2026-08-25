@@ -1,0 +1,9 @@
+### 1. 칭찬하고 싶은 점 저장(수정) 테스트
+PATCH http://localhost:8080/api/student-reports/RPT-001/proudest-moment
+Content-Type: application/json
+
+{
+  "proudestMoment": "매일 영단어를 30개씩 외운 나 자신을 칭찬합니다!"
+}
+### 창고(DB)에 테스트용 빈 리포트(RPT-001) 먼저 생성하기!
+POST http://localhost:8080/api/student-reports

@@ -1,0 +1,263 @@
+/*
+.exam-list-container {
+    margin-left: 220px;
+    padding: 94px 32px 40px;
+
+    min-height: 100vh;
+    box-sizing: border-box;
+
+    background: #f7f8fa;
+}
+ */
+
+.exam-list-container {
+    position: relative;
+
+    margin-left: 220px !important;
+    padding: 94px 32px 40px !important;
+
+    width: calc(100% - 220px);
+    min-height: 100vh;
+
+    box-sizing: border-box;
+
+    background: #f7f8fa;
+}
+
+.exam-list-container h1 {
+    margin-bottom: 30px;
+    font-size: 28px;
+    color: #222;
+}
+
+.exam-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.exam-info h2 {
+    margin: 0 0 10px;
+    font-size: 20px;
+    color: #222;
+}
+
+.exam-info span {
+    display: inline-block;
+    margin-right: 10px;
+    font-size: 14px;
+    color: #777;
+}
+
+.exam-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.exam-button,
+.review-button {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.exam-button {
+    background: #4f6ef7;
+    color: #fff;
+}
+
+.review-button {
+    background: #eef2ff;
+    color: #4f6ef7;
+}
+
+.exam-button:hover {
+    background: #405bd8;
+}
+
+.review-button:hover {
+    background: #e1e7ff;
+}
+
+.today-review-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 30px;
+    margin-bottom: 35px;
+
+    background: #fff;
+    border: 2px solid #4f6ef7;
+    border-radius: 14px;
+}
+
+.today-review-label {
+    display: inline-block;
+
+    margin-bottom: 8px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    color: #4f6ef7;
+}
+
+.today-review-info h2 {
+    margin: 0 0 8px;
+
+    font-size: 24px;
+
+    color: #222;
+}
+
+.today-review-info p {
+    margin: 0 0 14px;
+
+    font-size: 14px;
+
+    color: #777;
+}
+
+.today-review-info strong {
+    font-size: 15px;
+
+    color: #333;
+}
+
+.today-review-action a {
+    display: inline-block;
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    background: #4f6ef7;
+
+    color: #fff;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+.today-review-action a:hover {
+    background: #405bd8;
+}
+
+.today-review-action span {
+    color: #999;
+
+    font-size: 14px;
+}
+
+.exam-filter {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-bottom: 25px;
+}
+
+.exam-filter form {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.exam-filter input {
+    height: 38px;
+
+    padding: 0 12px;
+
+    border: 1px solid #dcdfe4;
+    border-radius: 7px;
+
+    background: white;
+}
+
+.exam-filter button,
+.exam-filter a {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 38px;
+
+    padding: 0 14px;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+}
+
+.exam-filter button {
+    border: none;
+
+    background: #4f6ef7;
+    color: white;
+
+    cursor: pointer;
+}
+
+.exam-filter a {
+    background: #eef0f3;
+
+    color: #555;
+}
+
+.pagination {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 6px;
+
+    margin-top: 30px;
+}
+
+.pagination a {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 36px;
+    height: 36px;
+
+    padding: 0 10px;
+
+    border: 1px solid #e1e4e8;
+    border-radius: 7px;
+
+    background: white;
+
+    color: #555;
+
+    font-size: 14px;
+}
+
+.pagination a:hover {
+    background: #f1f3f5;
+}
+
+.pagination a.active {
+    background: #4f6ef7;
+
+    border-color: #4f6ef7;
+
+    color: white;
+
+    font-weight: 600;
+}

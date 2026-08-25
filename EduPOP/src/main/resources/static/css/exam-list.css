@@ -1,0 +1,161 @@
+/* =====================================
+   시험 목록 전체 영역
+===================================== */
+
+.exam-list-container {
+    margin-left: 240px;
+
+    padding: 94px 40px 40px;
+
+    min-height: 100vh;
+    box-sizing: border-box;
+
+    background: #f7f8fa;
+}
+
+
+/* =====================================
+   HEADER
+===================================== */
+
+.exam-list-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 30px;
+}
+
+.exam-list-header h1 {
+    margin: 0 0 8px;
+
+    font-size: 28px;
+}
+
+.exam-list-header p {
+    margin: 0;
+
+    color: #888;
+
+    font-size: 14px;
+}
+
+
+/* =====================================
+   시험 만들기
+===================================== */
+
+.create-exam-button {
+    padding: 11px 18px;
+
+    background: #333;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+.create-exam-button:hover {
+    background: #111;
+}
+
+
+/* =====================================
+   TABLE
+===================================== */
+
+.exam-table-wrapper {
+    overflow: hidden;
+
+    background: white;
+
+    border: 1px solid #e3e5e8;
+
+    border-radius: 12px;
+}
+
+
+.exam-table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+
+.exam-table th {
+    padding: 15px;
+
+    background: #f8f9fa;
+
+    border-bottom: 1px solid #e5e5e5;
+
+    text-align: left;
+
+    font-size: 13px;
+
+    color: #666;
+}
+
+
+.exam-table td {
+    padding: 17px 15px;
+
+    border-bottom: 1px solid #eee;
+
+    font-size: 14px;
+}
+
+
+.exam-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+.exam-table tbody tr:hover {
+    background: #fafafa;
+}
+
+
+.exam-title {
+    font-weight: 600;
+}
+
+
+/* =====================================
+   STATUS
+===================================== */
+
+.status-badge {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 6px;
+
+    background: #f0f1f3;
+
+    font-size: 12px;
+}
+
+
+/* =====================================
+   EMPTY
+===================================== */
+
+.empty-exam {
+    padding: 80px;
+
+    background: white;
+
+    border: 1px solid #e3e5e8;
+    border-radius: 12px;
+
+    text-align: center;
+
+    color: #888;
+}

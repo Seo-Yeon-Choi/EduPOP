@@ -21,6 +21,7 @@ CREATE TABLE users (
                        name VARCHAR(50) NOT NULL,                  -- 사용자 실명
                        email VARCHAR(150),                         -- 이메일 주소
                        phone VARCHAR(30),                          -- 전화번호
+                       school_grade VARCHAR(20) NULL,               -- 학년
                        role VARCHAR(20) NOT NULL,                  -- ADMIN, TEACHER, STUDENT, PARENT
                        status VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, ACTIVE, INACTIVE, WITHDRAWN
                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -131,6 +132,7 @@ CREATE TABLE exam_questions (
                                 score DECIMAL(7,2) NOT NULL DEFAULT 5.00,           -- 문항 배점
                                 correct_answer TEXT,                                -- 정답 번호 또는 텍스트
                                 question_text TEXT NOT NULL,                        -- 문제 지문/본문
+                                passage TEXT,
                                 sort_order INT NOT NULL DEFAULT 1,
                                 source_question_id BIGINT,                          -- [서연] 나선형 복습 퀘스트 원본 참조 (Self-FK)
 
@@ -292,9 +294,19 @@ CREATE TABLE student_reports (
     -- [3. 시스템 관리 메타데이터]
                                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                  updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    -- [4. 아는 개념 / 모르는 개념]
+                                 known_concepts TEXT,
+                                 unknown_concepts TEXT,
 
                                  CONSTRAINT fk_student_reports_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+-- 3. 지난 달 리포트 (report_id = 1) 가상 데이터 추가
+INSERT INTO student_reports (student_id, period_start, period_end, books_read_count, exam_completion_rate, retest_completion_rate, study_attendance_days, overcome_wrong_count)
+VALUES (999, '2026-06-01', '2026-06-28', 3, 88.00, 78.00, 20, 28);
+
+-- 4. 이번 달 리포트 (report_id = 2) 가상 데이터 추가
+INSERT INTO student_reports (student_id, period_start, period_end, books_read_count, exam_completion_rate, retest_completion_rate, study_attendance_days, overcome_wrong_count)
+VALUES (999, '2026-07-01', '2026-07-28', 4, 92.00, 85.00, 24, 37);
 
 -- 2) 학부모 월간 발송 리포트 (교사 발행 / 무로그인 웹뷰)
 CREATE TABLE parent_reports (
@@ -361,4 +373,98 @@ CREATE TABLE student_growth (
                                 updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
                                 CONSTRAINT fk_student_growth_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- 객관식 선지 테이블 추가
+CREATE TABLE exam_question_choices (
+                                       choice_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                       question_id BIGINT NOT NULL,
+                                       choice_number INT NOT NULL,
+                                       choice_text TEXT NOT NULL,
+                                       sort_order INT NOT NULL DEFAULT 1,
+
+                                       CONSTRAINT fk_question_choices_question
+                                           FOREIGN KEY (question_id)
+                                               REFERENCES exam_questions(question_id)
+                                               ON DELETE CASCADE,
+
+                                       CONSTRAINT uk_question_choice_number
+                                           UNIQUE (question_id, choice_number)
+);
+
+
+-- 시험 응시 기록에 일반 시험 / 복습 구분 컬럼 추가
+ALTER TABLE exam_attempts
+    ADD COLUMN attempt_type VARCHAR(20) NOT NULL DEFAULT 'EXAM'
+        COMMENT 'EXAM: 일반 시험, REVIEW: 시험별 오답 복습'
+        AFTER attempt_no;
+
+
+-- 복습의 원본 시험 응시 기록 연결 컬럼 추가
+ALTER TABLE exam_attempts
+    ADD COLUMN source_attempt_id BIGINT NULL
+        COMMENT 'REVIEW 응시의 원본 attempt_id'
+        AFTER attempt_type;
+
+
+-- source_attempt_id 자기참조 FK 추가
+ALTER TABLE exam_attempts
+    ADD CONSTRAINT fk_exam_attempt_source
+        FOREIGN KEY (source_attempt_id)
+            REFERENCES exam_attempts(attempt_id)
+            ON DELETE SET NULL;
+
+
+-- 오늘의 누적 복습 응시 기록 테이블
+CREATE TABLE daily_review_attempts (
+                                       daily_review_attempt_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+                                       student_id BIGINT NOT NULL,
+                                       review_date DATE NOT NULL,
+
+                                       status VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
+
+                                       total_score DECIMAL(7,2) NOT NULL DEFAULT 0.00,
+                                       max_score DECIMAL(7,2) NOT NULL DEFAULT 0.00,
+
+                                       correct_count INT NOT NULL DEFAULT 0,
+                                       total_question_count INT NOT NULL DEFAULT 0,
+
+                                       started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                       submitted_at DATETIME NULL,
+                                       graded_at DATETIME NULL,
+
+                                       CONSTRAINT fk_daily_review_student
+                                           FOREIGN KEY (student_id)
+                                               REFERENCES users(user_id)
+                                               ON DELETE CASCADE
+);
+
+
+-- 오늘의 누적 복습 답안 테이블
+CREATE TABLE daily_review_answers (
+                                      daily_review_answer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+                                      daily_review_attempt_id BIGINT NOT NULL,
+                                      question_id BIGINT NOT NULL,
+
+                                      student_answer TEXT NULL,
+
+                                      is_correct BOOLEAN NOT NULL DEFAULT FALSE,
+                                      earned_score DECIMAL(7,2) NOT NULL DEFAULT 0.00,
+
+                                      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+                                      CONSTRAINT uk_daily_review_answer
+                                          UNIQUE (daily_review_attempt_id, question_id),
+
+                                      CONSTRAINT fk_daily_review_answer_attempt
+                                          FOREIGN KEY (daily_review_attempt_id)
+                                              REFERENCES daily_review_attempts(daily_review_attempt_id)
+                                              ON DELETE CASCADE,
+
+                                      CONSTRAINT fk_daily_review_answer_question
+                                          FOREIGN KEY (question_id)
+                                              REFERENCES exam_questions(question_id)
+                                              ON DELETE CASCADE
 );

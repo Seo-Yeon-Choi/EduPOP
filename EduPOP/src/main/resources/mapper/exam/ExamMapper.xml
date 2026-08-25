@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.EduPOP.repository.exam.ExamMapper">
+
+    <insert id="insert" parameterType="Exam" useGeneratedKeys="true" keyProperty="examId">
+
+        INSERT INTO exams
+        (
+        class_id,
+        teacher_id,
+        template_exam_id,
+        title,
+        exam_type,
+        exam_mode,
+        exam_round,
+        status,
+        exam_date,
+        file_url
+        )
+
+        VALUES
+        (
+        #{classId},
+        #{teacherId},
+        #{templateExamId},
+        #{title},
+        #{examType},
+        #{examMode},
+        #{examRound},
+        #{status},
+        #{examDate},
+        #{fileUrl}
+        )
+
+    </insert>
+
+    <select id="findById" parameterType="long" resultType="Exam">
+
+        SELECT *
+        FROM exams
+        WHERE exam_id = #{examId}
+
+    </select>
+
+    <update id="update" parameterType="Exam">
+
+        UPDATE exams
+
+        SET
+        title = #{title},
+        exam_type = #{examType},
+        exam_mode = #{examMode},
+        exam_round = #{examRound},
+        status = #{status},
+        exam_date = #{examDate},
+        file_url = #{fileUrl}
+
+        WHERE exam_id = #{examId}
+
+    </update>
+
+    <delete id="delete">
+
+        DELETE
+        FROM exams
+
+        WHERE exam_id = #{examId}
+
+    </delete>
+
+    <select id="findAll" resultType="Exam">
+
+        SELECT
+        exam_id,
+        class_id,
+        teacher_id,
+        template_exam_id,
+        title,
+        exam_type,
+        exam_mode,
+        exam_round,
+        status,
+        exam_date,
+        file_url,
+        created_at,
+        updated_at
+
+        FROM exams
+
+        ORDER BY created_at DESC
+
+    </select>
+
+</mapper>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>EduPOP - 오늘의 복습 결과</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/common.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/student-exam-result.css}">
+
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="result-container">
+
+    <section class="result-summary">
+
+        <h1>
+            오늘의 복습
+        </h1>
+
+        <p th:if="${attempt.reviewDate != null}"
+           th:text="${attempt.reviewDate}">
+        </p>
+
+        <div class="score">
+
+            <strong th:text="${attempt.totalScore}">
+                0
+            </strong>
+
+            <span>/</span>
+
+            <span th:text="${attempt.maxScore}">
+                0
+            </span>
+
+        </div>
+
+        <p>
+
+            총
+
+            <span th:text="${attempt.totalQuestionCount}">
+                0
+            </span>
+
+            문제 중
+
+            <strong th:text="${attempt.correctCount}">
+                0
+            </strong>
+
+            문제 정답
+
+        </p>
+
+    </section>
+
+
+    <section class="answer-result-list">
+
+        <article class="answer-result-card"
+                 th:each="answer, stat : ${answers}">
+
+            <div class="result-question">
+
+                <strong>
+                    문제
+                    <span th:text="${stat.count}">
+                        1
+                    </span>
+                </strong>
+
+                <span th:if="${answer.isCorrect}"
+                      class="correct">
+                    정답
+                </span>
+
+                <span th:unless="${answer.isCorrect}"
+                      class="wrong">
+                    오답
+                </span>
+
+            </div>
+
+            <p th:text="${answer.question.questionText}">
+                문제 내용
+            </p>
+
+            <div class="answer-info">
+
+                <p>
+                    내 답:
+                    <strong th:text="${answer.studentAnswer}">
+                    </strong>
+                </p>
+
+                <p th:unless="${answer.isCorrect}">
+                    정답:
+                    <strong th:text="${answer.question.correctAnswer}">
+                    </strong>
+                </p>
+
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <div class="result-buttons">
+
+        <!-- 제출 직후 -->
+        <a th:if="${from == 'submit'}"
+           th:href="@{/student/exams}">
+            시험 목록으로
+        </a>
+
+        <!-- 결과 목록에서 들어온 경우 -->
+        <a th:if="${from == 'list'}"
+           th:href="@{/student/exams/results}">
+            결과 목록으로
+        </a>
+
+    </div>
+
+</main>
+
+</body>
+
+</html>
