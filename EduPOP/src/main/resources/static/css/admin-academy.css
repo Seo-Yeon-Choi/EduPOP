@@ -1,0 +1,345 @@
+.academy-container {
+    margin-left: 240px;
+
+    min-height: 100vh;
+
+    padding: 104px 40px 50px;
+
+    background: #f7f8fa;
+
+    box-sizing: border-box;
+}
+
+
+/* 페이지 제목 */
+
+.academy-page-header {
+    max-width: 850px;
+
+    margin-bottom: 30px;
+}
+
+.academy-page-header h1 {
+    margin: 0 0 10px;
+
+    font-size: 28px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.academy-page-header p {
+    margin: 0;
+
+    font-size: 14px;
+
+    color: #777777;
+}
+
+
+/* 학원 정보 카드 */
+
+.academy-card {
+    width: 100%;
+    max-width: 850px;
+
+    padding: 32px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+
+    box-sizing: border-box;
+}
+
+
+/* 카드 제목 */
+
+.card-header {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid #eeeeee;
+}
+
+.card-header h2 {
+    margin: 0 0 8px;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.card-header p {
+    margin: 0;
+
+    font-size: 13px;
+    line-height: 1.6;
+
+    color: #888888;
+}
+
+
+/* 폼 */
+
+.academy-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+.form-group {
+    display: grid;
+
+    grid-template-columns: 160px 1fr;
+
+    align-items: center;
+
+    gap: 18px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #333333;
+}
+
+.form-group input {
+    width: 100%;
+    height: 46px;
+
+    padding: 0 14px;
+
+    border: 1px solid #dfe2e7;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    font-size: 14px;
+
+    color: #333333;
+
+    outline: none;
+
+    box-sizing: border-box;
+
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+    color: #aaaaaa;
+}
+
+.form-group input:focus {
+    border-color: #4f6ef7;
+
+    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.1);
+}
+
+
+/* 수정 버튼 */
+
+.form-button-area {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-top: 10px;
+    padding-top: 22px;
+
+    border-top: 1px solid #eeeeee;
+}
+
+.update-button {
+    min-width: 140px;
+    height: 46px;
+
+    padding: 0 22px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #4f6ef7;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.update-button:hover {
+    background: #405ee8;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 4px 12px rgba(79, 110, 247, 0.2);
+}
+
+.update-button:active {
+    transform: translateY(0);
+}
+
+
+/* 삭제 카드 */
+
+.delete-card {
+    width: 100%;
+    max-width: 850px;
+
+    margin-top: 28px;
+    padding: 30px 32px;
+
+    background: #ffffff;
+
+    border: 1px solid #f0c7c7;
+    border-radius: 16px;
+
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+
+    box-sizing: border-box;
+}
+
+.delete-card-header {
+    margin-bottom: 20px;
+}
+
+.delete-card-header h2 {
+    margin: 0 0 8px;
+
+    font-size: 19px;
+    font-weight: 700;
+
+    color: #d63c3c;
+}
+
+.delete-card-header p {
+    margin: 0;
+
+    font-size: 13px;
+    line-height: 1.6;
+
+    color: #777777;
+}
+
+
+/* 삭제 경고 */
+
+.delete-warning {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 10px;
+
+    margin-bottom: 22px;
+    padding: 14px 16px;
+
+    background: #fff5f5;
+
+    border: 1px solid #ffd0d0;
+    border-radius: 8px;
+
+    font-size: 13px;
+    line-height: 1.6;
+
+    color: #d64040;
+}
+
+.delete-warning strong {
+    flex-shrink: 0;
+}
+
+
+/* 삭제 버튼 */
+
+.delete-button {
+    min-width: 140px;
+    height: 44px;
+
+    padding: 0 20px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #e54848;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.delete-button:hover {
+    background: #d93636;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 4px 12px rgba(229, 72, 72, 0.2);
+}
+
+.delete-button:active {
+    transform: translateY(0);
+}
+
+
+/* 반응형 */
+
+@media (max-width: 900px) {
+
+    .academy-container {
+        margin-left: 0;
+
+        padding: 90px 20px 40px;
+    }
+}
+
+@media (max-width: 650px) {
+
+    .academy-container {
+        padding: 86px 16px 30px;
+    }
+
+    .academy-card,
+    .delete-card {
+        padding: 24px 20px;
+    }
+
+    .academy-page-header h1 {
+        font-size: 24px;
+    }
+
+    .form-group {
+        grid-template-columns: 1fr;
+
+        gap: 8px;
+    }
+
+    .form-button-area {
+        justify-content: stretch;
+    }
+
+    .update-button,
+    .delete-button {
+        width: 100%;
+    }
+}
