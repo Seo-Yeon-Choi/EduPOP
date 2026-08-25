@@ -64,7 +64,7 @@
         WHERE ct.class_id = #{classId}
           AND u.academy_id = #{academyId}
           AND ct.role_type = 'MAIN'
-        LIMIT 1
+#         LIMIT 1
 
     </select>
 

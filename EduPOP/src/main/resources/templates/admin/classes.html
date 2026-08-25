@@ -1,10 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>학급 관리</title>
 </head>
+
 <body>
+
+<h1>학급 관리</h1>
+
+<div th:if="${#lists.isEmpty(classes)}">
+    <p>등록된 학급이 없습니다.</p>
+</div>
+
+<div th:unless="${#lists.isEmpty(classes)}">
+
+    <table border="1">
+
+        <thead>
+        <tr>
+            <th>학급명</th>
+            <th>학년</th>
+            <th>정원</th>
+            <th>상태</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        <tr th:each="classInfo : ${classes}"
+            th:onclick="|location.href='@{/admin/classes/{classId}(classId=${classInfo.classId})}'|"
+            style="cursor:pointer;">
+
+            <td th:text="${classInfo.name}">
+                1반
+            </td>
+
+            <td th:text="${classInfo.targetGrade}">
+                1
+            </td>
+
+            <td th:text="${classInfo.maxStudents}">
+                20
+            </td>
+
+            <td th:text="${classInfo.status}">
+                ACTIVE
+            </td>
+
+        </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
 
 </body>
 </html>

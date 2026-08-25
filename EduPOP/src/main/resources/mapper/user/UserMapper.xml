@@ -20,6 +20,8 @@
         <result property="updatedAt" column="updated_at"/>
         <result property="withdrawnAt" column="withdrawn_at"/>
         <result property="schoolGrade" column="school_grade"/>
+        <result property="className" column="class_name"/>
+
 
     </resultMap>
 

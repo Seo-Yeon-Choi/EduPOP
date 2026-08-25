@@ -1,9 +1,8 @@
  package com.example.EduPOP.controller.auth;
 
-import com.example.EduPOP.domain.user.Academy;
-import com.example.EduPOP.domain.user.User;
-import com.example.EduPOP.domain.user.UserStatus;
+import com.example.EduPOP.domain.user.*;
 import com.example.EduPOP.service.auth.AcademyService;
+import com.example.EduPOP.service.auth.ClassService;
 import com.example.EduPOP.service.auth.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +20,14 @@ public class AdminController {
 
     private final UserService userService;
     private final AcademyService academyService;
+    private final ClassService classService;
 
     //관리자 학원등록버튼
     @GetMapping("/adminWaiting")
     public String adminWaiting() {
         return "main/adminWaiting";
     }
-
+//-------------------------------------------------------------------------
     // 관리자 회원 관리 페이지
     // 관리자 메인 페이지 이동
     @GetMapping("/main/adminMain")
@@ -74,7 +74,7 @@ public class AdminController {
 
         return "redirect:/admin/users";
     }
-
+//-------------------------------------------------------------------------
     //학원 관리
     //학원 조회
     @GetMapping("/admin/academies")
@@ -123,10 +123,78 @@ public class AdminController {
         session.invalidate();
         return "redirect:/";
     }
+//--------------------------------------------------------------------------
+    //학급 조회
+    @GetMapping("/admin/classes")
+    public String classes(HttpSession session,
+                          Model model){
+        User loginUser = (User) session.getAttribute("loginUser");
+        if(loginUser == null || loginUser.getAcademyId() == null){
+            return "redirect:/";
+        }
+        Long academyId = loginUser.getAcademyId();
+        List<AcademyClass> academyClasses = classService.findClassesByAcademyId(academyId);
 
-    //반 수정
-    //  @GetMapping("/admin/classes")
-    //  public String classes(){
-    //      return "admin/classes";
-    //  }
+        model.addAttribute("academyClasses", academyClasses);
+        return "admin/classes";
+    }
+
+    //학급 상세 조회
+    @GetMapping("/admin/classes/{classId}")
+    public String classDetail(
+            @PathVariable Long classId,
+            HttpSession session,
+            Model model){
+        User loginUser = (User) session.getAttribute("loginUser");
+        if(loginUser == null || loginUser.getAcademyId() == null){
+            return "redirect:/";
+        }
+        Long academyId = loginUser.getAcademyId();
+        ClassDetail classDetail = classService.findClassById(classId,academyId);
+        if (classDetail == null){
+            return "redirect:/admin/classes";
+        }
+        model.addAttribute("classDetail",classDetail);
+        return "admin/classDetail";
+    }
+
+    //학급 수정
+    @PostMapping("/admin/updateClass")
+    public String updateClass(@ModelAttribute AcademyClass classInfo,
+                              HttpSession session){
+        User loginUser =
+                (User) session.getAttribute("loginUser");
+        if (loginUser == null ||
+                loginUser.getAcademyId() == null) {
+            return "redirect:/";
+        }
+
+        classInfo.setAcademyId(loginUser.getAcademyId());
+        classService.updateClass(classInfo);
+
+        return "redirect:/admin/classes/"
+                + classInfo.getClassId();
+    }
+
+
+    // 학급 삭제
+    @PostMapping("/admin/deleteClass")
+    public String deleteClass(
+            @RequestParam Long classId,
+            HttpSession session
+    ) {
+        User loginUser =
+                (User) session.getAttribute("loginUser");
+        if (loginUser == null ||
+                loginUser.getAcademyId() == null) {
+            return "redirect:/";
+        }
+
+        classService.deleteClass(
+                classId,
+                loginUser.getAcademyId()
+        );
+
+        return "redirect:/admin/classes";
+    }
 }
