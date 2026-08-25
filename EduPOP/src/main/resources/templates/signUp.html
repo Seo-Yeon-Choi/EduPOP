@@ -15,6 +15,16 @@
     <input type="text" name="email" placeholder="이메일">
     <input type="text" name="phone" placeholder="전화번호">
     <input type="text" name="schoolGrade" placeholder="학년">
+    <div>
+        <label>학원 선택</label>
+        <select name="academyId" required>
+            <option value="">학원을 선택하세요</option>
+            <option th:each="academy : ${academies}"
+                    th:value="${academy.academyId}"
+                    th:text="${academy.name}">
+            </option>
+        </select>
+    </div>
 
     <div>
         <button type="submit">가입하기</button>

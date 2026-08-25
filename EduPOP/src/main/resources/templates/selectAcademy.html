@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>카카오 유저 학원 선택</title>
+</head>
+<body>
+<form th:action="@{/selectAcademy}" method="post">
+
+    <select name="academyId" required>
+        <option value="">학원을 선택하세요</option>
+
+        <option th:each="academy : ${academies}"
+                th:value="${academy.academyId}"
+                th:text="${academy.name}">
+        </option>
+    </select>
+
+    <button type="submit">선택 완료</button>
+
+</form>
+</body>
+</html>

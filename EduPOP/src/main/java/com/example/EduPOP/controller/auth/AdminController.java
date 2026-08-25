@@ -28,7 +28,7 @@ public class AdminController {
         return "main/adminWaiting";
     }
 
-    // 관리자 전체회원 관리 페이지
+    // 관리자 회원 관리 페이지
     // 관리자 메인 페이지 이동
     @GetMapping("/main/adminMain")
     public String adminMain() {
@@ -38,10 +38,19 @@ public class AdminController {
     //회원 관리
     // 회원 관리 페이지로 이동
     @GetMapping("/admin/users")
-    public String adminPage(Model model) {
-        List<User> allUsers = userService.getAllUsersExceptAdmin();
+    public String adminPage(HttpSession session,
+                            Model model) {
+        User loginUser = (User) session.getAttribute("loginUser");
+       //로그인이 안되어있거나 academyId가 없다면 돌려보냄
+        if (loginUser == null || loginUser.getAcademyId() == null){
+            return "redirect:/";
+        }
+        //로그인한 유저의 academyId를 기준으로 조회
+        Long academyId = loginUser.getAcademyId();
 
-        model.addAttribute("allUsers", allUsers);
+        List<User> academyUsers = userService.getUsersAcademyId(academyId);
+
+        model.addAttribute("allUsers", academyUsers);
         return "/admin/users";
     }
 
@@ -67,31 +76,21 @@ public class AdminController {
     }
 
     //학원 관리
-    //전체 학원 조회
+    //학원 조회
     @GetMapping("/admin/academies")
     public String findAllAcademies(HttpSession session, Model model) {
+
         User loginUser = (User) session.getAttribute("loginUser");
-
-        System.out.println("========== 학원관리 ==========");
-        System.out.println("loginUser = " + loginUser);
-
         if (loginUser == null) {
-            System.out.println("loginUser가 null");
             return "redirect:/";
         }
 
-        System.out.println("academyId = " + loginUser.getAcademyId());
         Long academyId = loginUser.getAcademyId();
         if (academyId == null) {
-            System.out.println("academyId가 null");
             return "redirect:/";
         }
 
-
         Academy academy = academyService.getAcademyById(academyId);
-
-        System.out.println("academy = " + academy);
-
         model.addAttribute("academy", academy);
         return "/admin/academies";
     }
@@ -103,13 +102,12 @@ public class AdminController {
             HttpSession session
     ) {
         User loginUser = (User) session.getAttribute("loginUser");
-
         if (loginUser == null || loginUser.getAcademyId() == null) {
             return "redirect:/";
         }
+
         academy.setAcademyId(loginUser.getAcademyId());
         academyService.updateAcademy(academy);
-
         return "redirect:/admin/academies";
     }
 
@@ -117,14 +115,12 @@ public class AdminController {
     @PostMapping("/admin/deleteAcademy")
     public String deleteAcademy(HttpSession session) {
         User loginUser = (User) session.getAttribute("loginUser");
-
         if (loginUser == null || loginUser.getAcademyId() == null) {
             return "redirect:/";
         }
 
         academyService.deleteAcademy(loginUser.getAcademyId());
         session.invalidate();
-
         return "redirect:/";
     }
 

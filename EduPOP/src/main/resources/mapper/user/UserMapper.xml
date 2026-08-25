@@ -23,7 +23,7 @@
 
     </resultMap>
 
-    <!-- ID로 회원 조회 -->
+    <!-- userID로 회원 조회 -->
     <select id="findByUserId"
             parameterType="Long"
             resultType="com.example.EduPOP.domain.user.User">
@@ -142,29 +142,55 @@
     </update>
 
     <!-- 모든 회원 조회 -->
-    <select id="findAllUsers"
-            resultMap="UserResultMap">
+<!--    <select id="findAllUsers"-->
+<!--            resultMap="UserResultMap">-->
 
-        SELECT u.user_id,
-        u.academy_id,
-        u.login_id,
-        u.password_hash,
-        u.name,
-        u.email,
-        u.phone,
-        u.role,
-        u.status,
-        u.kakaoId,
-        u.created_at,
-        u.updated_at,
-        u.withdrawn_at,
-        u.school_grade,
-        c.name AS class_name
-        FROM users u
-        LEFT JOIN classes c
-        ON u.class_id = c.class_id
+<!--        SELECT u.user_id,-->
+<!--        u.academy_id,-->
+<!--        u.login_id,-->
+<!--        u.password_hash,-->
+<!--        u.name,-->
+<!--        u.email,-->
+<!--        u.phone,-->
+<!--        u.role,-->
+<!--        u.status,-->
+<!--        u.kakaoId,-->
+<!--        u.created_at,-->
+<!--        u.updated_at,-->
+<!--        u.withdrawn_at,-->
+<!--        u.school_grade,-->
+<!--        c.name AS class_name-->
+<!--        FROM users u-->
+<!--        LEFT JOIN classes c-->
+<!--        ON u.class_id = c.class_id-->
+
+<!--    </select>-->
+
+    <!-- ADMIN과 같은 학원 ID로 회원 조회 -->
+    <select id="findUserByAcademyId" resultMap="UserResultMap">
+       SELECT u.user_id,
+              u.academy_id,
+              u.login_id,
+              u.name,
+              u.email,
+              u.phone,
+              u.role,
+              u.status,
+              u.kakaoId,
+              u.school_grade,
+              c.name AS class_name
+       FROM users u
+                LEFT JOIN class_students cs
+                          ON u.user_id = cs.student_id
+                              AND cs.status = 'ACTIVE'
+                LEFT JOIN classes c
+                          ON cs.class_id = c.class_id
+       WHERE u.academy_id = #{academyId}
+         AND u.role != 'ADMIN'
+       ORDER BY u.user_id DESC
 
     </select>
+
 
     <!-- 회원 상태 개별 수정 -->
     <update id="updateStatus">
@@ -216,5 +242,11 @@
 
     </delete>
 
+    <!-- kakao 회원이 학원 선택 후 academyID 추가해줌 -->
+    <update id="updateAcademyId">
+        UPDATE users
+        SET academy_id = #{academyId}
+        WHERE user_id = #{userId}
+    </update>
 </mapper>
 

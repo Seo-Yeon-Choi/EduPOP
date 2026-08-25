@@ -64,6 +64,7 @@ public class AcademyService {
         academyMapper.deleteAcademy(academyId);
     }
 
+    //전체 학원을 가져옴
     public List<Academy> getAllAcademies() {
         return academyMapper.findAllAcademies();
     }
