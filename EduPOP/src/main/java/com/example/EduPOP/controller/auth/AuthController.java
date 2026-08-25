@@ -31,9 +31,21 @@ public class AuthController {
 
     // 회원가입 화면
     @GetMapping("/signUp")
-    public String signUpPage(Model model) {
-        List<Academy> academies = academyService.getAllAcademies();
-        model.addAttribute("academies", academies);
+    public String signUpPage(Model model,
+                             HttpSession session) {
+        //요청받은 역할을 세션에 저장, null일시 기본값 NONE
+       String requestedRole = (String) session.getAttribute("requestedRole");
+       if (requestedRole == null) {
+           requestedRole = "NONE";
+       }
+
+       //관리자 가입이 아닐 시 학원선택 목록 안 뜸
+        if (!"ADMIN".equals(requestedRole)) {
+            List<Academy> academies = academyService.getAllAcademies();
+            model.addAttribute("academies", academies);
+        }
+        //관리자 가입이라면
+        model.addAttribute("requestedRole",requestedRole);
         return "signUp";
     }
 
@@ -210,16 +222,25 @@ public class AuthController {
 //--------------------------------------------------------------------------------------
     //카카오 회원 로그인 후 학원 선택
     @GetMapping("/selectAcademy")
-    public String selectAcademy(Model model){
+    public String selectAcademy(HttpSession session,
+                                Model model){
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null){
+            return "redirect:/";
+        }
         //모든 학원을 가져와서 model에 담음
         List<Academy> academies = academyService.getAllAcademies();
         model.addAttribute("academies", academies);
+        model.addAttribute("loginUser", loginUser);
         return "/selectAcademy";
     }
 
     //카카오 회원이 학원 선택 후
     @PostMapping("/selectAcademy")
     public String selectAcademy(@RequestParam Long academyId,
+                                @RequestParam String email,
+                                @RequestParam String phone,
+                                @RequestParam Integer schoolGrade,
                                 HttpSession session){
         User loginUser = (User) session.getAttribute("loginUser");
         if (loginUser == null){
@@ -227,12 +248,18 @@ public class AuthController {
         }
 
         //로그인한 유저의 학원 번호 DB 업데이트
-        userService.updateAcademyId(
+        userService.updateKakaoUserInfo  (
                 loginUser.getUserId(),
-                academyId
+                academyId,
+                email,
+                phone,
+                schoolGrade
         );
         //로그인한 유저의 학원 번호 세션 업데이트
         loginUser.setAcademyId(academyId);
+        loginUser.setEmail(email);
+        loginUser.setPhone(phone);
+        loginUser.setSchoolGrade(String.valueOf(schoolGrade));
         session.setAttribute("loginUser", loginUser);
 
         // PENDING 상태

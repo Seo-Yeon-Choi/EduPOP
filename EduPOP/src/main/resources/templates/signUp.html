@@ -29,7 +29,6 @@
 
             <div class="form-group">
                 <label for="loginId">아이디</label>
-
                 <input
                         type="text"
                         id="loginId"
@@ -40,7 +39,6 @@
 
             <div class="form-group">
                 <label for="passwordHash">비밀번호</label>
-
                 <input
                         type="password"
                         id="passwordHash"
@@ -51,7 +49,6 @@
 
             <div class="form-group">
                 <label for="name">이름</label>
-
                 <input
                         type="text"
                         id="name"
@@ -62,7 +59,6 @@
 
             <div class="form-group">
                 <label for="email">이메일</label>
-
                 <input
                         type="email"
                         id="email"
@@ -72,7 +68,6 @@
 
             <div class="form-group">
                 <label for="phone">전화번호</label>
-
                 <input
                         type="text"
                         id="phone"
@@ -82,7 +77,6 @@
 
             <div class="form-group">
                 <label for="schoolGrade">학년</label>
-
                 <input
                         type="text"
                         id="schoolGrade"
@@ -90,7 +84,10 @@
                         placeholder="예: 중학교 2학년">
             </div>
 
-            <div class="form-group">
+            <!-- 관리자 회원가입에서는 표시하지 않음 -->
+            <div class="form-group"
+                 th:if="${requestedRole != 'ADMIN'}">
+
                 <label for="academyId">학원 선택</label>
 
                 <select
@@ -98,9 +95,7 @@
                         name="academyId"
                         required>
 
-                    <option value="">
-                        학원을 선택하세요
-                    </option>
+                    <option value="">학원을 선택하세요</option>
 
                     <option
                             th:each="academy : ${academies}"
@@ -120,7 +115,7 @@
         <div class="login-area">
             <span>이미 계정이 있으신가요?</span>
 
-            <a href="/" class="login-link">
+            <a th:href="@{/}" class="login-link">
                 로그인하기
             </a>
         </div>

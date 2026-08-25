@@ -103,8 +103,17 @@ public class UserService {
     }
 
     // kakao회원이 학원 선택 후 academyID 추가해줌
-    public void updateAcademyId(Long userId, Long academyId){
-        userMapper.updateAcademyId(userId, academyId);
+    public void updateKakaoUserInfo(Long userId,
+                                    Long academyId,
+                                    String email,
+                                    String phone,
+                                    Integer schoolGrade){
+        userMapper.updateKakaoUserInfo(
+                userId,
+                academyId,
+                email,
+                phone,
+                schoolGrade);
     }
 
 }
