@@ -210,16 +210,25 @@ public class AuthController {
 //--------------------------------------------------------------------------------------
     //카카오 회원 로그인 후 학원 선택
     @GetMapping("/selectAcademy")
-    public String selectAcademy(Model model){
+    public String selectAcademy(HttpSession session,
+                                Model model){
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null){
+            return "redirect:/";
+        }
         //모든 학원을 가져와서 model에 담음
         List<Academy> academies = academyService.getAllAcademies();
         model.addAttribute("academies", academies);
+        model.addAttribute("loginUser", loginUser);
         return "/selectAcademy";
     }
 
     //카카오 회원이 학원 선택 후
     @PostMapping("/selectAcademy")
     public String selectAcademy(@RequestParam Long academyId,
+                                @RequestParam String email,
+                                @RequestParam String phone,
+                                @RequestParam Integer schoolGrade,
                                 HttpSession session){
         User loginUser = (User) session.getAttribute("loginUser");
         if (loginUser == null){
@@ -227,12 +236,18 @@ public class AuthController {
         }
 
         //로그인한 유저의 학원 번호 DB 업데이트
-        userService.updateAcademyId(
+        userService.updateKakaoUserInfo  (
                 loginUser.getUserId(),
-                academyId
+                academyId,
+                email,
+                phone,
+                schoolGrade
         );
         //로그인한 유저의 학원 번호 세션 업데이트
         loginUser.setAcademyId(academyId);
+        loginUser.setEmail(email);
+        loginUser.setPhone(phone);
+        loginUser.setSchoolGrade(String.valueOf(schoolGrade));
         session.setAttribute("loginUser", loginUser);
 
         // PENDING 상태

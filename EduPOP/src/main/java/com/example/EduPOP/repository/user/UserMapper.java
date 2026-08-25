@@ -48,7 +48,11 @@ public interface UserMapper {
     void deleteOldWithdrawnUsers();
 
     // kakao회원이 학원 선택 후 academyID 추가해줌
-    void updateAcademyId(@Param("userId") Long userId,
-                         @Param("academyId") Long academyId);
+    void updateKakaoUserInfo(@Param("userId") Long userId,
+                             @Param("academyId") Long academyId,
+                             @Param("email") String email,
+                             @Param("phone") String phone,
+                             @Param("schoolGrade") Integer schoolGrade
+        );
 }
 

@@ -245,9 +245,14 @@
     </delete>
 
     <!-- kakao 회원이 학원 선택 후 academyID 추가해줌 -->
-    <update id="updateAcademyId">
+    <update id="updateKakaoUserInfo">
         UPDATE users
-        SET academy_id = #{academyId}
+        SET
+            academy_id = #{academyId},
+            email = #{email},
+            phone = #{phone},
+            school_grade = #{schoolGrade},
+            updated_at = NOW()
         WHERE user_id = #{userId}
     </update>
 </mapper>

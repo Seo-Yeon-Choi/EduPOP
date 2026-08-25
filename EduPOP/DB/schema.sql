@@ -29,7 +29,7 @@ CREATE TABLE users (
                        kakaoId VARCHAR(150),                       -- 카카오 고유번호
 
                        CONSTRAINT uk_users_academy_login UNIQUE (academy_id, login_id),
-                       CONSTRAINT fk_users_academy FOREIGN KEY (academy_id) REFERENCES academies(academy_id),
+                       CONSTRAINT fk_users_academy FOREIGN KEY (academy_id) REFERENCES academies(academy_id)
                    );
 
 ALTER TABLE users ADD COLUMN kakaoId VARCHAR(150);
