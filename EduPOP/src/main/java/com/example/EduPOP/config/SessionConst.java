@@ -1,5 +1,4 @@
 package com.example.EduPOP.config;
 
-public class WebConfig {
-
+public class SessionConst {
 }

@@ -27,10 +27,15 @@ CREATE TABLE users (
                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                        withdrawn_at DATETIME,                      -- 탈퇴 시점 기록 (탈퇴 후 1년 보관 기간 측정용)
+                       kakaoId VARCHAR(150),                       -- 카카오 고유번호
+                       class_id BIGINT,                            -- 소속 학급
 
                        CONSTRAINT uk_users_academy_login UNIQUE (academy_id, login_id),
-                       CONSTRAINT fk_users_academy FOREIGN KEY (academy_id) REFERENCES academies(academy_id)
-);
+                       CONSTRAINT fk_users_academy FOREIGN KEY (academy_id) REFERENCES academies(academy_id),
+                       CONSTRAINT fk_users_classes FOREIGN KEY (class_id) REFERENCES classes(class_id)
+                   );
+
+ALTER TABLE users ADD COLUMN kakaoId VARCHAR(150);
 
 CREATE TABLE parent_students (
                                  parent_student_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -132,7 +137,6 @@ CREATE TABLE exam_questions (
                                 score DECIMAL(7,2) NOT NULL DEFAULT 5.00,           -- 문항 배점
                                 correct_answer TEXT,                                -- 정답 번호 또는 텍스트
                                 question_text TEXT NOT NULL,                        -- 문제 지문/본문
-                                passage TEXT,
                                 sort_order INT NOT NULL DEFAULT 1,
                                 source_question_id BIGINT,                          -- [서연] 나선형 복습 퀘스트 원본 참조 (Self-FK)
 
@@ -294,19 +298,9 @@ CREATE TABLE student_reports (
     -- [3. 시스템 관리 메타데이터]
                                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                  updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
-    -- [4. 아는 개념 / 모르는 개념]
-                                 known_concepts TEXT,
-                                 unknown_concepts TEXT,
 
                                  CONSTRAINT fk_student_reports_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
--- 3. 지난 달 리포트 (report_id = 1) 가상 데이터 추가
-INSERT INTO student_reports (student_id, period_start, period_end, books_read_count, exam_completion_rate, retest_completion_rate, study_attendance_days, overcome_wrong_count)
-VALUES (999, '2026-06-01', '2026-06-28', 3, 88.00, 78.00, 20, 28);
-
--- 4. 이번 달 리포트 (report_id = 2) 가상 데이터 추가
-INSERT INTO student_reports (student_id, period_start, period_end, books_read_count, exam_completion_rate, retest_completion_rate, study_attendance_days, overcome_wrong_count)
-VALUES (999, '2026-07-01', '2026-07-28', 4, 92.00, 85.00, 24, 37);
 
 -- 2) 학부모 월간 발송 리포트 (교사 발행 / 무로그인 웹뷰)
 CREATE TABLE parent_reports (
