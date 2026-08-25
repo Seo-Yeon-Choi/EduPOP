@@ -245,7 +245,13 @@ public class StudentExamController {
                         paging
                 );
 
+        StudentGrowthSummary growthSummary =
+                studentExamService.getStudentGrowthSummary(
+                        studentId
+                );
+
         model.addAttribute("results", results);
+        model.addAttribute("growthSummary", growthSummary);
         model.addAttribute("paging", paging);
         model.addAttribute("selectedDate", date);
 

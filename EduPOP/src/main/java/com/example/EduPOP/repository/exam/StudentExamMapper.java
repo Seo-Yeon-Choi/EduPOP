@@ -93,4 +93,17 @@ public interface StudentExamMapper {
             @Param("studentId") Long studentId,
             @Param("date") LocalDate date
     );
+
+    StudentGrowthSummary findStudentGrowthSummary(
+            @Param("studentId") Long studentId,
+            @Param("periodStart") LocalDate periodStart,
+            @Param("recentStart") LocalDate recentStart,
+            @Param("periodEnd") LocalDate periodEnd
+    );
+
+    List<LocalDate> findStudentGrowthStudyDates(
+            @Param("studentId") Long studentId,
+            @Param("periodStart") LocalDate periodStart,
+            @Param("periodEnd") LocalDate periodEnd
+    );
 }

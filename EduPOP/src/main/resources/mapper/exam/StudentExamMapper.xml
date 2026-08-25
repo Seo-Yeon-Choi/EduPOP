@@ -461,6 +461,167 @@
 
     </select>
 
+    <select id="findStudentGrowthSummary"
+            resultType="com.example.EduPOP.domain.exam.StudentGrowthSummary">
+
+        SELECT
+            COALESCE(
+                ROUND(
+                    SUM(
+                        CASE
+                            WHEN growth.completedDate BETWEEN #{periodStart}
+                                AND DATE_SUB(#{recentStart}, INTERVAL 1 DAY)
+                            THEN growth.totalScore
+                            ELSE 0
+                        END
+                    ) * 100
+                    / NULLIF(
+                        SUM(
+                            CASE
+                                WHEN growth.completedDate BETWEEN #{periodStart}
+                                    AND DATE_SUB(#{recentStart}, INTERVAL 1 DAY)
+                                THEN growth.maxScore
+                                ELSE 0
+                            END
+                        ),
+                        0
+                    )
+                ),
+                0
+            ) AS previousAverageScore,
+
+            COALESCE(
+                ROUND(
+                    SUM(
+                        CASE
+                            WHEN growth.completedDate BETWEEN #{recentStart}
+                                AND #{periodEnd}
+                            THEN growth.totalScore
+                            ELSE 0
+                        END
+                    ) * 100
+                    / NULLIF(
+                        SUM(
+                            CASE
+                                WHEN growth.completedDate BETWEEN #{recentStart}
+                                    AND #{periodEnd}
+                                THEN growth.maxScore
+                                ELSE 0
+                            END
+                        ),
+                        0
+                    )
+                ),
+                0
+            ) AS recentAverageScore,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN growth.completedDate BETWEEN #{periodStart}
+                            AND DATE_SUB(#{recentStart}, INTERVAL 1 DAY)
+                        THEN 1
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS previousAttemptCount,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN growth.completedDate BETWEEN #{recentStart}
+                            AND #{periodEnd}
+                        THEN 1
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS recentAttemptCount,
+
+            COUNT(*) AS completedAttemptCount,
+            COALESCE(SUM(growth.reviewCorrectCount), 0)
+                AS reviewCorrectCount,
+            COALESCE(SUM(growth.reviewQuestionCount), 0)
+                AS reviewQuestionCount
+
+        FROM (
+
+            SELECT
+                DATE(a.submitted_at) AS completedDate,
+                a.total_score AS totalScore,
+                a.max_score AS maxScore,
+                CASE
+                    WHEN a.attempt_type = 'REVIEW'
+                    THEN a.correct_count
+                    ELSE 0
+                END AS reviewCorrectCount,
+                CASE
+                    WHEN a.attempt_type = 'REVIEW'
+                    THEN a.total_question_count
+                    ELSE 0
+                END AS reviewQuestionCount
+
+            FROM exam_attempts a
+
+            WHERE a.student_id = #{studentId}
+              AND a.status = 'GRADED'
+              AND DATE(a.submitted_at)
+                    BETWEEN #{periodStart} AND #{periodEnd}
+
+            UNION ALL
+
+            SELECT
+                DATE(dra.submitted_at) AS completedDate,
+                dra.total_score AS totalScore,
+                dra.max_score AS maxScore,
+                dra.correct_count AS reviewCorrectCount,
+                dra.total_question_count AS reviewQuestionCount
+
+            FROM daily_review_attempts dra
+
+            WHERE dra.student_id = #{studentId}
+              AND dra.status = 'GRADED'
+              AND DATE(dra.submitted_at)
+                    BETWEEN #{periodStart} AND #{periodEnd}
+
+        ) growth
+
+    </select>
+
+    <select id="findStudentGrowthStudyDates"
+            resultType="java.time.LocalDate">
+
+        SELECT DISTINCT completedDate
+
+        FROM (
+
+            SELECT DATE(a.submitted_at) AS completedDate
+
+            FROM exam_attempts a
+
+            WHERE a.student_id = #{studentId}
+              AND a.status = 'GRADED'
+              AND DATE(a.submitted_at)
+                    BETWEEN #{periodStart} AND #{periodEnd}
+
+            UNION ALL
+
+            SELECT DATE(dra.submitted_at) AS completedDate
+
+            FROM daily_review_attempts dra
+
+            WHERE dra.student_id = #{studentId}
+              AND dra.status = 'GRADED'
+              AND DATE(dra.submitted_at)
+                    BETWEEN #{periodStart} AND #{periodEnd}
+
+        ) study
+
+        ORDER BY completedDate
+
+    </select>
+
     <insert id="insertAttempt"
             parameterType="com.example.EduPOP.domain.exam.ExamAttempt"
             useGeneratedKeys="true"

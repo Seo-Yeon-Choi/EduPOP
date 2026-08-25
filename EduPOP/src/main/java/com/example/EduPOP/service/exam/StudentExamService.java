@@ -9,8 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -444,6 +442,111 @@ public class StudentExamService {
                 paging.getPageSize(),
                 paging.getOffset()
         );
+    }
+
+    public StudentGrowthSummary getStudentGrowthSummary(
+            Long studentId
+    ) {
+
+        LocalDate periodEnd = LocalDate.now();
+        LocalDate periodStart = periodEnd.minusDays(27);
+        LocalDate recentStart = periodEnd.minusDays(13);
+
+        StudentGrowthSummary summary =
+                studentExamMapper.findStudentGrowthSummary(
+                        studentId,
+                        periodStart,
+                        recentStart,
+                        periodEnd
+                );
+
+        if (summary == null) {
+            summary = new StudentGrowthSummary();
+        }
+
+        summary.setPeriodStart(periodStart);
+        summary.setPeriodEnd(periodEnd);
+
+        int previousScore = safeInt(
+                summary.getPreviousAverageScore()
+        );
+        int recentScore = safeInt(
+                summary.getRecentAverageScore()
+        );
+        int reviewCorrectCount = safeInt(
+                summary.getReviewCorrectCount()
+        );
+        int reviewQuestionCount = safeInt(
+                summary.getReviewQuestionCount()
+        );
+
+        summary.setPreviousAverageScore(previousScore);
+        summary.setRecentAverageScore(recentScore);
+        summary.setScoreChange(recentScore - previousScore);
+        summary.setPreviousAttemptCount(
+                safeInt(summary.getPreviousAttemptCount())
+        );
+        summary.setRecentAttemptCount(
+                safeInt(summary.getRecentAttemptCount())
+        );
+        summary.setCompletedAttemptCount(
+                safeInt(summary.getCompletedAttemptCount())
+        );
+        summary.setReviewCorrectCount(reviewCorrectCount);
+        summary.setReviewQuestionCount(reviewQuestionCount);
+
+        int retrySuccessRate = reviewQuestionCount == 0
+                ? 0
+                : (int) Math.round(
+                        reviewCorrectCount * 100.0
+                                / reviewQuestionCount
+                );
+
+        summary.setRetrySuccessRate(retrySuccessRate);
+
+        List<LocalDate> studyDates =
+                studentExamMapper.findStudentGrowthStudyDates(
+                        studentId,
+                        periodStart,
+                        periodEnd
+                );
+
+        summary.setStudyDays(studyDates.size());
+        summary.setLongestStreak(
+                calculateLongestStreak(studyDates)
+        );
+
+        return summary;
+    }
+
+    private int calculateLongestStreak(
+            List<LocalDate> studyDates
+    ) {
+
+        int longestStreak = 0;
+        int currentStreak = 0;
+        LocalDate previousDate = null;
+
+        for (LocalDate studyDate : studyDates) {
+            if (previousDate != null
+                    && studyDate.equals(previousDate.plusDays(1))) {
+                currentStreak++;
+            } else {
+                currentStreak = 1;
+            }
+
+            longestStreak = Math.max(
+                    longestStreak,
+                    currentStreak
+            );
+            previousDate = studyDate;
+        }
+
+        return longestStreak;
+    }
+
+    private int safeInt(Integer value) {
+        return value == null ? 0 : value;
     }
 
     public int getTodayReviewCount(Long studentId) {
