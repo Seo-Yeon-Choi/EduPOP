@@ -16,7 +16,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/exams")
+@RequestMapping("/teacher/exams")
 public class ExamController {
 
     private final ExamService examService;

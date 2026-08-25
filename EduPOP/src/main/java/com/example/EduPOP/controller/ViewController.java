@@ -16,7 +16,7 @@ public class ViewController {
         this.studentReportService = studentReportService;
     }
 
-    @GetMapping("/test")
+    @GetMapping("/student/report")
     public String showTestPage(Model model) {
         // 1. 이번 달 리포트 가져오기 (DB에 밀어넣은 2번)
         StudentReport currentReport = studentReportService.getReport(2L);

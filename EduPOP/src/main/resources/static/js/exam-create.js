@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // =====================================
 
             try {
-                const response = await fetch("/exams/parse-pdf", { method: "POST", body: formData });
+                const response = await fetch("/teacher/exams/parse-pdf", { method: "POST", body: formData });
 
                 // =================================
                 // 서버 오류
@@ -904,7 +904,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
 
-                const response = await fetch("/exams",
+                const response = await fetch("/teacher/exams",
                         {
                             method:
                                 "POST",
@@ -944,7 +944,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 alert("시험지가 등록되었습니다.");
 
-                window.location.href = "/exams";
+                window.location.href = "/teacher/exams";
             }
 
             catch (error) {

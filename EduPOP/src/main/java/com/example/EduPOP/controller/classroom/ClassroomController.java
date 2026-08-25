@@ -66,7 +66,7 @@ public class ClassroomController {
             return "classroom/create"; // 500 에러 대신 친절하게 폼 화면으로 복귀
         }
 
-        return "redirect:/classroom/list";
+        return "redirect:admin/classroom/list";
     }
     // 반 목록 화면 매핑
     @GetMapping("/list")
