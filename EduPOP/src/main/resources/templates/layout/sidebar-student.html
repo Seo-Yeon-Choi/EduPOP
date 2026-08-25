@@ -48,9 +48,18 @@
 
         <!-- 독서 -->
         <a th:href="@{/student/reading}"
-           class="nav-item">
+           class="nav-item"
+           th:classappend="${activeMenu == 'reading' || activeMenu == 'reading-create'} ? ' active' : ''">
             <span class="nav-icon">▤</span>
             <span>독서</span>
+        </a>
+
+        <!-- 독서록 작성 -->
+        <a th:href="@{/student/reading-reports/create}"
+           class="nav-item nav-subitem"
+           th:classappend="${activeMenu == 'reading-create'} ? ' active' : ''">
+            <span class="nav-icon">＋</span>
+            <span>독서록 작성</span>
         </a>
 
         <!-- 자기성찰 리포트 -->

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>독서감상문 상세 | EduPOP</title>
+
+  <!-- 팀 공통 화면 모양과 독서 화면 전용 모양 적용 -->
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/reading.css}">
+
+  <!-- 삭제 전 확인 문구를 실행할 자바스크립트 연결 -->
+  <script th:src="@{/js/reading.js}" defer></script>
+</head>
+
+<body>
+
+<!-- 팀 공통 상단 영역 불러오기 -->
+<div th:replace="~{layout/header :: header}"></div>
+
+<!-- 팀 공통 학생 사이드바 불러오기 -->
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="main-content">
+  <div class="reading-page reading-detail-page">
+
+    <!-- 감상문 제목과 목록 이동 버튼 -->
+    <div class="page-toolbar">
+      <div>
+        <p class="page-kicker">
+          나의 독서
+        </p>
+
+        <!-- 감상문 제목이 없으면 기본 문구 표시 -->
+        <h1 class="page-title"
+            th:text="${readingReport.title != null
+                              and !#strings.isEmpty(readingReport.title)
+                              ? readingReport.title
+                              : '제목 없는 독서감상문'}">
+          독서감상문 제목
+        </h1>
+      </div>
+
+      <a class="btn btn-secondary"
+         th:href="@{/student/reading}">
+        목록으로
+      </a>
+    </div>
+
+    <!-- 컨트롤러가 전달한 성공 문구가 있을 때만 표시 -->
+    <div class="alert alert-success"
+         th:if="${successMessage != null}"
+         th:text="${successMessage}">
+      처리되었습니다.
+    </div>
+
+    <!-- 컨트롤러가 전달한 실패 문구가 있을 때만 표시 -->
+    <div class="alert alert-error"
+         th:if="${errorMessage != null}"
+         th:text="${errorMessage}">
+      오류가 발생했습니다.
+    </div>
+
+    <!-- 감상문과 연결된 도서 정보 -->
+    <section class="content-card book-detail-card">
+
+      <!-- 도서 표지 출력 -->
+      <div class="book-cover book-cover-large">
+
+        <img th:if="${book.coverImageUrl != null
+                            and !#strings.isEmpty(book.coverImageUrl)}"
+             th:src="${book.coverImageUrl}"
+             th:alt="|${book.title} 표지|">
+
+        <span th:unless="${book.coverImageUrl != null
+                                 and !#strings.isEmpty(book.coverImageUrl)}">
+                    표지 없음
+                </span>
+      </div>
+
+      <!-- 도서 제목·저자·독서 횟수 출력 -->
+      <div class="book-detail-info">
+
+                <span class="badge badge-neutral"
+                      th:text="|이 도서 독서 ${readingCount}회|">
+                    독서 1회
+                </span>
+
+        <h2 th:text="${book.title}">
+          도서 제목
+        </h2>
+
+        <!-- 저자가 없으면 저자 없음 표시 -->
+        <p th:text="${book.author != null
+                             and !#strings.isEmpty(book.author)
+                             ? book.author
+                             : '저자, 지은이 없음'}">
+          저자
+        </p>
+      </div>
+    </section>
+
+    <!-- 학생이 작성한 감상문 본문 -->
+    <section class="content-card reading-section">
+
+      <h2 class="section-title">
+        독서감상문 내용
+      </h2>
+
+      <!-- 줄바꿈을 유지하면서 감상문 내용 출력 -->
+      <div class="report-content"
+           th:text="${readingReport.content}">
+        독서감상문 내용
+      </div>
+    </section>
+
+    <!-- 교사가 등록한 첨삭 내용 -->
+    <section class="content-card reading-section feedback-section">
+
+      <h2 class="section-title">
+        선생님 Feedback
+      </h2>
+
+      <!-- 등록된 첨삭이 있을 때 출력 -->
+      <div th:if="${feedback != null}">
+
+        <p class="feedback-writer"
+           th:text="|${feedbackTeacherName} 선생님|">
+          선생님
+        </p>
+
+        <div class="feedback-content"
+             th:text="${feedback.content}">
+          Feedback 내용
+        </div>
+      </div>
+
+      <!-- 등록된 첨삭이 없을 때 출력 -->
+      <div class="empty-inline"
+           th:unless="${feedback != null}">
+        아직 등록된 Feedback이 없습니다.
+      </div>
+    </section>
+
+    <!-- 목록·수정·삭제 버튼 영역 -->
+    <div class="detail-actions">
+
+      <a class="btn btn-secondary"
+         th:href="@{/student/reading}">
+        목록
+      </a>
+
+      <!-- 첨삭이 없을 때만 수정과 삭제 허용 -->
+      <th:block th:if="${feedback == null}">
+
+        <!-- 현재 감상문의 수정 화면으로 이동 -->
+        <a class="btn btn-secondary"
+           th:href="@{/student/reading-reports/{id}/edit(id=${readingReport.readingReportId})}">
+          수정
+        </a>
+
+        <!-- 현재 감상문 번호를 포함해 삭제 요청 전송 -->
+        <form th:action="@{/student/reading-reports/{id}/delete(id=${readingReport.readingReportId})}"
+              method="post"
+              data-confirm="이 독서감상문을 삭제하시겠습니까?">
+
+          <button class="btn btn-danger"
+                  type="submit">
+            삭제
+          </button>
+        </form>
+      </th:block>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
