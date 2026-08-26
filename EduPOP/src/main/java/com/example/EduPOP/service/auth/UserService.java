@@ -1,7 +1,6 @@
 package com.example.EduPOP.service.auth;
 
 import com.example.EduPOP.domain.user.User;
-import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.repository.user.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -9,38 +8,35 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+    );
+
     private final UserMapper userMapper;
 
     @Transactional
     public boolean registerLocalUser(User user) {
-
-        // 중복 확인
-        User existingUser =
-                userMapper.findByLoginId(user.getLoginId());
+        User existingUser = userMapper.findByLoginId(user.getLoginId());
 
         if (existingUser != null) {
             return false;
         }
 
-        // 로그인 시 회원상태 기본값 PENDING
         user.setStatus(UserStatus.PENDING);
-
         userMapper.saveUser(user);
-
         return true;
     }
 
     public User login(String loginId, String passwordHash) {
-
         User user = userMapper.findByLoginId(loginId);
 
-        if (user == null ||
-                !passwordHash.equals(user.getPasswordHash())) {
+        if (user == null || !passwordHash.equals(user.getPasswordHash())) {
             return null;
         }
 
@@ -51,70 +47,123 @@ public class UserService {
         return userMapper.findByUserId(userId);
     }
 
-    // 회원 조회
-//    // ADMIN을 제외한 모든 회원 목록 가져오기
-//    public List<User> getAllUsersExceptAdmin() {
-//
-//        List<User> allUsers =
-//                userMapper.findAllUsers();
-//
-//        // ADMIN이 아닌 유저들만 필터링
-//        return allUsers.stream()
-//                .filter(user -> user.getRole() != UserRole.ADMIN)
-//                .toList();
-//    }
-
-    //학원Id로 조회
-    public List<User> getUsersAcademyId(Long academyId){
+    public List<User> getUsersAcademyId(Long academyId) {
         return userMapper.findUserByAcademyId(academyId);
     }
 
-    // 관리자가 표에서 특정 회원의 상태를 직접 변경
     @Transactional
-    public void updateStatus(
-            Long userId,
-            UserStatus status
-    ) {
+    public void updateStatus(Long userId, UserStatus status) {
         userMapper.updateStatus(userId, status);
     }
 
-    // 여러 명 일괄 상태 변경
     @Transactional
-    public void updateUsersStatusBatch(
-            List<Long> userIds,
-            UserStatus status
-    ) {
+    public void updateUsersStatusBatch(List<Long> userIds, UserStatus status) {
         if (userIds != null && !userIds.isEmpty()) {
-            userMapper.updateUsersStatusBatch(
-                    userIds,
-                    status
-            );
+            userMapper.updateUsersStatusBatch(userIds, status);
         }
     }
 
-    // 회원 탈퇴 (휴지통으로 이동)
     @Transactional
     public void withdrawUser(Long userId) {
-        // mapper가 withdrawnAt 시간을 찍어줌
-        userMapper.updateStatus(
-                userId,
-                UserStatus.WITHDRAWN
-        );
+        userMapper.updateStatus(userId, UserStatus.WITHDRAWN);
     }
 
-    // kakao회원이 학원 선택 후 academyID 추가해줌
-    public void updateKakaoUserInfo(Long userId,
-                                    Long academyId,
-                                    String email,
-                                    String phone,
-                                    Integer schoolGrade){
-        userMapper.updateKakaoUserInfo(
-                userId,
-                academyId,
-                email,
-                phone,
-                schoolGrade);
+    public void updateKakaoUserInfo(
+            Long userId,
+            Long academyId,
+            String email,
+            String phone,
+            Integer schoolGrade
+    ) {
+        userMapper.updateKakaoUserInfo(userId, academyId, email, phone, schoolGrade);
     }
 
+    @Transactional
+    public User updateAccount(
+            Long userId,
+            User changes,
+            String newPassword,
+            String confirmPassword
+    ) {
+        User savedUser = userMapper.findByUserId(userId);
+
+        if (savedUser == null || savedUser.getStatus() == UserStatus.WITHDRAWN) {
+            throw new IllegalArgumentException("수정할 수 없는 계정입니다.");
+        }
+
+        String email = trimToNull(changes.getEmail());
+        String phone = trimToNull(changes.getPhone());
+        String schoolGrade = trimToNull(changes.getSchoolGrade());
+        validateEmail(email);
+
+        if (isSocialUser(savedUser)) {
+            userMapper.updateSocialAccount(userId, email, phone, schoolGrade);
+        } else {
+            String name = trimToNull(changes.getName());
+
+            if (name == null) {
+                throw new IllegalArgumentException("이름을 입력해주세요.");
+            }
+
+            String password = validateNewPassword(newPassword, confirmPassword);
+            userMapper.updateLocalAccount(userId, password, name, email, phone, schoolGrade);
+        }
+
+        return userMapper.findByUserId(userId);
+    }
+
+    public boolean isSocialUser(User user) {
+        return hasText(user.getKakaoId())
+                || hasText(user.getNaverId())
+                || hasText(user.getGoogleId());
+    }
+
+    public String getLoginType(User user) {
+        if (hasText(user.getKakaoId())) {
+            return "카카오 로그인";
+        }
+
+        if (hasText(user.getNaverId())) {
+            return "네이버 로그인";
+        }
+
+        if (hasText(user.getGoogleId())) {
+            return "구글 로그인";
+        }
+
+        return "일반 로그인";
+    }
+
+    private String validateNewPassword(String newPassword, String confirmPassword) {
+        String password = trimToNull(newPassword);
+        String confirmation = trimToNull(confirmPassword);
+
+        if (password == null && confirmation == null) {
+            return null;
+        }
+
+        if (password == null || !password.equals(confirmation)) {
+            throw new IllegalArgumentException("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        }
+
+        if (password.length() < 4) {
+            throw new IllegalArgumentException("새 비밀번호는 4자 이상 입력해주세요.");
+        }
+
+        return password;
+    }
+
+    private void validateEmail(String email) {
+        if (email != null && !EMAIL_PATTERN.matcher(email).matches()) {
+            throw new IllegalArgumentException("이메일 형식을 확인해주세요.");
+        }
+    }
+
+    private String trimToNull(String value) {
+        return hasText(value) ? value.trim() : null;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
 }
-
