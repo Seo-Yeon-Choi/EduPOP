@@ -86,4 +86,85 @@
         WHERE question_type_tag IS NOT NULL
     </select>
 
+    <!-- 해당 반의 시험별 평균 vs 전체 반 평균 비교 -->
+    <select id="findExamComparisonsByClassId" resultType="com.example.EduPOP.controller.analytics.dto.ClassWarningResponse$ExamComparisonDto">
+        SELECT
+            e.title AS examTitle,
+            DATE_FORMAT(e.exam_date, '%Y-%m-%d') AS examDate, -- 💡 DB의 날짜를 YYYY-MM-DD 형태로 변환하여 examDate로 전달
+            ROUND(AVG(ea.total_score), 1) AS classAverageScore,
+            (
+                SELECT ROUND(AVG(ea_all.total_score), 1)
+                FROM exam_attempts ea_all
+                WHERE ea_all.exam_id = e.exam_id
+            ) AS totalAverageScore
+        FROM classes c
+                 JOIN class_students cs ON c.class_id = cs.class_id
+                 JOIN exam_attempts ea ON cs.student_id = ea.student_id
+                 JOIN exams e ON ea.exam_id = e.exam_id
+        WHERE c.class_id = #{classId} AND cs.status = 'ACTIVE'
+        GROUP BY e.exam_id, e.title, e.exam_date
+        HAVING COUNT(ea.attempt_id) > 0
+        ORDER BY e.exam_date ASC
+    </select>
+
+    <!-- 우측 슬라이드 패널용: 해당 반 학생별 오답률 집계 (오답률 높은 순 정렬) -->
+    <select id="findVulnerableStudentsByClassId" resultType="com.example.EduPOP.controller.analytics.dto.ClassWarningResponse$StudentVulnerableDto">
+        SELECT
+            u.user_id AS studentId,
+            u.name AS studentName,
+            ROUND(
+                    SUM(CASE WHEN eans.is_correct = 0 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(eans.answer_id), 0), 1
+            ) AS errorRate
+        FROM class_students cs
+                 JOIN users u ON cs.student_id = u.user_id
+                 LEFT JOIN exam_attempts ea ON u.user_id = ea.student_id
+                 LEFT JOIN exam_answers eans ON ea.attempt_id = eans.attempt_id
+        WHERE cs.class_id = #{classId} AND cs.status = 'ACTIVE'
+        GROUP BY u.user_id, u.name
+        HAVING COUNT(eans.answer_id) > 0
+        ORDER BY errorRate DESC
+    </select>
+
+    <!-- 특정 학생의 취약 문항/단어 TOP 5 (question_text 사용) -->
+    <select id="findTopWeakWordsByStudentId" resultType="java.lang.String">
+        SELECT eq.question_text AS weakWord
+        FROM exam_answers eans
+                 JOIN exam_questions eq ON eans.question_id = eq.question_id
+                 JOIN exam_attempts ea ON eans.attempt_id = ea.attempt_id
+        WHERE ea.student_id = #{studentId} AND eans.is_correct = 0
+        GROUP BY eq.question_text
+        ORDER BY COUNT(*) DESC
+        LIMIT 5
+    </select>
+
+    <!-- 특정 학생의 취약 유형 TOP 3 -->
+    <select id="findTopWeakTypesByStudentId" resultType="java.lang.String">
+        SELECT COALESCE(eq.question_type_tag, '기본') AS weakType
+        FROM exam_answers eans
+                 JOIN exam_questions eq ON eans.question_id = eq.question_id
+                 JOIN exam_attempts ea ON eans.attempt_id = ea.attempt_id
+        WHERE ea.student_id = #{studentId} AND eans.is_correct = 0
+        GROUP BY eq.question_type_tag
+        ORDER BY COUNT(*) DESC
+        LIMIT 3
+    </select>
+
+    <!-- 반 전체 취약 유형 TOP / 우수 유형 TOP 조회 -->
+    <select id="findClassCategoryStats" resultType="com.example.EduPOP.controller.analytics.dto.StudentTrendResponse$SubCategoryStatDto">
+        SELECT
+            COALESCE(eq.question_type, '일반') AS largeCategory,
+            COALESCE(eq.question_type_tag, '기본') AS smallCategory,
+            ROUND(
+                    SUM(CASE WHEN eans.is_correct = 0 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(eans.answer_id), 0), 1
+            ) AS studentScoreRate
+        FROM class_students cs
+                 JOIN exam_attempts ea ON cs.student_id = ea.student_id
+                 JOIN exam_answers eans ON ea.attempt_id = eans.attempt_id
+                 JOIN exam_questions eq ON eans.question_id = eq.question_id
+        WHERE cs.class_id = #{classId} AND cs.status = 'ACTIVE'
+        GROUP BY COALESCE(eq.question_type, '일반'), COALESCE(eq.question_type_tag, '기본')
+        ORDER BY studentScoreRate DESC
+        LIMIT 3
+    </select>
+
 </mapper>
