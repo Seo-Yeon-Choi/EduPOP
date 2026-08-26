@@ -10,16 +10,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal; // BigDecimal(빅 데시멀): 소수점 계산을 정확하게 처리하는 숫자 타입
+import java.math.BigDecimal; // BigDecimal(빅 데시멀): 소수점 계산용 숫자 타입
 import java.math.RoundingMode; // RoundingMode(라운딩 모드): 소수점 처리 방법
-import java.util.List; // List(리스트): 여러 경험치 로그를 순서대로 저장하는 자료형
+import java.util.List; // List(리스트): 여러 경험치 로그를 저장하는 자료형
 
 @Service // 경험치 지급과 캐릭터 성장 판단을 담당하는 객체로 등록
 @RequiredArgsConstructor // final 필드를 받는 생성자를 자동 생성
-@Transactional(readOnly = true) // Transactional(트랜잭셔널), readOnly(리드 온리): 조회 중 DB 변경 방지
+@Transactional(readOnly = true) // 조회 작업에서는 DB 내용을 변경하지 않도록 설정
 public class ExpService {
 
-    private final ExpMapper expMapper; // 경험치 관련 SQL 실행을 Mapper에 요청하기 위해 주입
+    private final ExpMapper expMapper; // 경험치 관련 DB 작업을 Mapper에 요청하기 위해 주입
 
 
     public ExpDTO getExpInfo(
@@ -36,42 +36,68 @@ public class ExpService {
         int totalExp =
                 expGrowth == null || expGrowth.getTotalExp() == null
                         ? 0
-                        : expGrowth.getTotalExp(); // 성장 기록이 없으면 총 경험치를 0점으로 사용
+                        : expGrowth.getTotalExp();
+        // 성장 기록이 없는 학생은 총 경험치를 0점으로 사용
+
+        ExpLevel currentLevel =
+                ExpLevel.findLevel(
+                        totalExp
+                );
+        // currentLevel(커런트 레벨): 총 경험치에 맞는 현재 성장 단계 조회
 
         int characterStage =
-                ExpLevel.findCharacterStage(
-                        totalExp
-                ); // 총 경험치에 맞는 캐릭터 단계 계산
+                currentLevel.getCharacterStage();
+        // characterStage(캐릭터 스테이지): 현재 성장 단계 번호
 
-        ExpDTO expDto = new ExpDTO(); // 웹페이지에 전달할 경험치 정보 객체 생성
+        ExpDTO expDto =
+                new ExpDTO();
+        // ExpDTO(이엑스피 디티오): 웹페이지에 전달할 경험치 정보 객체 생성
 
-        expDto.setStudentId(studentId); // 경험치 정보를 조회한 학생 번호 저장
+        expDto.setStudentId(
+                studentId
+        ); // 경험치 정보를 조회한 학생 번호 저장
 
-        expDto.setTotalExp(totalExp); // 현재 총 경험치 저장
+        expDto.setTotalExp(
+                totalExp
+        ); // 현재 총 경험치 저장
 
         expDto.setCharacterStage(
                 characterStage
-        ); // 현재 캐릭터 단계 저장
+        ); // 현재 캐릭터 성장 단계 저장
+
+        expDto.setStageName(
+                currentLevel.getStageName()
+        ); // G부터 GROW UP까지 현재 단계 이름 저장
 
         expDto.setExpToNextStage(
                 calculateExpToNextStage(
                         totalExp,
-                        characterStage
+                        currentLevel
                 )
         ); // 다음 캐릭터 단계까지 필요한 경험치 저장
 
+        expDto.setExpProgressPercent(
+                calculateExpProgressPercent(
+                        totalExp,
+                        currentLevel
+                )
+        ); // 현재 단계의 경험치 진행률 저장
+
         expDto.setMaxStage(
-                characterStage
-                        == ExpLevel.LEVEL_3.getCharacterStage()
-        ); // 현재 캐릭터가 최종 단계인지 저장
+                currentLevel == ExpLevel.LEVEL_6
+        ); // 현재 캐릭터가 최종 6단계인지 저장
 
         expDto.setCharacterImageUrl(
-                findCharacterImageUrl(
+                findCharacterImageUrl()
+        ); // 공통 캐릭터 이미지 주소 저장
+
+        expDto.setBackgroundImageUrl(
+                findBackgroundImageUrl(
                         characterStage
                 )
-        ); // 현재 단계에 맞는 캐릭터 이미지 주소 저장
+        ); // 현재 단계에 맞는 배경 이미지 주소 저장
 
-        return expDto; // 완성한 경험치 정보를 반환
+        return expDto; // 완성한 경험치 정보를 Controller에 반환
     }
 
 
@@ -83,20 +109,28 @@ public class ExpService {
             BigDecimal maxScore
     ) { // giveExamExp(기브 이그잼 이엑스피): 일반 시험 경험치 지급
 
-        validateId(studentId, "학생 번호"); // 올바른 학생 번호인지 확인
+        validateId(
+                studentId,
+                "학생 번호"
+        ); // 올바른 학생 번호인지 확인
 
-        validateId(examId, "시험 번호"); // 올바른 시험 번호인지 확인
+        validateId(
+                examId,
+                "시험 번호"
+        ); // 올바른 시험 번호인지 확인
 
         BigDecimal convertedScore =
                 calculateConvertedScore(
                         totalScore,
                         maxScore
-                ); // convertedScore(컨버티드 스코어): 100점 만점으로 환산한 시험 점수
+                );
+        // convertedScore(컨버티드 스코어): 100점 만점으로 환산한 시험 점수
 
         int earnedExp =
                 findExamExpAmount(
                         convertedScore
-                ); // earnedExp(언드 이엑스피): 시험 점수에 따라 지급할 경험치
+                );
+        // earnedExp(언드 이엑스피): 시험 점수에 따라 지급할 경험치
 
         return giveExp(
                 studentId,
@@ -113,7 +147,10 @@ public class ExpService {
             Long examId
     ) { // giveReviewExp(기브 리뷰 이엑스피): 시험 복습 경험치 지급
 
-        validateId(studentId, "학생 번호"); // 올바른 학생 번호인지 확인
+        validateId(
+                studentId,
+                "학생 번호"
+        ); // 올바른 학생 번호인지 확인
 
         validateId(
                 examId,
@@ -125,7 +162,7 @@ public class ExpService {
                 ExpActivityType.REVIEW_LOG,
                 examId,
                 30
-        ); // 같은 시험 복습은 최초 1회에만 경험치 지급
+        ); // 같은 시험 복습은 최초 1회에만 경험치 30점 지급
     }
 
 
@@ -136,7 +173,10 @@ public class ExpService {
             int readingCount
     ) { // giveReadingExp(기브 리딩 이엑스피): 독서감상문 경험치 지급
 
-        validateId(studentId, "학생 번호"); // 올바른 학생 번호인지 확인
+        validateId(
+                studentId,
+                "학생 번호"
+        ); // 올바른 학생 번호인지 확인
 
         validateId(
                 readingReportId,
@@ -152,7 +192,8 @@ public class ExpService {
         int earnedExp =
                 findReadingExpAmount(
                         readingCount
-                ); // earnedExp(언드 이엑스피): 같은 책의 감상문 순서에 따라 지급할 경험치
+                );
+        // earnedExp(언드 이엑스피): 감상문 작성 순서에 따라 지급할 경험치
 
         if (earnedExp == 0) {
             return 0; // 같은 책의 다섯 번째 감상문부터는 경험치를 지급하지 않음
@@ -163,7 +204,7 @@ public class ExpService {
                 ExpActivityType.READING_LOG,
                 readingReportId,
                 earnedExp
-        ); // 감상문 번호를 기준으로 독서 경험치 중복 지급 방지
+        ); // 감상문 번호를 기준으로 중복 지급 방지
     }
 
 
@@ -171,7 +212,10 @@ public class ExpService {
             Long studentId
     ) { // getExpLogs(겟 이엑스피 로그스): 학생의 경험치 지급 로그 목록 조회
 
-        validateId(studentId, "학생 번호"); // 올바른 학생 번호인지 확인
+        validateId(
+                studentId,
+                "학생 번호"
+        ); // 올바른 학생 번호인지 확인
 
         return expMapper.findExpLogsByStudentId(
                 studentId
@@ -191,7 +235,8 @@ public class ExpService {
                         studentId,
                         expLogType.name(),
                         referenceId
-                ); // duplicateCount(듀플리케이트 카운트): 이미 지급된 같은 활동 개수
+                );
+        // duplicateCount(듀플리케이트 카운트): 이미 지급된 같은 활동 개수
 
         if (duplicateCount > 0) {
             return 0; // 이미 지급된 활동이면 경험치를 다시 지급하지 않음
@@ -228,7 +273,7 @@ public class ExpService {
 
         expLog.setReferenceId(
                 referenceId
-        ); // 경험치를 발생시킨 원본 데이터 번호 저장
+        ); // 경험치를 발생시킨 시험·복습·감상문 번호 저장
 
         expLog.setEarnedExp(
                 earnedExp
@@ -237,7 +282,8 @@ public class ExpService {
         int insertedLogCount =
                 expMapper.insertExpLog(
                         expLog
-                ); // insertedLogCount(인서티드 로그 카운트): 등록된 로그 개수
+                );
+        // insertedLogCount(인서티드 로그 카운트): 등록된 로그 개수
 
         if (insertedLogCount != 1
                 || expLog.getLogId() == null) {
@@ -257,7 +303,8 @@ public class ExpService {
     ) { // insertFirstExpGrowth(인서트 퍼스트 이엑스피 그로스): 첫 성장 정보 등록
 
         ExpGrowth newExpGrowth =
-                new ExpGrowth(); // newExpGrowth(뉴 이엑스피 그로스): 처음 저장할 성장 객체
+                new ExpGrowth();
+        // newExpGrowth(뉴 이엑스피 그로스): 처음 저장할 성장 객체
 
         newExpGrowth.setStudentId(
                 studentId
@@ -276,7 +323,8 @@ public class ExpService {
         int insertedGrowthCount =
                 expMapper.insertExpGrowth(
                         newExpGrowth
-                ); // insertedGrowthCount(인서티드 그로스 카운트): 등록된 성장 정보 개수
+                );
+        // insertedGrowthCount(인서티드 그로스 카운트): 등록된 성장 정보 개수
 
         if (insertedGrowthCount != 1) {
             throw new IllegalStateException(
@@ -295,7 +343,8 @@ public class ExpService {
                 expMapper.addExp(
                         expGrowth.getStudentId(),
                         earnedExp
-                ); // updatedExpCount(업데이트드 이엑스피 카운트): 경험치가 수정된 행 개수
+                );
+        // updatedExpCount(업데이트드 이엑스피 카운트): 경험치가 수정된 행 개수
 
         if (updatedExpCount != 1) {
             throw new IllegalStateException(
@@ -419,70 +468,95 @@ public class ExpService {
 
     private int findReadingExpAmount(
             int readingCount
-    ) { // findReadingExpAmount(파인드 리딩 이엑스피 어마운트): 독서 순서에 맞는 경험치 선택
+    ) { // findReadingExpAmount(파인드 리딩 이엑스피 어마운트): 감상문 순서에 맞는 경험치 선택
 
         return switch (readingCount) {
 
-            case 1 -> 35; // 첫 번째 감상문이면 경험치 35점
+            case 1 -> 35; // 같은 책의 첫 번째 감상문이면 경험치 35점
 
-            case 2 -> 25; // 두 번째 감상문이면 경험치 25점
+            case 2 -> 25; // 같은 책의 두 번째 감상문이면 경험치 25점
 
-            case 3 -> 15; // 세 번째 감상문이면 경험치 15점
+            case 3 -> 15; // 같은 책의 세 번째 감상문이면 경험치 15점
 
-            case 4 -> 5; // 네 번째 감상문이면 경험치 5점
+            case 4 -> 5; // 같은 책의 네 번째 감상문이면 경험치 5점
 
-            default -> 0; // 다섯 번째 이상이면 경험치를 지급하지 않음
+            default -> 0; // 같은 책의 다섯 번째 이상이면 경험치를 지급하지 않음
         };
     }
 
 
     private int calculateExpToNextStage(
             int totalExp,
-            int characterStage
+            ExpLevel currentLevel
     ) { // calculateExpToNextStage(캘큘레이트 이엑스피 투 넥스트 스테이지): 다음 단계까지 남은 경험치 계산
 
-        if (characterStage
-                == ExpLevel.LEVEL_1.getCharacterStage()) {
+        ExpLevel nextLevel =
+                currentLevel.findNextLevel();
+        // nextLevel(넥스트 레벨): 현재 단계 다음의 성장 단계
 
-            return Math.max(
-                    ExpLevel.LEVEL_2.getMinExp()
-                            - totalExp,
-                    0
-            ); // 2단계까지 필요한 경험치 계산
+        if (nextLevel == null) {
+            return 0; // 최종 6단계이면 필요한 다음 단계 경험치는 0점
         }
 
-        if (characterStage
-                == ExpLevel.LEVEL_2.getCharacterStage()) {
-
-            return Math.max(
-                    ExpLevel.LEVEL_3.getMinExp()
-                            - totalExp,
-                    0
-            ); // 3단계까지 필요한 경험치 계산
-        }
-
-        return 0; // 최종 단계이면 다음 단계까지 필요한 경험치는 0점
+        return Math.max(
+                nextLevel.getMinExp() - totalExp,
+                0
+        ); // 다음 성장 단계까지 필요한 경험치 계산
     }
 
 
-    private String findCharacterImageUrl(
+    private int calculateExpProgressPercent(
+            int totalExp,
+            ExpLevel currentLevel
+    ) { // calculateExpProgressPercent(캘큘레이트 이엑스피 프로그레스 퍼센트): 현재 단계 진행률 계산
+
+        ExpLevel nextLevel =
+                currentLevel.findNextLevel();
+        // 현재 단계 다음의 성장 단계 조회
+
+        if (nextLevel == null) {
+            return 100; // 최종 6단계이면 진행률을 100퍼센트로 반환
+        }
+
+        int currentStageExp =
+                Math.max(
+                        totalExp - currentLevel.getMinExp(),
+                        0
+                );
+        // currentStageExp(커런트 스테이지 이엑스피): 현재 단계에서 획득한 경험치
+
+        int currentStageMaxExp =
+                nextLevel.getMinExp()
+                        - currentLevel.getMinExp();
+        // currentStageMaxExp(커런트 스테이지 맥스 이엑스피): 현재 단계의 전체 경험치 구간
+
+        int progressPercent =
+                currentStageExp * 100
+                        / currentStageMaxExp;
+        // progressPercent(프로그레스 퍼센트): 현재 단계 경험치 진행률
+
+        return Math.min(
+                progressPercent,
+                100
+        ); // 진행률이 100퍼센트를 넘지 않도록 제한
+    }
+
+
+    private String findCharacterImageUrl() {
+        // findCharacterImageUrl(파인드 캐릭터 이미지 유알엘): 공통 캐릭터 이미지 주소 조회
+
+        return "/images/exp/character.png"; // 모든 단계에서 사용하는 캐릭터 이미지 주소
+    }
+
+
+    private String findBackgroundImageUrl(
             int characterStage
-    ) { // findCharacterImageUrl(파인드 캐릭터 이미지 유알엘): 단계별 이미지 주소 선택
+    ) { // findBackgroundImageUrl(파인드 백그라운드 이미지 유알엘): 단계별 배경 주소 조회
 
-        return switch (characterStage) {
-
-            case 2 ->
-                    "/images/exp/stage2.png";
-            // 캐릭터 2단계 이미지 주소 반환
-
-            case 3 ->
-                    "/images/exp/stage3.png";
-            // 캐릭터 3단계 이미지 주소 반환
-
-            default ->
-                    "/images/exp/stage1.png";
-            // 캐릭터 1단계 이미지 주소 반환
-        };
+        return "/images/exp/stage"
+                + characterStage
+                + "-background.png";
+        // 현재 단계 번호에 맞는 배경 이미지 주소 반환
     }
 
 
