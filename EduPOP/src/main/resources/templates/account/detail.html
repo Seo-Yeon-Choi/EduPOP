@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPOP - 계정 정보</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/account.css}">
+</head>
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<th:block th:if="${accountUser.role.name() == 'STUDENT'}">
+    <div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+</th:block>
+<th:block th:if="${accountUser.role.name() == 'TEACHER'}">
+    <div th:replace="~{layout/sidebar-teacher :: sidebar}"></div>
+</th:block>
+<th:block th:if="${accountUser.role.name() == 'ADMIN'}">
+    <div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
+</th:block>
+
+<main class="account-page-container">
+    <header class="account-page-header">
+        <div>
+            <span class="page-label">ACCOUNT</span>
+            <h1>계정 정보</h1>
+            <p>현재 등록된 개인정보와 계정 정보를 확인할 수 있습니다.</p>
+        </div>
+        <div class="header-actions">
+            <a class="secondary-button" th:href="${homeUrl}">메인으로</a>
+            <a class="primary-button" th:href="@{/account/edit}">수정하기</a>
+        </div>
+    </header>
+
+    <div class="success-message" th:if="${message != null}" th:text="${message}">
+        계정 정보가 수정되었습니다.
+    </div>
+
+    <section class="account-card">
+        <div class="card-title-row">
+            <div>
+                <h2>기본 정보</h2>
+                <p>아이디와 소속 학원은 계정정보 수정에서 변경할 수 없습니다.</p>
+            </div>
+            <span class="login-type-badge" th:text="${loginType}">일반 로그인</span>
+        </div>
+
+        <dl class="account-info-grid">
+            <div th:unless="${socialUser}">
+                <dt>아이디</dt>
+                <dd th:text="${accountUser.loginId}">student01</dd>
+            </div>
+            <div th:if="${socialUser}">
+                <dt>로그인 방식</dt>
+                <dd th:text="${loginType}">카카오 로그인</dd>
+            </div>
+            <div>
+                <dt>이름</dt>
+                <dd th:text="${accountUser.name}">홍길동</dd>
+            </div>
+            <div>
+                <dt>이메일</dt>
+                <dd th:text="${accountUser.email != null and !accountUser.email.isEmpty() ? accountUser.email : '-'}">
+                    student@example.com
+                </dd>
+            </div>
+            <div>
+                <dt>전화번호</dt>
+                <dd th:text="${accountUser.phone != null and !accountUser.phone.isEmpty() ? accountUser.phone : '-'}">
+                    010-0000-0000
+                </dd>
+            </div>
+            <div>
+                <dt>학년</dt>
+                <dd th:text="${accountUser.schoolGrade != null and !accountUser.schoolGrade.isEmpty() ? accountUser.schoolGrade : '-'}">
+                    2학년
+                </dd>
+            </div>
+            <div>
+                <dt>소속 학원</dt>
+                <dd th:text="${accountUser.academyName != null and !accountUser.academyName.isEmpty() ? accountUser.academyName : '-'}">
+                    EduPOP 영어학원
+                </dd>
+            </div>
+            <div>
+                <dt>권한</dt>
+                <dd th:text="${accountUser.role}">STUDENT</dd>
+            </div>
+            <div>
+                <dt>계정 상태</dt>
+                <dd><span class="status-badge" th:text="${accountUser.status}">ACTIVE</span></dd>
+            </div>
+        </dl>
+    </section>
+</main>
+
+</body>
+</html>
