@@ -1,7 +1,7 @@
 package com.example.EduPOP.controller;
 
 import com.example.EduPOP.domain.report.ParentReport;
-import com.example.EduPOP.service.ParentReportService;
+import com.example.EduPOP.service.report.ParentReportService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,7 +1,7 @@
 package com.example.EduPOP.controller;
 
 import com.example.EduPOP.domain.report.ParentReport;
-import com.example.EduPOP.service.ParentReportService;
+import com.example.EduPOP.service.report.ParentReportService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;

@@ -1,4 +1,4 @@
-package com.example.EduPOP.service;
+package com.example.EduPOP.service.report;
 
 import com.example.EduPOP.domain.report.StudentReport;
 // 곧 만들 창고(Repository)를 미리 불러옵니다! (지금은 빨간 줄이 뜨는 게 정상입니다)

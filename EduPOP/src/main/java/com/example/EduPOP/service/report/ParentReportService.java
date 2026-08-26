@@ -1,9 +1,9 @@
-package com.example.EduPOP.service;
+package com.example.EduPOP.service.report;
 
 import com.example.EduPOP.domain.report.ParentReport;
 import com.example.EduPOP.domain.report.ParentDeviceLink; // 🚀 에러 해결: Import 추가!
 import com.example.EduPOP.dto.ReportMetricsDTO;
-import com.example.EduPOP.mapper.ReportMapper;
+import com.example.EduPOP.repository.report.ReportMapper;
 import com.example.EduPOP.repository.ParentReportRepository;
 import com.example.EduPOP.repository.ParentDeviceLinkRepository; // 🚀 에러 해결: Import 추가!
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.example.EduPOP.controller;
 
-import com.example.EduPOP.service.ParentReportService;
+import com.example.EduPOP.service.report.ParentReportService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,4 +1,4 @@
-package com.example.EduPOP.mapper;
+package com.example.EduPOP.repository.report;
 
 import com.example.EduPOP.dto.ReportMetricsDTO;
 import org.apache.ibatis.annotations.Mapper;

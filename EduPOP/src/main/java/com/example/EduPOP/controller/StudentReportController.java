@@ -1,7 +1,7 @@
 package com.example.EduPOP.controller;
 
 import com.example.EduPOP.domain.report.StudentReport;
-import com.example.EduPOP.service.StudentReportService;
+import com.example.EduPOP.service.report.StudentReportService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
