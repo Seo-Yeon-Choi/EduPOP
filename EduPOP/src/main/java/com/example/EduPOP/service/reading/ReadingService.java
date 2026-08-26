@@ -7,6 +7,7 @@ import com.example.EduPOP.repository.reading.ReadingMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.EduPOP.service.exp.ExpService;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,9 +15,10 @@ import java.util.Objects;
 @Service // 독서 기능의 실제 처리와 판단을 담당하는 객체로 등록
 @RequiredArgsConstructor // final 필드를 매개변수로 받는 생성자를 자동 생성
 @Transactional(readOnly = true) // 조회 메서드는 기본적으로 DB 내용을 변경하지 않도록 설정
-public class ReadingService {
+public class    ReadingService {
 
     private final ReadingMapper readingMapper; // 독서 관련 SQL 실행을 Mapper에 요청하기 위해 주입
+    private final ExpService expService; // ExpService(이엑스피 서비스): 독서감상문 경험치 지급을 요청하기 위해 주입
 
 
     @Transactional // 도서 등록 중 실행되는 DB 작업을 하나의 작업 단위로 처리
@@ -172,6 +174,17 @@ public class ReadingService {
                     "독서감상문 등록에 실패했습니다."
             );
         }
+        int readingCount =
+                readingMapper.countReadingReportsByStudentIdAndBookId(
+                        studentId,
+                        bookId
+                ); // readingCount(리딩 카운트): 같은 학생이 같은 책으로 작성한 감상문 개수 조회
+
+        expService.giveReadingExp(
+                studentId,
+                readingReport.getReadingReportId(),
+                readingCount
+        ); // giveReadingExp(기브 리딩 이엑스피): 등록한 감상문에 해당하는 독서 경험치 지급
 
         return readingReport.getReadingReportId(); // 자동 생성된 감상문 번호 반환
     }

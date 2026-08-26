@@ -23,27 +23,43 @@ public interface ExpMapper { //  경험치 관련 DB 작업 규칙
             ExpGrowth expGrowth
     ); // 처음 경험치를 받는 학생의 성장 기록 등록
 
-    int addExp( //  학생의 기존 경험치에 새 경험치 추가
-            @Param("studentId") Long studentId,
-            @Param("earnedExp") Integer earnedExp
+    int addExp( //  학생의 기존 경험치에 새 경험치 지급
+                @Param("studentId") Long studentId,
+                @Param("earnedExp") Integer earnedExp
     );
 
     int updateExpStage(
             @Param("studentId") Long studentId,
             @Param("characterStage") Integer characterStage
-    ); // 경험치에 맞게 학생의 캐릭터 단계 수정
+    ); // 경험치에 맞게 학생의 캐릭터 등급 수정
 
     int countDuplicateExp(
             @Param("studentId") Long studentId,
             @Param("activityType") String activityType,
             @Param("referenceId") Long referenceId
-    ); // (듀플리케이트): 같은 활동의 경험치 중복 지급 확인
+    ); // (듀플리케이트): 중복 활동의 경험치 중복 지급 확인
 
     int insertExpLog(
             ExpLog expLog
-    ); // 경험치 지급 기록 등록
+    ); // 경험치 지급 로그
+
+    ExpLog findExpLog(
+            @Param("studentId") Long studentId,
+            @Param("activityType") String activityType,
+            @Param("referenceId") Long referenceId
+    ); // 학생 번호와 활동 번호로 지급된 경험치 로그 조회
+
+    int subtractExp(
+            @Param("studentId") Long studentId,
+            @Param("earnedExp") Integer earnedExp
+    ); // 지급 원인이 삭제되면 학생의 누적 경험치에서 기존 경험치 회수
+
+    int deleteExpLog(
+            @Param("logId") Long logId,
+            @Param("studentId") Long studentId
+    ); // 회수 완료된 경험치 지급 로그 삭제
 
     List<ExpLog> findExpLogsByStudentId(
             @Param("studentId") Long studentId
-    ); // 학생 번호로 경험치 지급 로그 목록 조회
+    ); // 학생 번호로 경험치 지급 로그 조회
 }

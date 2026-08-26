@@ -1,0 +1,100 @@
+<section xmlns:th="http://www.thymeleaf.org"
+         th:fragment="expCard"
+         class="exp-card"
+         id="expCard"
+         aria-labelledby="expCardTitle">
+
+    <!-- 경험치 정보를 불러오는 동안 표시 -->
+    <div class="exp-loading" id="expLoading">
+        성장 정보를 불러오는 중입니다.
+    </div>
+
+    <!-- 경험치 조회에 실패했을 때 표시 -->
+    <div class="exp-error"
+         id="expError"
+         role="alert"
+         hidden>
+        성장 정보를 불러오지 못했습니다.
+    </div>
+
+    <!-- 경험치 조회가 끝나면 표시할 실제 내용 -->
+    <div class="exp-content"
+         id="expContent"
+         hidden>
+
+        <!-- 캐릭터 배경과 단계별 캐릭터 이미지 표시 영역 -->
+        <div class="exp-character-area">
+
+            <div class="exp-character-background"
+                 aria-hidden="true">
+            </div>
+
+            <img class="exp-character-image"
+                 id="expCharacterImage"
+                 src=""
+                 alt="현재 성장 단계 캐릭터"
+                 hidden>
+
+            <!-- 캐릭터 이미지를 만들기 전까지 표시할 임시 영역 -->
+            <div class="exp-character-placeholder"
+                 id="expCharacterPlaceholder">
+                <span>캐릭터 준비 중</span>
+            </div>
+
+        </div>
+
+        <!-- 현재 단계와 경험치 정보 표시 영역 -->
+        <div class="exp-info-area">
+
+            <p class="exp-label">
+                MY GROWTH
+            </p>
+
+            <div class="exp-title-row">
+                <h2 id="expCardTitle">
+                    나의 성장 캐릭터
+                </h2>
+
+                <span class="exp-stage-badge"
+                      id="expStageBadge">
+                    1단계
+                </span>
+            </div>
+
+            <div class="exp-score-row">
+                <strong class="exp-total"
+                        id="expTotal">
+                    0 EXP
+                </strong>
+
+                <span class="exp-next"
+                      id="expNext">
+                    다음 단계까지 100 EXP
+                </span>
+            </div>
+
+            <!-- 현재 단계에서 다음 단계까지의 진행 정도 표시 -->
+            <div class="exp-progress"
+                 id="expProgress"
+                 role="progressbar"
+                 aria-label="다음 캐릭터 단계까지의 경험치 진행률"
+                 aria-valuemin="0"
+                 aria-valuemax="100"
+                 aria-valuenow="0">
+
+                <div class="exp-progress-bar"
+                     id="expProgressBar">
+                </div>
+
+            </div>
+
+            <p class="exp-guide"
+               id="expGuide">
+                시험·복습·독서 활동으로 경험치를 모아 캐릭터를 성장시켜 보세요.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
