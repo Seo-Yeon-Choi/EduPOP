@@ -296,9 +296,19 @@ CREATE TABLE student_reports (
     -- [3. 시스템 관리 메타데이터]
                                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                  updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    -- [4. 아는 개념 / 모르는 개념]
+                                 known_concepts TEXT,
+                                 unknown_concepts TEXT,
 
                                  CONSTRAINT fk_student_reports_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+-- 3. 지난 달 리포트 (report_id = 1) 가상 데이터 추가
+INSERT INTO student_reports (student_id, period_start, period_end, books_read_count, exam_completion_rate, retest_completion_rate, study_attendance_days, overcome_wrong_count)
+VALUES (999, '2026-06-01', '2026-06-28', 3, 88.00, 78.00, 20, 28);
+
+-- 4. 이번 달 리포트 (report_id = 2) 가상 데이터 추가
+INSERT INTO student_reports (student_id, period_start, period_end, books_read_count, exam_completion_rate, retest_completion_rate, study_attendance_days, overcome_wrong_count)
+VALUES (999, '2026-07-01', '2026-07-28', 4, 92.00, 85.00, 24, 37);
 
 -- 2) 학부모 월간 발송 리포트 (교사 발행 / 무로그인 웹뷰)
 CREATE TABLE parent_reports (
@@ -332,7 +342,8 @@ CREATE TABLE parent_reports (
                                 CONSTRAINT fk_parent_reports_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
                                 CONSTRAINT fk_parent_reports_creator FOREIGN KEY (created_by) REFERENCES users(user_id)
 );
-
+ALTER TABLE parent_reports
+    ADD COLUMN radar_chart_data TEXT;
 
 -- =========================================================================================
 -- [도메인 8] 활동 로그 & 캐릭터 성장 도메인
@@ -460,3 +471,14 @@ CREATE TABLE daily_review_answers (
                                               REFERENCES exam_questions(question_id)
                                               ON DELETE CASCADE
 );
+CREATE TABLE parent_device_links (
+                                     link_id BIGINT AUTO_INCREMENT PRIMARY KEY,             -- 기기 연결 고유 ID (PK)
+                                     student_id BIGINT NOT NULL,                            -- 연결된 학생의 ID (FK)
+                                     device_token VARCHAR(100) NOT NULL UNIQUE,             -- 브라우저(쿠키)에 저장될 난수 토큰
+                                     connected_at DATETIME NOT NULL,                        -- 최초 기기 연결(인증) 일시
+                                     expires_at DATETIME NOT NULL,                          -- 기기 연결 만료 일시 (기본 1년)
+
+    -- 외래 키(FK) 제약조건: 학생이 삭제되면 이 기기 연결 기록도 같이 삭제되도록 설정
+                                     CONSTRAINT fk_parent_device_student
+                                         FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
+) COMMENT = '학부모 무로그인 기기 연결(자동 로그인) 관리 테이블';
