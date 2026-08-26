@@ -174,18 +174,6 @@ public class    ReadingService {
                     "독서감상문 등록에 실패했습니다."
             );
         }
-        int readingCount =
-                readingMapper.countReadingReportsByStudentIdAndBookId(
-                        studentId,
-                        bookId
-                ); // readingCount(리딩 카운트): 같은 학생이 같은 책으로 작성한 감상문 개수 조회
-
-        expService.giveReadingExp(
-                studentId,
-                readingReport.getReadingReportId(),
-                readingCount
-        ); // giveReadingExp(기브 리딩 이엑스피): 등록한 감상문에 해당하는 독서 경험치 지급
-
         return readingReport.getReadingReportId(); // 자동 생성된 감상문 번호 반환
     }
 
@@ -379,10 +367,12 @@ public class    ReadingService {
         validateId(teacherId, "교사 번호"); // 올바른 교사 번호인지 확인
         validateId(readingReportId, "감상문 번호"); // 올바른 감상문 번호인지 확인
 
-        getTeacherReadingReport(
-                teacherId,
-                readingReportId
-        ); // 담당 교사가 열람할 수 있는 감상문인지 확인
+        ReadingReport feedbackReport =
+                getTeacherReadingReport(
+                        teacherId,
+                        readingReportId
+                );
+        // feedbackReport(피드백 리포트): 담당 교사가 확인할 감상문 정보 조회
 
         String normalizedContent =
                 requireText(
@@ -430,8 +420,23 @@ public class    ReadingService {
                 );
             }
 
-            return;
-        }
+            int readingCount =
+                    readingMapper
+                            .countFeedbackReportsByStudentIdAndBookId(
+                                    feedbackReport.getStudentId(),
+                                    feedbackReport.getBookId()
+                            );
+            //  같은 책으로 피드백까지 받은 감상문 순서 조회
+
+            expService.giveReadingExp(
+                    feedbackReport.getStudentId(),
+                    readingReportId,
+                    readingCount
+            );
+            // 교사가 처음 피드백을 등록한 감상문에 독서 경험치 지급
+
+            return; // 신규 피드백 등록과 경험치 지급을 마치고 메서드 종료
+             }
 
         if (!Objects.equals(
                 savedFeedback.getTeacherId(),

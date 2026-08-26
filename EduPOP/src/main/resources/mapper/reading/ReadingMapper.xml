@@ -255,6 +255,19 @@
 
     </select>
 
+    <!-- 같은 학생이 같은 책으로 작성하고 교사 피드백까지 받은 감상문 개수 조회 -->
+    <select id="countFeedbackReportsByStudentIdAndBookId"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM reading_reports rr
+        INNER JOIN reading_feedbacks rf
+        ON rf.reading_report_id = rr.reading_report_id
+        WHERE rr.student_id = #{studentId}
+        AND rr.book_id = #{bookId}
+
+    </select>
+
 
     <!-- 작성 학생 본인의 감상문 제목과 내용 수정 -->
     <update id="updateReadingReportByStudentId"

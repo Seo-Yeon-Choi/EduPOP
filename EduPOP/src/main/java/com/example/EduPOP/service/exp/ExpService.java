@@ -100,6 +100,35 @@ public class ExpService {
         return expDto; // 완성한 경험치 정보를 Controller에 반환
     }
 
+    @Transactional // 시험 제출 종류에 맞는 경험치 지급 작업을 하나의 작업 단위로 처리
+    public int giveAttemptExp(
+            Long studentId,
+            Long examId,
+            String attemptType,
+            BigDecimal totalScore,
+            BigDecimal maxScore
+    ) { // giveAttemptExp(기브 어템프트 이엑스피): 시험 응시 종류에 맞는 경험치 지급
+
+        if ("EXAM".equals(attemptType)) {
+            return giveExamExp(
+                    studentId,
+                    examId,
+                    totalScore,
+                    maxScore
+            ); // 일반 시험이면 점수에 맞는 시험 경험치 지급
+        }
+
+        if ("REVIEW".equals(attemptType)) {
+            return giveReviewExp(
+                    studentId,
+                    examId
+            ); // 복습 시험이면 같은 원본 시험당 최초 한 번 경험치 30점 지급
+        }
+
+        throw new IllegalArgumentException(
+                "올바르지 않은 시험 응시 종류입니다."
+        ); // EXAM 또는 REVIEW가 아니면 잘못된 요청으로 처리
+    }
 
     @Transactional // 시험 경험치 지급 작업을 하나의 작업 단위로 처리
     public int giveExamExp(

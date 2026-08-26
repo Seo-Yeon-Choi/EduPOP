@@ -414,6 +414,43 @@
 }
 
 
+
+
+/* ========================================
+   성장 캐릭터 움직임
+======================================== */
+
+.exp-character-image:not([hidden]) {
+    animation: expCharacterMove 3s ease-in-out infinite;
+    transform-origin: center bottom;
+}
+
+/* expCharacterMove(이엑스피 캐릭터 무브): 캐릭터가 천천히 위아래로 움직이는 효과 */
+@keyframes expCharacterMove {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-7px) scale(1.01);
+    }
+}
+
+
+/* ========================================
+   움직임 최소화 설정
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .exp-character-image:not([hidden]) {
+        animation: none;
+    }
+}
+
+
 /* ========================================
    반응형 화면
 ======================================== */
@@ -482,34 +519,5 @@
     .exp-next,
     .exp-progress-text {
         text-align: left;
-    }
-    /* ========================================
-   성장 캐릭터 움직임
-======================================== */
-
-    .exp-character-image:not([hidden]) {
-        animation: expCharacterMove 3s ease-in-out infinite;
-        transform-origin: center bottom;
-    }
-
-    /* expCharacterMove(이엑스피 캐릭터 무브): 캐릭터가 천천히 위아래로 움직이는 효과 */
-    @keyframes expCharacterMove {
-
-        0%,
-        100% {
-            transform: translateY(0) scale(1);
-        }
-
-        50% {
-            transform: translateY(-7px) scale(1.01);
-        }
-    }
-
-    /* 움직임 최소화 설정을 사용하는 사람에게는 애니메이션 중지 */
-    @media (prefers-reduced-motion: reduce) {
-
-        .exp-character-image:not([hidden]) {
-            animation: none;
-        }
     }
 }
