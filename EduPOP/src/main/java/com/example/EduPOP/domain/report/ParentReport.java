@@ -103,4 +103,20 @@ public class ParentReport {
     public String getTeacherComment() { return teacherComment; }
     public String getTeacherName() { return teacherName; }
     public String getRadarChartData() { return radarChartData; }
+    // ========================================================
+    // 🚀 추가 부품 1: 토큰 가져오기 (이게 없어서 getAccessToken 에러가 났습니다!)
+    // ========================================================
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    // ========================================================
+    // 🚀 추가 부품 2: 리포트 발송 상태 변경 (이게 없어서 publish 에러가 났습니다!)
+    // ========================================================
+    public void publish() {
+        if ("DRAFT".equals(this.status)) {
+            this.status = "PUBLISHED";
+            this.publishedAt = LocalDateTime.now();
+        }
+    }
 }

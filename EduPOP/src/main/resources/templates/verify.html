@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EduPOP - 학부모 인증</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <style>
+        .verify-container { max-width: 400px; margin: 100px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+        .input-field { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; }
+        .btn-submit { width: 100%; padding: 14px; background: #845ef7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body style="background-color: #f8f9fa;">
+
+<div class="verify-container">
+    <h2>🔒 학부모 인증</h2>
+    <p style="color: #6c757d; font-size: 14px; margin-bottom: 20px;">
+        개인정보 보호를 위해 <strong>최초 1회 인증</strong>이 필요합니다.<br>
+        이후에는 이 기기에서 인증 없이 바로 확인할 수 있습니다.
+    </p>
+
+    <!-- 에러 메시지 출력 영역 -->
+    <div th:if="${error}" style="color: #ff6b6b; margin-bottom: 15px; font-size: 14px; font-weight: bold;" th:text="${error}"></div>
+
+    <!-- 인증 정보 전송 폼 -->
+    <form th:action="@{/share/reports/{token}/verify(token=${token})}" method="post">
+        <input type="text" name="studentName" class="input-field" placeholder="학생 이름 (예: 김민수)" required>
+        <input type="password" name="phoneLast4" class="input-field" placeholder="학부모 전화번호 뒷자리 4개 (예: 1234)" maxlength="4" required>
+        <button type="submit" class="btn-submit">인증하고 리포트 보기</button>
+    </form>
+</div>
+
+</body>
+</html>

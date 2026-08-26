@@ -373,3 +373,14 @@ CREATE TABLE student_growth (
 
                                 CONSTRAINT fk_student_growth_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+CREATE TABLE parent_device_links (
+                                     link_id BIGINT AUTO_INCREMENT PRIMARY KEY,             -- 기기 연결 고유 ID (PK)
+                                     student_id BIGINT NOT NULL,                            -- 연결된 학생의 ID (FK)
+                                     device_token VARCHAR(100) NOT NULL UNIQUE,             -- 브라우저(쿠키)에 저장될 난수 토큰
+                                     connected_at DATETIME NOT NULL,                        -- 최초 기기 연결(인증) 일시
+                                     expires_at DATETIME NOT NULL,                          -- 기기 연결 만료 일시 (기본 1년)
+
+    -- 외래 키(FK) 제약조건: 학생이 삭제되면 이 기기 연결 기록도 같이 삭제되도록 설정
+                                     CONSTRAINT fk_parent_device_student
+                                         FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
+) COMMENT = '학부모 무로그인 기기 연결(자동 로그인) 관리 테이블';

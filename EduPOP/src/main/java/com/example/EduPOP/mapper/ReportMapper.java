@@ -27,4 +27,9 @@ public interface ReportMapper {
             @Param("periodStart") LocalDate periodStart,
             @Param("periodEnd") LocalDate periodEnd
     );
+    // ========================================================
+    // 학생 ID로 학부모 전화번호 가져오기
+    // ========================================================
+    @Select("SELECT phone FROM users WHERE user_id = #{studentId}")
+    String getParentPhoneByStudentId(@Param("studentId") Long studentId);
 }
