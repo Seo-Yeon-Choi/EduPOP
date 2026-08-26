@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPOP - 반 성적 전체 분석</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #f8fafc; font-family: sans-serif; color: #1e293b; margin:0; }
+        .page-content-wrapper { margin-left: 240px !important; margin-top: 70px !important; padding: 24px 32px; }
+        .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .stat-box { text-align: center; padding: 20px; background: #f1f5f9; border-radius: 8px; }
+        .stat-value { font-size: 32px; font-weight: 800; color: #0f172a; margin-top: 8px; }
+    </style>
+</head>
+<body>
+<th:block th:replace="~{layout/header :: header}"></th:block>
+<th:block th:replace="~{layout/sidebar-teacher :: sidebar}"></th:block>
+
+<div class="page-content-wrapper">
+    <!-- 정보 저장을 위한 히든 필드 -->
+    <input type="hidden" id="hdnExamId" th:value="${examId}">
+    <input type="hidden" id="hdnClassId" th:value="${classId}">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h1 style="margin: 0; font-size: 24px; font-weight: 800;">📊 반 전체 성적 분석 대시보드</h1>
+        <a th:href="@{/exam/omr-matrix(examId=${examId})}" class="btn-secondary" style="padding: 8px 16px; text-decoration: none;">← 채점 화면으로 돌아가기</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+        <div class="card stat-box">
+            <div style="color: #64748b; font-weight: 600;">우리 반 평균 점수</div>
+            <div class="stat-value" id="valClassAvg" style="color: #2563eb;">로딩중...</div>
+        </div>
+        <div class="card stat-box">
+            <div style="color: #64748b; font-weight: 600;">이 시험을 치른 전체 응시자 평균</div>
+            <div class="stat-value" id="valTotalAvg">로딩중...</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top: 0;">평균 점수 비교 차트</h3>
+        <div style="height: 300px;">
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const examId = document.getElementById('hdnExamId').value;
+        const classId = document.getElementById('hdnClassId').value;
+
+        // 이전에 만들어둔 통계 API 호출
+        fetch(`/exam/api/stats?examId=${examId}&classId=${classId}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('valClassAvg').innerText = data.classAvg + '점';
+                document.getElementById('valTotalAvg').innerText = data.totalAvg + '점';
+
+                // 세련된 막대그래프 그리기
+                const ctx = document.getElementById('barChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['우리 반 평균', '전체 응시자 평균'],
+                        datasets: [{
+                            label: '평균 점수',
+                            data: [data.classAvg, data.totalAvg],
+                            backgroundColor: ['rgba(37, 99, 235, 0.7)', 'rgba(148, 163, 184, 0.7)'],
+                            borderColor: ['#2563eb', '#94a3b8'],
+                            borderWidth: 2,
+                            borderRadius: 8 // 💡 막대그래프 모서리를 둥글게!
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, max: 100 } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            })
+            .catch(err => {
+                console.error("통계 조회 실패:", err);
+            });
+    });
+</script>
+</body>
+</html>
