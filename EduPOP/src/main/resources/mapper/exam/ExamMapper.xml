@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -7,113 +6,75 @@
 <mapper namespace="com.example.EduPOP.repository.exam.ExamMapper">
 
     <insert id="insert" parameterType="Exam" useGeneratedKeys="true" keyProperty="examId">
-
         INSERT INTO exams
         (
-        class_id,
-        teacher_id,
-        template_exam_id,
-        title,
-        exam_type,
-        exam_mode,
-        exam_round,
-        status,
-        exam_date,
-        file_url
+            class_id, teacher_id, template_exam_id, title, exam_type,
+            exam_mode, exam_round, status, exam_date, file_url
         )
-
         VALUES
         (
-        #{classId},
-        #{teacherId},
-        #{templateExamId},
-        #{title},
-        #{examType},
-        #{examMode},
-        #{examRound},
-        #{status},
-        #{examDate},
-        #{fileUrl}
+            #{classId}, #{teacherId}, #{templateExamId}, #{title}, #{examType},
+            #{examMode}, #{examRound}, #{status}, #{examDate}, #{fileUrl}
         )
-
     </insert>
 
     <select id="findById" parameterType="long" resultType="Exam">
-
-        SELECT *
-        FROM exams
-        WHERE exam_id = #{examId}
-
+        SELECT
+            e.exam_id,
+            e.class_id,
+            c.name AS class_name,
+            e.teacher_id,
+            e.template_exam_id,
+            e.title,
+            e.exam_type,
+            e.exam_mode,
+            e.exam_round,
+            e.status,
+            e.exam_date,
+            e.file_url,
+            e.created_at,
+            e.updated_at
+        FROM exams e
+        LEFT JOIN classes c ON c.class_id = e.class_id
+        WHERE e.exam_id = #{examId}
     </select>
 
     <update id="update" parameterType="Exam">
-
         UPDATE exams
-
         SET
-        title = #{title},
-        exam_type = #{examType},
-        exam_mode = #{examMode},
-        exam_round = #{examRound},
-        status = #{status},
-        exam_date = #{examDate},
-        file_url = #{fileUrl}
-
+            class_id = #{classId},
+            title = #{title},
+            exam_type = #{examType},
+            exam_mode = #{examMode},
+            exam_round = #{examRound},
+            status = #{status},
+            exam_date = #{examDate},
+            file_url = #{fileUrl}
         WHERE exam_id = #{examId}
-
     </update>
 
     <delete id="delete">
-
-        DELETE
-        FROM exams
-
+        DELETE FROM exams
         WHERE exam_id = #{examId}
-
     </delete>
 
     <select id="findAll" resultType="Exam">
-
         SELECT
-        exam_id,
-        class_id,
-        teacher_id,
-        template_exam_id,
-        title,
-        exam_type,
-        exam_mode,
-        exam_round,
-        status,
-        exam_date,
-        file_url,
-        created_at,
-        updated_at
-
+            exam_id, class_id, teacher_id, template_exam_id, title,
+            exam_type, exam_mode, exam_round, status, exam_date,
+            file_url, created_at, updated_at
         FROM exams
-
         ORDER BY created_at DESC
-
     </select>
 
-    <select id="findByTeacherId"
-            resultType="com.example.EduPOP.domain.exam.Exam">
-
+    <select id="findByTeacherId" resultType="com.example.EduPOP.domain.exam.Exam">
         SELECT
-        exam_id,
-        class_id,
-        teacher_id,
-        template_exam_id,
-        title,
-        exam_type,
-        exam_mode,
-        exam_round,
-        status,
-        exam_date,
-        file_url
+            exam_id, class_id, teacher_id, template_exam_id, title,
+            exam_type, exam_mode, exam_round, status, exam_date,
+            file_url, created_at, updated_at
         FROM exams
         WHERE teacher_id = #{teacherId}
         ORDER BY exam_id DESC
-
     </select>
 
 </mapper>

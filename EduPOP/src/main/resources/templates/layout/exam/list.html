@@ -1,41 +1,29 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>EduPOP - 시험지 목록</title>
-
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/exam-list.css}">
 </head>
-
 <body>
 
-<!-- HEADER -->
 <div th:replace="~{layout/header :: header}"></div>
-
-<!-- SIDEBAR -->
 <div th:replace="~{layout/sidebar-teacher :: sidebar}"></div>
 
-<!-- MAIN -->
 <main class="exam-list-container">
-
-    <!-- 상단 제목 / 시험지 생성 버튼 -->
     <div class="exam-list-header">
         <div>
             <h1>시험지 목록</h1>
-            <p>등록된 시험지를 확인하고 관리할 수 있습니다.</p>
+            <p>시험명을 누르면 등록한 문제와 시험 정보를 확인할 수 있습니다.</p>
         </div>
 
         <a th:href="@{/teacher/exams/create}" class="create-exam-button">+ 시험지 만들기</a>
     </div>
 
-    <!-- 시험이 하나도 없는 경우 -->
     <div class="empty-exam" th:if="${#lists.isEmpty(exams)}">등록된 시험지가 없습니다.</div>
 
-    <!-- 시험 목록 -->
     <div class="exam-table-wrapper" th:unless="${#lists.isEmpty(exams)}">
         <table class="exam-table">
             <thead>
@@ -47,31 +35,25 @@
                 <th>시험일</th>
                 <th>상태</th>
                 <th>등록일</th>
+                <th>관리</th>
             </tr>
             </thead>
-
             <tbody>
             <tr th:each="exam : ${exams}">
                 <td th:text="${exam.examId}">1</td>
-
                 <td class="exam-title">
-                    <span th:text="${exam.title}">8월 월말 평가</span>
+                    <a class="exam-title-link"
+                       th:href="@{/teacher/exams/{examId}(examId=${exam.examId})}"
+                       th:text="${exam.title}">8월 월말 평가</a>
                 </td>
-
                 <td th:text="${exam.examType}">MONTHLY</td>
-
                 <td th:text="${exam.examMode}">PAPER</td>
-
-                <td th:text="${exam.examDate}">2026-08-31</td>
-
+                <td th:text="${exam.examDate != null ? exam.examDate : '-'}">2026-08-31</td>
+                <td><span class="status-badge" th:text="${exam.status}">DRAFT</span></td>
+                <td th:text="${exam.createdAt != null ? #temporals.format(exam.createdAt, 'yyyy-MM-dd') : '-'}">2026-08-20</td>
                 <td>
-                    <span class="status-badge" th:text="${exam.status}">
-                        DRAFT
-                    </span>
-                </td>
-
-                <td th:text="${#temporals.format(exam.createdAt, 'yyyy-MM-dd')}">
-                    2026-08-20
+                    <a class="edit-exam-link"
+                       th:href="@{/teacher/exams/{examId}/edit(examId=${exam.examId})}">수정</a>
                 </td>
             </tr>
             </tbody>
