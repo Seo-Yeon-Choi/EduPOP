@@ -1,19 +1,17 @@
 package com.example.EduPOP.domain.exam;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 public class ExamAttempt {
-
     private Long attemptId;
     private Long examId;
     private Long studentId;
-
     private Integer attemptNo;
 
     private String attemptType;

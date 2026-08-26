@@ -1,26 +1,22 @@
 package com.example.EduPOP.domain.exam;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class Exam {
-
     private Long examId;
     private Long classId;
     private String className;
     private Long teacherId;
     private Long templateExamId;
     private String title;
-    private ExamType examType;
+    private String examType;
     private ExamMode examMode;
     private Integer examRound;
     private ExamStatus status;
