@@ -15,6 +15,10 @@ public interface UserMapper {
 
     User findByKakaoId(@Param("kakaoId") String kakaoId);
 
+    User findByNaverId(@Param("naverId") String naverId);
+
+    User findByGoogleId(String googleId);
+
     User findByLoginId(@Param("loginId") String loginId);
 
     // user 저장

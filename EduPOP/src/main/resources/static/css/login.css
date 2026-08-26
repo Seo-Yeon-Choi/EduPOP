@@ -1,141 +1,105 @@
 .login-main-container {
-    min-height: 100vh;
-
     display: flex;
-    justify-content: center;
     align-items: center;
-
+    justify-content: center;
+    min-height: 100vh;
     padding: 104px 24px 40px;
-
     background: #f7f8fa;
-
     box-sizing: border-box;
 }
-
-
-/* ==============================
-   메인 로그인 카드
-============================== */
 
 .login-main-card {
     width: 100%;
     max-width: 480px;
-
-    padding: 44px 42px;
-
-    background: #ffffff;
-
+    padding: 42px;
+    background: #fff;
     border: 1px solid #e6e8eb;
     border-radius: 18px;
-
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
-
+    box-shadow: 0 10px 32px rgba(25, 39, 80, 0.08);
     box-sizing: border-box;
 }
 
-
-/* ==============================
-   제목
-============================== */
-
 .login-main-header {
-    margin-bottom: 34px;
-
+    margin-bottom: 32px;
     text-align: center;
 }
 
 .login-label {
     margin: 0 0 8px;
-
+    color: #4f6ef7;
     font-size: 12px;
     font-weight: 800;
-
     letter-spacing: 1.5px;
-
-    color: #4f6ef7;
 }
 
 .login-main-header h1 {
     margin: 0 0 12px;
-
+    color: #222;
     font-size: 27px;
     font-weight: 700;
-
     line-height: 1.4;
-
-    color: #222222;
 }
 
 .login-description {
     margin: 0;
-
+    color: #777;
     font-size: 14px;
     line-height: 1.7;
-
-    color: #777777;
 }
-
-
-/* ==============================
-   로그인 선택 영역
-============================== */
 
 .login-option-area {
     display: flex;
     flex-direction: column;
-
-    gap: 14px;
+    gap: 12px;
 }
 
-
-/* ==============================
-   일반 로그인
-============================== */
-
-.login-option-button {
+.login-option-button,
+.kakao-login-button,
+.naver-login-button,
+.signup-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     height: 52px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    position: relative;
-
     border-radius: 9px;
-
     text-decoration: none;
-
     box-sizing: border-box;
+    transition: transform 0.2s ease, box-shadow 0.2s ease,
+                background-color 0.2s ease;
+}
 
-    transition:
-            background-color 0.2s ease,
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
+.login-option-button:hover,
+.kakao-login-button:hover,
+.naver-login-button:hover,
+.signup-button:hover {
+    transform: translateY(-1px);
+}
+
+.login-option-button:focus-visible,
+.kakao-login-button:focus-visible,
+.naver-login-button:focus-visible,
+.signup-button:focus-visible {
+    outline: 3px solid rgba(79, 110, 247, 0.25);
+    outline-offset: 2px;
 }
 
 .local-login-button {
     background: #4f6ef7;
-
-    color: #ffffff;
-
+    color: #fff;
     font-size: 15px;
     font-weight: 700;
 }
 
 .local-login-button:hover {
     background: #405ee8;
-
-    transform: translateY(-1px);
-
-    box-shadow: 0 5px 14px rgba(79, 110, 247, 0.2);
+    box-shadow: 0 5px 14px rgba(79, 110, 247, 0.22);
 }
 
 .button-icon {
     position: absolute;
-
-    left: 18px;
-
+    left: 19px;
     font-size: 18px;
 }
 
@@ -143,135 +107,108 @@
     line-height: 1;
 }
 
-
-/* ==============================
-   카카오 로그인
-============================== */
-
 .kakao-login-button {
-    width: 100%;
-    height: 52px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
     overflow: hidden;
-
     background: #fee500;
-
-    border-radius: 9px;
-
-    text-decoration: none;
-
-    box-sizing: border-box;
-
-    transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
 }
 
 .kakao-login-button:hover {
-    transform: translateY(-1px);
-
+    background: #f6de00;
     box-shadow: 0 5px 14px rgba(0, 0, 0, 0.1);
 }
 
 .kakao-login-button img {
     display: block;
-
-    max-width: 222px;
     width: 100%;
-    height: auto;
-
-    border: none;
+    max-width: 240px;
+    height: 100%;
+    border: 0;
+    object-fit: contain;
 }
 
+.naver-login-button {
+    background: #03c75a;
+    color: #fff;
+}
 
-/* ==============================
-   구분 영역
-============================== */
+.naver-login-button:hover {
+    background: #02b351;
+    box-shadow: 0 5px 14px rgba(3, 199, 90, 0.22);
+}
+
+.naver-login-logo {
+    position: absolute;
+    left: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 21px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.naver-login-text {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.login-error-message {
+    margin: 2px 0 0;
+    padding: 10px 12px;
+    background: #fff3f2;
+    border-radius: 7px;
+    color: #d93025;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+}
 
 .signup-divider {
     display: flex;
     align-items: center;
-
     gap: 14px;
-
     margin: 28px 0 18px;
-
-    color: #999999;
-
+    color: #999;
     font-size: 12px;
 }
 
 .signup-divider::before,
 .signup-divider::after {
-    content: "";
-
     flex: 1;
-
     height: 1px;
-
     background: #e8e8e8;
+    content: "";
 }
 
 .signup-divider span {
     white-space: nowrap;
 }
 
-
-/* ==============================
-   회원가입
-============================== */
-
 .signup-button {
-    width: 100%;
-    height: 50px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background: #ffffff;
-
+    background: #fff;
     border: 1px solid #4f6ef7;
-    border-radius: 9px;
-
     color: #4f6ef7;
-
     font-size: 15px;
     font-weight: 700;
-
-    text-decoration: none;
-
-    box-sizing: border-box;
-
-    transition:
-            background-color 0.2s ease,
-            color 0.2s ease,
-            transform 0.2s ease;
 }
 
 .signup-button:hover {
     background: #f4f6ff;
-
-    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 110, 247, 0.1);
 }
 
-
-/* ==============================
-   반응형
-============================== */
-
 @media (max-width: 600px) {
-
     .login-main-container {
-        padding: 90px 16px 30px;
+        align-items: flex-start;
+        padding: 88px 16px 28px;
     }
 
     .login-main-card {
-        padding: 34px 22px;
+        padding: 32px 22px;
+        border-radius: 14px;
+    }
+
+    .login-main-header {
+        margin-bottom: 28px;
     }
 
     .login-main-header h1 {
@@ -284,7 +221,98 @@
 
     .login-option-button,
     .kakao-login-button,
+    .naver-login-button,
     .signup-button {
         height: 50px;
     }
+}
+
+.google-login-button {
+    width: 100%;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    background: #ffffff;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+
+    color: #3c4043;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.google-login-button:hover {
+    background: #f8f9fa;
+}
+
+.google-login-logo {
+    color: #4285f4;
+    font-size: 20px;
+    font-weight: 700;
+}
+.kakao-login-button {
+    width: 100%;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    background: #fee500;
+    border: none;
+    border-radius: 6px;
+
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+
+    cursor: pointer;
+    transition:
+            background-color 0.2s ease,
+            transform 0.1s ease;
+}
+
+.kakao-login-button:hover {
+    background: #f5dc00;
+}
+
+.kakao-login-button:active {
+    transform: scale(0.99);
+}
+
+.kakao-login-logo {
+    position: relative;
+
+    width: 22px;
+    height: 18px;
+
+    display: inline-block;
+
+    background: #191919;
+    border-radius: 50%;
+}
+
+.kakao-login-logo::after {
+    content: "";
+
+    position: absolute;
+    left: 2px;
+    bottom: -3px;
+
+    width: 7px;
+    height: 7px;
+
+    background: #191919;
+    transform: rotate(35deg);
+}
+
+.kakao-login-text {
+    line-height: 1;
 }

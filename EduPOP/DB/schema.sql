@@ -28,12 +28,12 @@ CREATE TABLE users (
                        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                        withdrawn_at DATETIME,                      -- 탈퇴 시점 기록 (탈퇴 후 1년 보관 기간 측정용)
                        kakaoId VARCHAR(150),                       -- 카카오 고유번호
+                       naverId VARCHAR(150),                       -- 네이버 로그인 고유 식별자
 
                        CONSTRAINT uk_users_academy_login UNIQUE (academy_id, login_id),
+                       CONSTRAINT uk_users_naver_id UNIQUE (naverId),
                        CONSTRAINT fk_users_academy FOREIGN KEY (academy_id) REFERENCES academies(academy_id)
                    );
-
-ALTER TABLE users ADD COLUMN kakaoId VARCHAR(150);
 
 CREATE TABLE parent_students (
                                  parent_student_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -482,3 +482,13 @@ CREATE TABLE parent_device_links (
                                      CONSTRAINT fk_parent_device_student
                                          FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) COMMENT = '학부모 무로그인 기기 연결(자동 로그인) 관리 테이블';
+
+ALTER TABLE users
+    ADD COLUMN googleId VARCHAR(255) NULL AFTER naverId,
+    ADD CONSTRAINT uk_users_google_id UNIQUE (googleId);
+
+ALTER TABLE users
+    ADD COLUMN naverId VARCHAR(150) NULL AFTER kakaoId;
+
+ALTER TABLE users
+    ADD CONSTRAINT uk_users_naver_id UNIQUE (naverId);

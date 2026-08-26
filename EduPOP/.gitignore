@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 네이버 로그인용 ID & PW ###
+.env
