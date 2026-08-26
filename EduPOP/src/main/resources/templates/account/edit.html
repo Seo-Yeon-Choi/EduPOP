@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPOP - 계정 정보 수정</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/account.css}">
+</head>
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<th:block th:if="${accountUser.role.name() == 'STUDENT'}">
+    <div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+</th:block>
+<th:block th:if="${accountUser.role.name() == 'TEACHER'}">
+    <div th:replace="~{layout/sidebar-teacher :: sidebar}"></div>
+</th:block>
+<th:block th:if="${accountUser.role.name() == 'ADMIN'}">
+    <div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
+</th:block>
+
+<main class="account-page-container">
+    <header class="account-page-header">
+        <div>
+            <span class="page-label">ACCOUNT EDIT</span>
+            <h1>계정 정보 수정</h1>
+            <p th:if="${socialUser}">이메일, 전화번호, 학년을 수정할 수 있습니다.</p>
+            <p th:unless="${socialUser}">비밀번호, 이름, 이메일, 전화번호, 학년을 수정할 수 있습니다.</p>
+        </div>
+    </header>
+
+    <div class="error-message" th:if="${error != null}" th:text="${error}">
+        입력 내용을 확인해주세요.
+    </div>
+
+    <section class="account-card">
+        <div class="card-title-row">
+            <div>
+                <h2>수정할 정보</h2>
+                <p>회색으로 표시된 항목은 변경할 수 없습니다.</p>
+            </div>
+            <span class="login-type-badge" th:text="${loginType}">일반 로그인</span>
+        </div>
+
+        <form class="account-edit-form" th:action="@{/account/edit}" method="post">
+            <div class="form-grid">
+                <div class="form-group" th:unless="${socialUser}">
+                    <label for="loginId">아이디</label>
+                    <input id="loginId" type="text" th:value="${accountUser.loginId}" disabled>
+                    <small>아이디는 변경할 수 없습니다.</small>
+                </div>
+
+                <div class="form-group" th:if="${socialUser}">
+                    <label for="loginType">로그인 방식</label>
+                    <input id="loginType" type="text" th:value="${loginType}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label for="academyName">소속 학원</label>
+                    <input id="academyName" type="text"
+                           th:value="${accountUser.academyName != null ? accountUser.academyName : '-'}" disabled>
+                    <small>소속 학원은 변경할 수 없습니다.</small>
+                </div>
+
+                <div class="form-group full-width" th:if="${socialUser}">
+                    <label for="socialName">이름</label>
+                    <input id="socialName" type="text" th:value="${accountUser.name}" disabled>
+                    <small>소셜 계정의 이름은 로그인 제공자에서 관리됩니다.</small>
+                </div>
+
+                <div class="form-group full-width" th:unless="${socialUser}">
+                    <label for="name">이름</label>
+                    <input id="name" name="name" type="text" th:value="${accountUser.name}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input id="email" name="email" type="email" th:value="${accountUser.email}"
+                           placeholder="example@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">전화번호</label>
+                    <input id="phone" name="phone" type="text" th:value="${accountUser.phone}"
+                           placeholder="010-0000-0000">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="schoolGrade">학년</label>
+                    <input id="schoolGrade" name="schoolGrade" type="text"
+                           th:value="${accountUser.schoolGrade}" placeholder="예: 중학교 2학년 또는 2">
+                </div>
+            </div>
+
+            <div class="password-section" th:unless="${socialUser}">
+                <div class="section-heading">
+                    <h3>비밀번호 변경</h3>
+                    <p>비밀번호를 바꾸지 않으려면 아래 입력칸을 비워두세요.</p>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="newPassword">새 비밀번호</label>
+                        <input id="newPassword" name="newPassword" type="password" minlength="4"
+                               autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">새 비밀번호 확인</label>
+                        <input id="confirmPassword" name="confirmPassword" type="password" minlength="4"
+                               autocomplete="new-password">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a class="secondary-button" th:href="@{/account}">취소</a>
+                <button class="primary-button" type="submit">변경사항 저장</button>
+            </div>
+        </form>
+    </section>
+</main>
+
+</body>
+</html>
