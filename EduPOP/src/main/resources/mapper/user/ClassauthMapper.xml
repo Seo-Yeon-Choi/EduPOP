@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.EduPOP.repository.user.ClassauthMapper">
+
+    <!-- 학급 목록 -->
+    <select id="findClassesByAcademyId" resultType="com.example.EduPOP.domain.user.AcademyClass">
+        SELECT
+            class_id,
+            academy_id,
+            name,
+            COALESCE(target_grade, 0) AS targetGrade,
+            COALESCE(max_students, 0) AS maxStudents,
+            description,
+            created_at,
+            updated_at
+        FROM classes
+        WHERE academy_id = #{academyId}
+        ORDER BY class_id DESC
+    </select>
+
+    <!--특정 학급 조회-->
+    <select id="findClassById" resultType="com.example.EduPOP.domain.user.AcademyClass">
+        SELECT
+            class_id,
+            academy_id,
+            name,
+            target_grade,
+            max_students,
+            description,
+            created_at,
+            updated_at
+        FROM classes
+        WHERE class_id = #{classId}
+          AND academy_id = #{academyId}
+    </select>
+
+    <!-- 학급 상세 기본 정보 -->
+    <select id="findClassDetail"
+            resultType="com.example.EduPOP.domain.user.ClassDetail">
+
+        SELECT
+            c.class_id,
+            c.academy_id,
+            c.name AS class_name
+        FROM classes c
+        WHERE c.class_id = #{classId}
+          AND c.academy_id = #{academyId}
+
+    </select>
+
+
+    <!-- 담임교사 -->
+    <select id="findTeacherName"
+            resultType="String">
+
+        SELECT u.name
+        FROM class_teachers ct
+                 JOIN users u
+                      ON ct.teacher_id = u.user_id
+        WHERE ct.class_id = #{classId}
+          AND u.academy_id = #{academyId}
+          AND ct.role_type = 'MAIN'
+#         LIMIT 1
+
+    </select>
+
+
+    <!-- 학생 명단 -->
+    <select id="findStudent"
+            resultType="com.example.EduPOP.domain.user.StudentInfo">
+
+        SELECT
+            u.user_id,
+            u.name,
+            u.email,
+            u.phone,
+            u.status
+        FROM class_students cs
+                 JOIN users u
+                      ON cs.student_id = u.user_id
+        WHERE cs.class_id = #{classId}
+          AND u.academy_id = #{academyId}
+          AND cs.status = 'ACTIVE'
+        ORDER BY u.name
+
+    </select>
+<!-- =============================================================== -->
+    <!-- 학급 수정 -->
+    <update id="updateClass">
+
+        UPDATE classes
+        SET
+            name = #{name},
+            target_grade = #{targetGrade},
+            max_students = #{maxStudents},
+            description = #{description},
+            updated_at = NOW()
+        WHERE class_id = #{classId}
+          AND academy_id = #{academyId}
+
+    </update>
+
+    <!-- =============================================================== -->
+
+    <!-- 학급 삭제 -->
+    <delete id="deleteClass">
+
+        DELETE FROM classes
+        WHERE class_id = #{classId}
+          AND academy_id = #{academyId}
+
+    </delete>
+
+    <!-- 학생 관계 삭제 -->
+    <delete id="deleteClassStudents">
+
+        DELETE FROM class_students
+        WHERE class_id = #{classId}
+
+    </delete>
+
+
+    <!-- 교사 관계 삭제 -->
+    <delete id="deleteClassTeachers">
+
+        DELETE FROM class_teachers
+        WHERE class_id = #{classId}
+
+    </delete>
+
+
+
+</mapper>

@@ -27,10 +27,13 @@ CREATE TABLE users (
                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                        withdrawn_at DATETIME,                      -- 탈퇴 시점 기록 (탈퇴 후 1년 보관 기간 측정용)
+                       kakaoId VARCHAR(150),                       -- 카카오 고유번호
+                       naverId VARCHAR(150),                       -- 네이버 로그인 고유 식별자
 
                        CONSTRAINT uk_users_academy_login UNIQUE (academy_id, login_id),
+                       CONSTRAINT uk_users_naver_id UNIQUE (naverId),
                        CONSTRAINT fk_users_academy FOREIGN KEY (academy_id) REFERENCES academies(academy_id)
-);
+                   );
 
 CREATE TABLE parent_students (
                                  parent_student_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -132,7 +135,6 @@ CREATE TABLE exam_questions (
                                 score DECIMAL(7,2) NOT NULL DEFAULT 5.00,           -- 문항 배점
                                 correct_answer TEXT,                                -- 정답 번호 또는 텍스트
                                 question_text TEXT NOT NULL,                        -- 문제 지문/본문
-                                passage TEXT,
                                 sort_order INT NOT NULL DEFAULT 1,
                                 source_question_id BIGINT,                          -- [서연] 나선형 복습 퀘스트 원본 참조 (Self-FK)
 
@@ -340,7 +342,8 @@ CREATE TABLE parent_reports (
                                 CONSTRAINT fk_parent_reports_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
                                 CONSTRAINT fk_parent_reports_creator FOREIGN KEY (created_by) REFERENCES users(user_id)
 );
-
+ALTER TABLE parent_reports
+    ADD COLUMN radar_chart_data TEXT;
 
 -- =========================================================================================
 -- [도메인 8] 활동 로그 & 캐릭터 성장 도메인
@@ -468,3 +471,24 @@ CREATE TABLE daily_review_answers (
                                               REFERENCES exam_questions(question_id)
                                               ON DELETE CASCADE
 );
+CREATE TABLE parent_device_links (
+                                     link_id BIGINT AUTO_INCREMENT PRIMARY KEY,             -- 기기 연결 고유 ID (PK)
+                                     student_id BIGINT NOT NULL,                            -- 연결된 학생의 ID (FK)
+                                     device_token VARCHAR(100) NOT NULL UNIQUE,             -- 브라우저(쿠키)에 저장될 난수 토큰
+                                     connected_at DATETIME NOT NULL,                        -- 최초 기기 연결(인증) 일시
+                                     expires_at DATETIME NOT NULL,                          -- 기기 연결 만료 일시 (기본 1년)
+
+    -- 외래 키(FK) 제약조건: 학생이 삭제되면 이 기기 연결 기록도 같이 삭제되도록 설정
+                                     CONSTRAINT fk_parent_device_student
+                                         FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
+) COMMENT = '학부모 무로그인 기기 연결(자동 로그인) 관리 테이블';
+
+ALTER TABLE users
+    ADD COLUMN googleId VARCHAR(255) NULL AFTER naverId,
+    ADD CONSTRAINT uk_users_google_id UNIQUE (googleId);
+
+ALTER TABLE users
+    ADD COLUMN naverId VARCHAR(150) NULL AFTER kakaoId;
+
+ALTER TABLE users
+    ADD CONSTRAINT uk_users_naver_id UNIQUE (naverId);

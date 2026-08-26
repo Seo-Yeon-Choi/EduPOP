@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduPOP - 로그인</title>
+
+    <!-- 공통 CSS -->
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+
+    <!-- 로그인 진입 페이지 CSS -->
+    <link rel="stylesheet" th:href="@{/css/login-route.css}">
+</head>
+
+<body>
+
+<!-- 기존 공통 Header -->
+<div th:replace="~{layout/header :: header}"></div>
+
+<main class="login-route-container">
+
+    <section class="login-route-card">
+
+        <div class="login-route-header">
+            <h1>로그인</h1>
+            <p>사용자 유형을 선택해주세요.</p>
+        </div>
+
+        <div class="role-button-group">
+
+            <a href="/login/route/student" class="role-button">
+                <div class="role-icon">🎓</div>
+                <div class="role-text">
+                    <span class="role-title">학생 로그인</span>
+                    <span class="role-description">
+                        시험 응시와 학습 결과를 확인합니다.
+                    </span>
+                </div>
+            </a>
+
+            <a href="/login/route/teacher" class="role-button">
+                <div class="role-icon">📚</div>
+                <div class="role-text">
+                    <span class="role-title">교사 로그인</span>
+                    <span class="role-description">
+                        시험과 학생 학습 정보를 관리합니다.
+                    </span>
+                </div>
+            </a>
+
+            <a href="/login/route/admin" class="role-button">
+                <div class="role-icon">⚙️</div>
+                <div class="role-text">
+                    <span class="role-title">관리자 로그인</span>
+                    <span class="role-description">
+                        학원과 사용자 정보를 관리합니다.
+                    </span>
+                </div>
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- 회원탈퇴 완료시 띄울 안내창 -->
+<script th:if="${message != null}">
+    alert("[[${message}]]");
+</script>
+
+<!-- 다른 역할 로그인 시도시 띄울 안내창 -->
+<script th:if="${error != null}">
+    alert("[[${error}]]");
+</script>
+
+</body>
+</html>

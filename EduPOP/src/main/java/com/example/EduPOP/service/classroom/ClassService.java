@@ -1,6 +1,6 @@
 package com.example.EduPOP.service.classroom;
 
-import com.example.EduPOP.domain.classroom.AcademyClass;
+import com.example.EduPOP.domain.user.AcademyClass;
 import com.example.EduPOP.repository.classroom.ClassMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

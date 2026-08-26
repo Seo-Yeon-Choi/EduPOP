@@ -1,17 +1,315 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XML 선언: UTF-8 인코딩을 명시합니다. -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!-- MyBatis DTD 선언: 이 파일이 MyBatis 매퍼 규격을 따른다는 정의문입니다. -->
 
-<!-- namespace 속성에는 이 XML과 짝을 이루는 실제 Java Mapper 인터페이스의 풀 패키지 경로를 작성합니다. -->
 <mapper namespace="com.example.EduPOP.repository.user.UserMapper">
+    <resultMap id="UserResultMap"
+               type="com.example.EduPOP.domain.user.User">
 
-    <!-- 테스트용 쿼리 또는 실제 필요한 SQL을 태그 안에 작성합니다. -->
-    <!-- id 값은 Java 인터페이스의 메서드 이름과 반드시 일치해야 합니다. -->
-    <select id="selectTest" resultType="int">
-        SELECT 1
+        <result property="userId" column="user_id"/>
+        <result property="loginId" column="login_id"/>
+        <result property="academyId" column="academy_id"/>
+        <result property="passwordHash" column="password_hash"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="role" column="role"/>
+        <result property="status" column="status"/>
+        <result property="kakaoId" column="kakaoId"/>
+        <result property="naverId" column="naverId"/>
+        <result property="googleId" column="googleId"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="withdrawnAt" column="withdrawn_at"/>
+        <result property="schoolGrade" column="school_grade"/>
+        <result property="className" column="class_name"/>
+
+
+    </resultMap>
+
+    <!-- userID로 회원 조회 -->
+    <select id="findByUserId"
+            parameterType="Long"
+            resultType="com.example.EduPOP.domain.user.User">
+
+        SELECT user_id,
+        kakaoId,
+        naverId,
+        login_id,
+        academy_id,
+        password_hash,
+        name,
+        email,
+        phone,
+        role,
+        status,
+        created_at,
+        updated_at,
+        withdrawn_at,
+        school_grade
+        FROM users
+        WHERE user_id = #{userId}
+
     </select>
 
+    <!-- 네이버 ID로 회원 조회 -->
+    <select id="findByNaverId"
+            parameterType="String"
+            resultType="com.example.EduPOP.domain.user.User">
+
+        SELECT user_id,
+        kakaoId,
+        naverId,
+        login_id,
+        academy_id,
+        password_hash,
+        name,
+        email,
+        phone,
+        role,
+        status,
+        created_at,
+        updated_at,
+        withdrawn_at,
+        school_grade
+        FROM users
+        WHERE naverId = #{naverId}
+
+    </select>
+
+    <!-- 카카오 ID로 회원 조회 -->
+    <select id="findByKakaoId"
+            parameterType="String"
+            resultType="com.example.EduPOP.domain.user.User">
+
+        SELECT user_id,
+        kakaoId,
+        naverId,
+        login_id,
+        academy_id,
+        password_hash,
+        name,
+        email,
+        phone,
+        role,
+        status,
+        created_at,
+        updated_at,
+        withdrawn_at,
+        school_grade
+        FROM users
+        WHERE kakaoId = #{kakaoId}
+
+    </select>
+
+    <select id="findByGoogleId"
+            parameterType="string"
+            resultType="com.example.EduPOP.domain.user.User">
+        SELECT user_id,
+               kakaoId,
+               naverId,
+               login_id,
+               academy_id,
+               password_hash,
+               name,
+               email,
+               phone,
+               role,
+               status,
+               created_at,
+               updated_at,
+               withdrawn_at,
+               school_grade
+        FROM users
+        WHERE googleId = #{googleId}
+    </select>
+
+    <!-- 로그인 ID로 회원 조회 -->
+    <select id="findByLoginId"
+            parameterType="String"
+            resultMap="UserResultMap">
+
+        SELECT user_id,
+        kakaoId,
+        naverId,
+        login_id,
+        academy_id,
+        password_hash,
+        name,
+        email,
+        phone,
+        role,
+        status,
+        created_at,
+        updated_at,
+        withdrawn_at,
+        school_grade
+        FROM users
+        WHERE login_id = #{loginId}
+
+    </select>
+
+    <!-- 회원 저장 -->
+    <insert id="saveUser"
+            parameterType="com.example.EduPOP.domain.user.User"
+            useGeneratedKeys="true"
+            keyProperty="userId">
+
+        INSERT INTO users (
+        academy_id,
+        login_id,
+        password_hash,
+        name,
+        email,
+        phone,
+        role,
+        status,
+        created_at,
+        kakaoId,
+        naverId,
+        googleId,
+        school_grade
+        )
+        VALUES (
+        #{academyId},
+        #{loginId},
+        #{passwordHash},
+        #{name},
+        #{email},
+        #{phone},
+        #{role},
+        #{status},
+        NOW(),
+        #{kakaoId},
+        #{naverId},
+        #{googleId},
+        #{schoolGrade}
+        )
+
+    </insert>
+
+    <!-- 학원 ID 및 상태 변경 -->
+    <update id="updateAcademyAndStatus">
+
+        UPDATE users
+        SET academy_id = #{academyId},
+        role = #{role},
+        status = #{status}
+        WHERE user_id = #{userId}
+
+    </update>
+
+    <!-- 모든 회원 조회 -->
+<!--    <select id="findAllUsers"-->
+<!--            resultMap="UserResultMap">-->
+
+<!--        SELECT u.user_id,-->
+<!--        u.academy_id,-->
+<!--        u.login_id,-->
+<!--        u.password_hash,-->
+<!--        u.name,-->
+<!--        u.email,-->
+<!--        u.phone,-->
+<!--        u.role,-->
+<!--        u.status,-->
+<!--        u.kakaoId,-->
+<!--        u.created_at,-->
+<!--        u.updated_at,-->
+<!--        u.withdrawn_at,-->
+<!--        u.school_grade,-->
+<!--        c.name AS class_name-->
+<!--        FROM users u-->
+<!--        LEFT JOIN classes c-->
+<!--        ON u.class_id = c.class_id-->
+
+<!--    </select>-->
+
+    <!-- ADMIN과 같은 학원 ID로 회원 조회 -->
+    <select id="findUserByAcademyId" resultMap="UserResultMap">
+       SELECT u.user_id,
+              u.academy_id,
+              u.login_id,
+              u.name,
+              u.email,
+              u.phone,
+              u.role,
+              u.status,
+              u.kakaoId,
+              u.naverId,
+              u.school_grade,
+              c.name AS class_name
+       FROM users u
+                LEFT JOIN class_students cs
+                          ON u.user_id = cs.student_id
+                              AND cs.status = 'ACTIVE'
+                LEFT JOIN classes c
+                          ON cs.class_id = c.class_id
+       WHERE u.academy_id = #{academyId}
+         AND u.role != 'ADMIN'
+       ORDER BY u.user_id DESC
+
+    </select>
+
+
+    <!-- 회원 상태 개별 수정 -->
+    <update id="updateStatus">
+
+        UPDATE users
+        SET status = #{status},
+
+        /* 상태가 탈퇴(WITHDRAWN)로 바뀌면 현재 시간을 기록 */
+        withdrawn_at = CASE
+        WHEN #{status} = 'WITHDRAWN' THEN NOW()
+        ELSE NULL
+        END
+
+        WHERE user_id = #{userId}
+
+    </update>
+
+    <!-- 여러 명의 ID를 받아 한 번에 수정 -->
+    <update id="updateUsersStatusBatch">
+
+        UPDATE users
+        SET status = #{status},
+
+        withdrawn_at = CASE
+        WHEN #{status} = 'WITHDRAWN' THEN NOW()
+        ELSE NULL
+        END
+
+        WHERE user_id IN
+
+        <foreach item="id"
+                 collection="userIds"
+                 open="("
+                 separator=","
+                 close=")">
+
+            #{id}
+
+        </foreach>
+
+    </update>
+
+    <!-- 1년 지난 탈퇴(WITHDRAWN) 회원 자동 삭제 -->
+    <delete id="deleteOldWithdrawnUsers">
+
+        DELETE FROM users
+        WHERE status = 'WITHDRAWN'
+        AND withdrawn_at &lt;= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+
+    </delete>
+
+    <!-- kakao 회원이 학원 선택 후 academyID 추가해줌 -->
+    <update id="updateKakaoUserInfo">
+        UPDATE users
+        SET
+            academy_id = #{academyId},
+            email = #{email},
+            phone = #{phone},
+            school_grade = #{schoolGrade},
+            updated_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
 </mapper>

@@ -20,5 +20,7 @@ public interface ExamMapper {
 
     List<Exam> findAll();
 
+    List<Exam> findByTeacherId(Long teacherId);
+
     List<StudentExamResult> findDailyReviewResults(Long studentId);
 }

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduPOP - 학원 관리</title>
+
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-academy.css}">
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
+
+<main class="academy-container">
+
+    <div class="academy-page-header">
+        <h1>학원 정보 관리</h1>
+        <p>등록된 학원 정보를 수정하거나 삭제할 수 있습니다.</p>
+    </div>
+
+    <section class="academy-card">
+
+        <div class="card-header">
+            <h2>학원 기본 정보</h2>
+            <p>변경할 정보를 입력한 뒤 수정 버튼을 눌러주세요.</p>
+        </div>
+
+        <form th:action="@{/admin/updateAcademy}"
+              method="post"
+              class="academy-form">
+
+            <div class="form-group">
+                <label for="academyName">학원명</label>
+
+                <input
+                        type="text"
+                        id="academyName"
+                        name="name"
+                        th:value="${academy.name}"
+                        placeholder="학원명을 입력해주세요."
+                        required>
+            </div>
+
+            <div class="form-group">
+                <label for="address">주소</label>
+
+                <input
+                        type="text"
+                        id="address"
+                        name="address"
+                        th:value="${academy.address}"
+                        placeholder="학원 주소를 입력해주세요."
+                        required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">전화번호</label>
+
+                <input
+                        type="text"
+                        id="phone"
+                        name="phone"
+                        th:value="${academy.phone}"
+                        placeholder="02-0000-0000"
+                        required>
+            </div>
+
+            <div class="form-group">
+                <label for="business">사업자 등록번호</label>
+
+                <input
+                        type="text"
+                        id="business"
+                        name="businessCer"
+                        th:value="${academy.businessCer}"
+                        placeholder="사업자 등록번호를 입력해주세요."
+                        required>
+            </div>
+
+            <div class="form-button-area">
+                <button type="submit" class="update-button">
+                    정보 수정하기
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+    <section class="delete-card">
+
+        <div class="delete-card-header">
+            <h2>학원 삭제</h2>
+
+            <p>
+                학원을 삭제하면 관련 데이터가 함께 삭제될 수 있습니다.
+            </p>
+        </div>
+
+        <div class="delete-warning">
+            <strong>주의</strong>
+
+            <span>
+                삭제된 학원 정보는 다시 복구할 수 없습니다.
+                반드시 확인 후 삭제해주세요.
+            </span>
+        </div>
+
+        <form th:action="@{/admin/deleteAcademy}"
+              method="post"
+              onsubmit="return confirmDelete();">
+
+            <button type="submit" class="delete-button">
+                학원 삭제하기
+            </button>
+
+        </form>
+
+    </section>
+
+</main>
+
+<script>
+    function confirmDelete() {
+        return confirm(
+            "정말로 학원을 삭제하시겠습니까?\n삭제 후에는 되돌릴 수 없습니다."
+        );
+    }
+</script>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 package com.example.EduPOP.repository.classroom;
 
-import com.example.EduPOP.domain.classroom.AcademyClass;
+import com.example.EduPOP.domain.user.AcademyClass;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

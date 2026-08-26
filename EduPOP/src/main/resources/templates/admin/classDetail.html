@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>학급 상세</title>
+</head>
+
+<body>
+
+<h1 th:text="${classDetail.className}">
+    1반
+</h1>
+
+
+<!-- 담임교사 -->
+<section>
+
+    <h2>담임교사</h2>
+
+    <p th:if="${classDetail.teacherName == null}">
+        담임교사가 없습니다.
+    </p>
+
+    <p th:unless="${classDetail.teacherName == null}"
+       th:text="${classDetail.teacherName}">
+        김선생님
+    </p>
+
+</section>
+
+
+<!-- 학생 명단 -->
+<section>
+
+    <h2>학생 명단</h2>
+
+    <p th:if="${#lists.isEmpty(classDetail.students)}">
+        등록된 학생이 없습니다.
+    </p>
+
+    <table th:unless="${#lists.isEmpty(classDetail.students)}"
+           border="1">
+
+        <thead>
+        <tr>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>전화번호</th>
+            <th>상태</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        <tr th:each="student : ${classDetail.students}">
+
+            <td th:text="${student.name}">
+                홍길동
+            </td>
+
+            <td th:text="${student.email}">
+                test@test.com
+            </td>
+
+            <td th:text="${student.phone}">
+                010-0000-0000
+            </td>
+
+            <td th:text="${student.status}">
+                ACTIVE
+            </td>
+
+        </tr>
+
+        </tbody>
+
+    </table>
+
+</section>
+
+
+<!-- 수정 -->
+<section>
+
+    <h2>학급 수정</h2>
+
+    <form method="post"
+          th:action="@{/admin/updateClass}">
+
+        <input type="hidden"
+               name="classId"
+               th:value="${classDetail.classId}">
+
+        <label>학급명</label>
+        <input type="text" name="name"
+               th:value="${classDetail.className}">
+
+        
+        <button type="submit">
+            수정
+        </button>
+
+    </form>
+
+</section>
+
+
+<!-- 삭제 -->
+<section>
+
+    <form method="post"
+          th:action="@{/admin/deleteClass}"
+          onsubmit="return confirm('이 학급을 삭제하시겠습니까?');">
+
+        <input type="hidden"
+               name="classId"
+               th:value="${classDetail.classId}">
+
+        <button type="submit">
+            삭제
+        </button>
+
+    </form>
+
+</section>
+
+
+<a th:href="@{/admin/classes}">
+    학급 목록으로
+</a>
+
+</body>
+</html>

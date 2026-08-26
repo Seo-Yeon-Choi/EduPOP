@@ -1,0 +1,195 @@
+/* ==============================
+   로그인 역할 선택 페이지
+============================== */
+
+.login-route-container {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 104px 24px 40px;
+
+    background: #f7f8fa;
+
+    box-sizing: border-box;
+}
+
+
+/* ==============================
+   로그인 카드
+============================== */
+
+.login-route-card {
+    width: 100%;
+    max-width: 560px;
+
+    padding: 42px;
+
+    background: #ffffff;
+
+    border: 1px solid #e6e8eb;
+    border-radius: 16px;
+
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+
+/* ==============================
+   제목 영역
+============================== */
+
+.login-route-header {
+    margin-bottom: 34px;
+    text-align: center;
+}
+
+.login-route-header h1 {
+    margin: 0 0 10px;
+
+    font-size: 30px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.login-route-header p {
+    margin: 0;
+
+    font-size: 15px;
+
+    color: #777777;
+}
+
+
+/* ==============================
+   역할 버튼 영역
+============================== */
+
+.role-button-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 14px;
+}
+
+
+/* ==============================
+   역할 버튼
+============================== */
+
+.role-button {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+
+    padding: 20px 22px;
+
+    border: 1px solid #e3e6eb;
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    text-decoration: none;
+
+    box-sizing: border-box;
+
+    transition:
+            border-color 0.2s ease,
+            background-color 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.role-button:hover {
+    border-color: #4f6ef7;
+
+    background: #f8f9ff;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 5px 14px rgba(79, 110, 247, 0.12);
+}
+
+
+/* ==============================
+   아이콘
+============================== */
+
+.role-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 48px;
+    height: 48px;
+
+    margin-right: 18px;
+
+    flex-shrink: 0;
+
+    background: #eef1ff;
+
+    border-radius: 12px;
+
+    font-size: 23px;
+}
+
+
+/* ==============================
+   역할 설명
+============================== */
+
+.role-text {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.role-title {
+    font-size: 17px;
+    font-weight: 700;
+
+    color: #333333;
+}
+
+.role-description {
+    font-size: 13px;
+    line-height: 1.5;
+
+    color: #888888;
+}
+
+
+/* ==============================
+   반응형
+============================== */
+
+@media (max-width: 600px) {
+
+    .login-route-container {
+        padding: 90px 16px 30px;
+    }
+
+    .login-route-card {
+        padding: 30px 22px;
+    }
+
+    .login-route-header h1 {
+        font-size: 26px;
+    }
+
+    .role-button {
+        padding: 17px 16px;
+    }
+
+    .role-icon {
+        width: 44px;
+        height: 44px;
+
+        margin-right: 14px;
+    }
+}

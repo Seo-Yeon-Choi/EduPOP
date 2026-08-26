@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.EduPOP.repository.user.AcademyMapper">
+
+    <insert id="save"
+            parameterType="com.example.EduPOP.domain.user.Academy"
+            useGeneratedKeys="true"
+            keyProperty="academyId">
+
+        INSERT INTO academies (
+            name,
+            address,
+            phone,
+            business_cer,
+            created_at,
+            updated_at
+        )
+        VALUES (
+                   #{name},
+                   #{address},
+                   #{phone},
+                   #{businessCer},
+                   NOW(),
+                   NOW()
+               )
+
+    </insert>
+
+    <select id="findAllAcademies"
+            resultType="com.example.EduPOP.domain.user.Academy">
+
+        SELECT academy_id,
+               name,
+               address,
+               phone,
+               business_cer,
+               created_at,
+               updated_at
+        FROM academies
+        ORDER BY created_at DESC
+
+    </select>
+
+    <select id="findById"
+            resultType="com.example.EduPOP.domain.user.Academy">
+
+        SELECT academy_id,
+               name,
+               address,
+               phone,
+               business_cer,
+               created_at,
+               updated_at
+        FROM academies
+        WHERE academy_id = #{academyId}
+
+    </select>
+
+    <update id="updateAcademy">
+
+        UPDATE academies
+        SET name = #{name},
+            address = #{address},
+            phone = #{phone},
+            business_cer = #{businessCer},
+            updated_at = NOW()
+        WHERE academy_id = #{academyId}
+
+    </update>
+
+    <update id="clearUserAcademyId">
+
+        UPDATE users
+        SET academy_id = NULL
+        WHERE academy_id = #{academyId}
+
+    </update>
+
+    <delete id="deleteAcademy">
+
+        DELETE FROM academies
+        WHERE academy_id = #{academyId}
+
+    </delete>
+
+</mapper>

@@ -30,6 +30,126 @@
         </div>
 
     </div>
+
+    <section class="growth-summary"
+             th:if="${growthSummary != null}">
+
+        <div class="growth-summary-header">
+            <div>
+                <span class="growth-summary-eyebrow">GROWTH SUMMARY</span>
+                <h2>최근 4주 나의 성장</h2>
+                <p th:text="|${growthSummary.periodStart} ~ ${growthSummary.periodEnd}|"></p>
+            </div>
+
+            <span class="growth-period-badge">최근 28일</span>
+        </div>
+
+        <div class="growth-main-grid">
+
+            <article class="growth-metric-card">
+                <div class="growth-metric-title">
+                    <span class="growth-icon">🎯</span>
+                    <h3>학습 이해도</h3>
+                </div>
+
+                <div th:if="${growthSummary.previousAttemptCount > 0
+                             and growthSummary.recentAttemptCount > 0}">
+                    <div class="growth-score-row">
+                        <strong th:text="|${growthSummary.previousAverageScore}% → ${growthSummary.recentAverageScore}%|"></strong>
+
+                        <span class="growth-change positive"
+                              th:if="${growthSummary.scoreChange > 0}"
+                              th:text="|+${growthSummary.scoreChange}점 ↑|"></span>
+
+                        <span class="growth-change negative"
+                              th:if="${growthSummary.scoreChange &lt; 0}"
+                              th:text="|${growthSummary.scoreChange}점 ↓|"></span>
+
+                        <span class="growth-change neutral"
+                              th:if="${growthSummary.scoreChange == 0}">
+                            변동 없음
+                        </span>
+                    </div>
+
+                    <div class="growth-progress">
+                        <span th:style="|width: ${growthSummary.recentAverageScore}%|"></span>
+                    </div>
+
+                    <p class="growth-description">
+                        이전 2주와 최근 2주의 평균 득점률을 비교한 결과입니다.
+                    </p>
+                </div>
+
+                <div th:if="${growthSummary.previousAttemptCount == 0
+                             and growthSummary.recentAttemptCount > 0}">
+                    <div class="growth-score-row">
+                        <strong th:text="|${growthSummary.recentAverageScore}%|"></strong>
+                        <span class="growth-change neutral">최근 평균</span>
+                    </div>
+
+                    <div class="growth-progress">
+                        <span th:style="|width: ${growthSummary.recentAverageScore}%|"></span>
+                    </div>
+
+                    <p class="growth-description">
+                        이전 2주 응시 기록이 쌓이면 성장 폭도 함께 표시됩니다.
+                    </p>
+                </div>
+
+                <p class="growth-empty"
+                   th:if="${growthSummary.recentAttemptCount == 0}">
+                    최근 2주 응시 기록이 없습니다.
+                </p>
+            </article>
+
+            <article class="growth-metric-card">
+                <div class="growth-metric-title">
+                    <span class="growth-icon">🔁</span>
+                    <h3>오답 재도전 성공률</h3>
+                </div>
+
+                <div th:if="${growthSummary.reviewQuestionCount > 0}">
+                    <div class="growth-score-row">
+                        <strong th:text="|${growthSummary.retrySuccessRate}%|"></strong>
+                        <span class="growth-change positive"
+                              th:text="|${growthSummary.reviewCorrectCount}문항 성공|"></span>
+                    </div>
+
+                    <div class="growth-progress review">
+                        <span th:style="|width: ${growthSummary.retrySuccessRate}%|"></span>
+                    </div>
+
+                    <p class="growth-description"
+                       th:text="|최근 4주 복습 ${growthSummary.reviewQuestionCount}문항 중 ${growthSummary.reviewCorrectCount}문항을 맞혔습니다.|"></p>
+                </div>
+
+                <p class="growth-empty"
+                   th:if="${growthSummary.reviewQuestionCount == 0}">
+                    최근 4주 복습 기록이 없습니다.
+                </p>
+            </article>
+
+        </div>
+
+        <div class="growth-stat-grid">
+            <div class="growth-stat">
+                <span>한 달 학습일</span>
+                <strong th:text="|${growthSummary.studyDays}일 / 28일|"></strong>
+            </div>
+
+            <div class="growth-stat">
+                <span>최장 연속 학습일</span>
+                <strong th:text="|${growthSummary.longestStreak}일 연속 🔥|"></strong>
+            </div>
+
+            <div class="growth-stat">
+                <span>시험·복습 완료</span>
+                <strong th:text="|${growthSummary.completedAttemptCount}회|"></strong>
+            </div>
+        </div>
+
+    </section>
+
     <div class="result-filter">
 
         <form th:action="@{/student/exams/results}"

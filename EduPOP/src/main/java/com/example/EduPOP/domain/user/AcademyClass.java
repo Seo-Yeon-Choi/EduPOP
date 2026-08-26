@@ -1,20 +1,18 @@
-package com.example.EduPOP.domain.classroom;
+package com.example.EduPOP.domain.user;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+import java.time.LocalDateTime;
+
+@Data
 public class AcademyClass {
-
     private Long classId;
     private Long academyId;
-
     private String name;
     private String targetGrade;
-
     private Integer maxStudents;
-
     private String status;
     private String description;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

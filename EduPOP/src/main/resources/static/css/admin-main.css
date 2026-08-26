@@ -1,0 +1,244 @@
+.admin-container {
+    margin-left: 240px;
+
+    min-height: 100vh;
+
+    padding: 104px 40px 50px;
+
+    background: #f7f8fa;
+
+    box-sizing: border-box;
+}
+
+
+/* 관리자 페이지 제목 */
+
+.admin-page-header {
+    margin-bottom: 32px;
+}
+
+.admin-page-header h1 {
+    margin: 0 0 10px;
+
+    font-size: 28px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.admin-page-header p {
+    margin: 0;
+
+    font-size: 14px;
+
+    color: #777777;
+}
+
+
+/* 메뉴 카드 영역 */
+
+.admin-menu-grid {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+
+    gap: 20px;
+
+    max-width: 1000px;
+}
+
+
+/* 메뉴 카드 */
+
+.admin-menu-card {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    min-height: 130px;
+
+    padding: 26px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+
+    text-decoration: none;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+
+    box-sizing: border-box;
+
+    transition:
+            transform 0.2s ease,
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background-color 0.2s ease;
+}
+
+.admin-menu-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #4f6ef7;
+
+    background: #fafbff;
+
+    box-shadow: 0 8px 20px rgba(79, 110, 247, 0.1);
+}
+
+
+/* 메뉴 아이콘 */
+
+.menu-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 58px;
+    height: 58px;
+
+    margin-right: 20px;
+
+    flex-shrink: 0;
+
+    background: #eef1ff;
+
+    border-radius: 14px;
+
+    font-size: 27px;
+}
+
+
+/* 메뉴 설명 */
+
+.menu-content {
+    flex: 1;
+}
+
+.menu-content h2 {
+    margin: 0 0 8px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.menu-content p {
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 1.6;
+
+    color: #777777;
+}
+
+
+/* 오른쪽 화살표 */
+
+.menu-arrow {
+    margin-left: 16px;
+
+    font-size: 28px;
+    font-weight: 300;
+
+    color: #aaaaaa;
+
+    transition: transform 0.2s ease;
+}
+
+.admin-menu-card:hover .menu-arrow {
+    transform: translateX(3px);
+
+    color: #4f6ef7;
+}
+
+
+/* 로그아웃 영역 */
+
+.logout-area {
+    max-width: 1000px;
+
+    margin-top: 35px;
+    padding-top: 25px;
+
+    border-top: 1px solid #e3e5e8;
+}
+
+.logout-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 110px;
+    height: 44px;
+
+    padding: 0 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #ffb5b5;
+    border-radius: 8px;
+
+    color: #e54848;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease;
+}
+
+.logout-button:hover {
+    background: #fff4f4;
+
+    border-color: #ff8585;
+
+    color: #d93636;
+}
+
+
+/* 반응형 */
+
+@media (max-width: 900px) {
+
+    .admin-container {
+        margin-left: 0;
+
+        padding: 90px 20px 40px;
+    }
+
+    .admin-menu-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .admin-container {
+        padding: 86px 16px 30px;
+    }
+
+    .admin-page-header h1 {
+        font-size: 24px;
+    }
+
+    .admin-menu-card {
+        padding: 20px;
+    }
+
+    .menu-icon {
+        width: 50px;
+        height: 50px;
+
+        margin-right: 15px;
+
+        font-size: 23px;
+    }
+}

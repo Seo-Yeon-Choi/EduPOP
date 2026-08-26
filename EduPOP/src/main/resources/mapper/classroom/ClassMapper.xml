@@ -7,7 +7,7 @@
 <mapper namespace="com.example.EduPOP.repository.classroom.ClassMapper">
 
     <select id="findByTeacherId"
-            resultType="com.example.EduPOP.domain.classroom.AcademyClass">
+            resultType="com.example.EduPOP.domain.user.AcademyClass">
 
         SELECT
         c.class_id,
