@@ -23,72 +23,70 @@ import java.util.List;
 public class ExamController {
 
     private final ExamService examService;
-
     private final ClassService classService;
-
     private final PdfTextExtractService pdfTextExtractService;
-
     private final ExamQuestionParseService examQuestionParseService;
 
-    // =========================================
-    // 시험지 목록
-    // =========================================
-
     @GetMapping
-    public String examList(
-            HttpSession session,
-            Model model
-    ) {
-
+    public String examList(HttpSession session, Model model) {
         Long teacherId = getLoginTeacherId(session);
 
         if (teacherId == null) {
             return "redirect:/LocalLogin";
         }
 
-        model.addAttribute(
-                "exams",
-                examService.getExamListByTeacher(teacherId)
-        );
-
+        model.addAttribute("exams", examService.getExamListByTeacher(teacherId));
         return "layout/exam/list";
     }
 
-    // =========================================
-    // 시험지 생성 화면
-    // =========================================
-
     @GetMapping("/create")
-    public String createPage(
-            HttpSession session,
-            Model model
-    ) {
-
+    public String createPage(HttpSession session, Model model) {
         Long teacherId = getLoginTeacherId(session);
 
         if (teacherId == null) {
             return "redirect:/LocalLogin";
         }
 
-        model.addAttribute(
-                "classes",
-                classService.getClassesByTeacher(teacherId)
-        );
-
+        model.addAttribute("classes", classService.getClassesByTeacher(teacherId));
         return "layout/exam/create";
     }
 
-    // =========================================
-    // 시험지 등록
-    // =========================================
+    @GetMapping("/{examId}")
+    public String detailPage(
+            @PathVariable Long examId,
+            HttpSession session,
+            Model model
+    ) {
+        Long teacherId = getLoginTeacherId(session);
+
+        if (teacherId == null) {
+            return "redirect:/LocalLogin";
+        }
+
+        model.addAttribute("exam", examService.getExamDetailForTeacher(examId, teacherId));
+        return "layout/exam/detail";
+    }
+
+    @GetMapping("/{examId}/edit")
+    public String editPage(
+            @PathVariable Long examId,
+            HttpSession session,
+            Model model
+    ) {
+        Long teacherId = getLoginTeacherId(session);
+
+        if (teacherId == null) {
+            return "redirect:/LocalLogin";
+        }
+
+        model.addAttribute("exam", examService.getExamDetailForTeacher(examId, teacherId));
+        model.addAttribute("classes", classService.getClassesByTeacher(teacherId));
+        return "layout/exam/edit";
+    }
 
     @PostMapping
     @ResponseBody
-    public Long createExam(
-            @RequestBody Exam exam,
-            HttpSession session
-    ) {
-
+    public Long createExam(@RequestBody Exam exam, HttpSession session) {
         Long teacherId = getLoginTeacherId(session);
 
         if (teacherId == null) {
@@ -96,65 +94,56 @@ public class ExamController {
         }
 
         exam.setTeacherId(teacherId);
-
-        System.out.println("classId = " + exam.getClassId());
-        System.out.println("teacherId = " + exam.getTeacherId());
-
         return examService.createExam(exam);
     }
-    // =========================================
-    // PDF 문제 추출
-    // =========================================
+
+    @PutMapping("/{examId}")
+    @ResponseBody
+    public Long updateExam(
+            @PathVariable Long examId,
+            @RequestBody Exam exam,
+            HttpSession session
+    ) {
+        Long teacherId = getLoginTeacherId(session);
+
+        if (teacherId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+
+        validateAssignedClass(teacherId, exam.getClassId());
+        examService.updateExam(examId, teacherId, exam);
+        return examId;
+    }
 
     @PostMapping("/parse-pdf")
     @ResponseBody
-    public List<ExamQuestion> parsePdf(@RequestParam("file") MultipartFile file, @RequestParam("examType") String examType) {
-
-        // -------------------------------------
-        // PDFBox 텍스트 추출
-        // -------------------------------------
-
+    public List<ExamQuestion> parsePdf(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("examType") String examType
+    ) {
         String text = pdfTextExtractService.extractText(file);
-
-        // 개발 중 확인용
-        System.out.println("=================================");
-
-        System.out.println("PDF 추출 결과");
-
-        System.out.println("examType = " + examType);
-
-        System.out.println(text);
-
-        System.out.println("=================================");
-
-        // =====================================
-        // 단어 시험
-        // =====================================
 
         if ("WORD".equalsIgnoreCase(examType)) {
             return examQuestionParseService.parseWordExam(text);
         }
 
-        // =====================================
-        // 일반 시험
-        // =====================================
-
         return examQuestionParseService.parseNormalExam(text);
     }
 
     private Long getLoginTeacherId(HttpSession session) {
+        User loginUser = (User) session.getAttribute("loginUser");
 
-        User loginUser =
-                (User) session.getAttribute("loginUser");
-
-        if (loginUser == null) {
-            return null;
-        }
-
-        if (loginUser.getRole() != UserRole.TEACHER) {
+        if (loginUser == null || loginUser.getRole() != UserRole.TEACHER) {
             return null;
         }
 
         return loginUser.getUserId();
+    }
+
+    private void validateAssignedClass(Long teacherId, Long classId) {
+        if (classId == null || classService.getClassesByTeacher(teacherId).stream()
+                .noneMatch(classItem -> classItem.getClassId().equals(classId))) {
+            throw new IllegalArgumentException("담당 반에만 시험을 등록할 수 있습니다.");
+        }
     }
 }

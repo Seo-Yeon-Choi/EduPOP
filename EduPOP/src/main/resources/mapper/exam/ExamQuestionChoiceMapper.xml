@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -7,49 +6,29 @@
 <mapper namespace="com.example.EduPOP.repository.exam.ExamQuestionChoiceMapper">
 
     <insert id="insert" parameterType="ExamQuestionChoice" useGeneratedKeys="true" keyProperty="choiceId">
-
         INSERT INTO exam_question_choices
-        (
-        question_id,
-        choice_number,
-        choice_text,
-        sort_order
-        )
-
+        (question_id, choice_number, choice_text, sort_order)
         VALUES
-        (
-        #{questionId},
-        #{choiceNumber},
-        #{choiceText},
-        #{sortOrder}
-        )
-
+        (#{questionId}, #{choiceNumber}, #{choiceText}, #{sortOrder})
     </insert>
 
     <select id="findByQuestionId" resultType="ExamQuestionChoice">
-
-        SELECT
-            choice_id,
-            question_id,
-            choice_number,
-            choice_text,
-            sort_order
-
+        SELECT choice_id, question_id, choice_number, choice_text, sort_order
         FROM exam_question_choices
-
         WHERE question_id = #{questionId}
-
         ORDER BY sort_order
-
     </select>
 
+    <update id="update" parameterType="ExamQuestionChoice">
+        UPDATE exam_question_choices
+        SET choice_text = #{choiceText}
+        WHERE choice_id = #{choiceId}
+          AND question_id = #{questionId}
+    </update>
+
     <delete id="deleteByQuestionId">
-
-        DELETE
-        FROM exam_question_choices
-
+        DELETE FROM exam_question_choices
         WHERE question_id = #{questionId}
-
     </delete>
 
 </mapper>

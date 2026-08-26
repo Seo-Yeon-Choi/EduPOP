@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="|EduPOP - ${exam.title}|">EduPOP - 시험지 상세</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/exam-detail.css}">
+</head>
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+<div th:replace="~{layout/sidebar-teacher :: sidebar}"></div>
+
+<main class="exam-detail-container">
+    <header class="page-header">
+        <div>
+            <span class="page-eyebrow">시험지 상세</span>
+            <h1 th:text="${exam.title}">8월 월말 평가</h1>
+            <p>등록된 시험 정보와 문항 내용을 확인할 수 있습니다.</p>
+        </div>
+        <div class="header-actions">
+            <a class="secondary-button" th:href="@{/teacher/exams}">목록으로</a>
+            <a class="primary-button"
+               th:href="@{/teacher/exams/{examId}/edit(examId=${exam.examId})}">수정</a>
+        </div>
+    </header>
+
+    <section class="info-card">
+        <h2>시험 기본 정보</h2>
+        <dl class="info-grid">
+            <div><dt>대상 반</dt><dd th:text="${exam.className}">중등 심화 A반</dd></div>
+            <div><dt>시험 종류</dt><dd th:text="${exam.examType}">MONTHLY</dd></div>
+            <div><dt>시험 방식</dt><dd th:text="${exam.examMode}">PAPER</dd></div>
+            <div><dt>시험일</dt><dd th:text="${exam.examDate != null ? exam.examDate : '-'}">2026-08-31</dd></div>
+            <div><dt>상태</dt><dd><span class="status-badge" th:text="${exam.status}">DRAFT</span></dd></div>
+            <div><dt>회차</dt><dd th:text="${exam.examRound}">1</dd></div>
+        </dl>
+    </section>
+
+    <section class="question-section">
+        <div class="section-title-row">
+            <h2>문항 내용</h2>
+            <span class="question-count" th:text="|총 ${#lists.size(exam.questions)}문항|">총 10문항</span>
+        </div>
+
+        <div class="empty-question" th:if="${#lists.isEmpty(exam.questions)}">등록된 문항이 없습니다.</div>
+
+        <article class="question-card" th:each="question : ${exam.questions}">
+            <div class="question-card-header">
+                <div>
+                    <span class="question-number" th:text="|${question.questionNumber}번|">1번</span>
+                    <span class="type-badge" th:text="${question.questionType}">MULTIPLE_CHOICE</span>
+                </div>
+                <span class="score" th:text="|${question.score}점|">5점</span>
+            </div>
+
+            <div class="question-tag" th:if="${question.questionTypeTag != null and !question.questionTypeTag.isEmpty()}"
+                 th:text="${question.questionTypeTag}">GRAMMAR</div>
+
+            <div class="content-block passage-block"
+                 th:if="${question.passage != null and !question.passage.isEmpty()}">
+                <h3>지문</h3>
+                <p th:text="${question.passage}">지문 내용</p>
+            </div>
+
+            <div class="content-block">
+                <h3>문제</h3>
+                <p class="question-text" th:text="${question.questionText}">문제 내용</p>
+            </div>
+
+            <ol class="choice-list" th:if="${!#lists.isEmpty(question.choices)}">
+                <li th:each="choice : ${question.choices}">
+                    <span class="choice-number" th:text="${choice.choiceNumber}">1</span>
+                    <span th:text="${choice.choiceText}">선지 내용</span>
+                </li>
+            </ol>
+
+            <div class="answer-box">
+                <span>정답</span>
+                <strong th:text="${question.correctAnswer != null ? question.correctAnswer : '-'}">1</strong>
+            </div>
+        </article>
+    </section>
+</main>
+
+</body>
+</html>

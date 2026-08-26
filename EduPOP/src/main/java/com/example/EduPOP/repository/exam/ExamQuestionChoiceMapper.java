@@ -12,6 +12,7 @@ public interface ExamQuestionChoiceMapper {
 
     List<ExamQuestionChoice> findByQuestionId(Long questionId);
 
-    int deleteByQuestionId(Long questionId);
+    int update(ExamQuestionChoice choice);
 
+    int deleteByQuestionId(Long questionId);
 }
