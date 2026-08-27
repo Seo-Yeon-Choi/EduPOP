@@ -20,7 +20,7 @@
         ON ea.attempt_id = a.attempt_id
         WHERE a.exam_id = e.exam_id
         AND a.student_id = #{studentId}
-        AND a.attempt_type = 'EXAM'
+        AND COALESCE(a.attempt_type, 'EXAM') = 'EXAM'
         AND a.status = 'GRADED'
         AND ea.is_correct = FALSE
         ) AS wrongCount
@@ -318,7 +318,7 @@
         e.exam_type
         AS examType,
         -->
-        a.attempt_type
+        COALESCE(a.attempt_type, 'EXAM')
         AS attemptType,
 
         'EXAM'
@@ -339,7 +339,7 @@
         a.total_question_count
         AS totalQuestionCount,
 
-        a.submitted_at
+        COALESCE(a.submitted_at, a.graded_at)
         AS submittedAt
 
         FROM exam_attempts a
@@ -826,7 +826,7 @@
 
         WHERE a.student_id = #{studentId}
 
-          AND a.attempt_type = 'EXAM'
+          AND COALESCE(a.attempt_type, 'EXAM') = 'EXAM'
 
           AND a.status = 'GRADED'
 
@@ -857,7 +857,7 @@
 
         WHERE a.student_id = #{studentId}
 
-          AND a.attempt_type = 'EXAM'
+          AND COALESCE(a.attempt_type, 'EXAM') = 'EXAM'
 
           AND a.status = 'GRADED'
 
