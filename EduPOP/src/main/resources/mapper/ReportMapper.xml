@@ -37,15 +37,15 @@
              WHERE student_id = #{studentId} AND activity_type = 'OVERCOME_WRONG'
                AND created_at BETWEEN #{periodStart} AND #{periodEnd}) AS overcomeWrongCount,
 
-            -- [3. 취약 유형] : 기간 내 오답이 가장 많은 문제 유형 태그 추출
-            (SELECT eq.question_type_tag
+            -- [3. 취약 유형] : 기간 내 오답이 가장 많은 소분류 추출
+            (SELECT eq.small_category
              FROM exam_answers ans
                       JOIN exam_questions eq ON ans.question_id = eq.question_id
                       JOIN exam_attempts ea ON ans.attempt_id = ea.attempt_id
                       JOIN exams e ON ea.exam_id = e.exam_id
              WHERE ea.student_id = #{studentId} AND ans.is_correct = false
                AND e.exam_date BETWEEN #{periodStart} AND #{periodEnd}
-             GROUP BY eq.question_type_tag
+             GROUP BY eq.small_category
              ORDER BY COUNT(*) DESC LIMIT 1) AS topWeakTypeTag
 
         FROM users u
