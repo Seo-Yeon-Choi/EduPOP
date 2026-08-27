@@ -107,7 +107,8 @@ class ExamServiceTest {
         question.setExamId(1L);
         question.setQuestionNumber(1);
         question.setQuestionType("MULTIPLE_CHOICE");
-        question.setQuestionTypeTag("GRAMMAR");
+        question.setLargeCategory("GRAMMAR");
+        question.setSmallCategory("RELATIVE_CLAUSE");
         question.setQuestionText("기존 문제");
         question.setSortOrder(1);
         return question;
@@ -116,7 +117,9 @@ class ExamServiceTest {
     private ExamQuestion requestedQuestion(Long questionId, Long choiceId) {
         ExamQuestion question = new ExamQuestion();
         question.setQuestionId(questionId);
-        question.setQuestionTypeTag("VOCABULARY");
+        question.setQuestionType("MULTIPLE_CHOICE");
+        question.setLargeCategory("VOCABULARY");
+        question.setSmallCategory("SYNONYM");
         question.setQuestionText("수정한 문제");
         question.setScore(new BigDecimal("5.00"));
         question.setCorrectAnswer("1");
