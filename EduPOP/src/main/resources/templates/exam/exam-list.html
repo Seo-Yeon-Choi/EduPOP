@@ -10,11 +10,9 @@
         body { margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; }
         .page-content-wrapper { margin-left: 240px !important; margin-top: 70px !important; padding: 24px 32px; min-height: calc(100vh - 70px); background-color: #f8fafc; }
 
-        /* 2열 스플릿 워크스페이스 */
         .workspace-layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
         .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); padding: 20px 24px; margin-bottom: 20px; }
 
-        /* 좌측 반 리스트 사이드바 스타일 */
         .class-sidebar { padding: 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; }
         .sidebar-title { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
         .class-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #334155; text-decoration: none; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; transition: all 0.15s ease; }
@@ -32,14 +30,12 @@
         .btn-danger { background-color: #fee2e2; color: #dc2626; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
         .btn-danger:hover { background-color: #fecaca; }
 
-        /* 모달 스타일 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px); z-index: 9999; justify-content: center; align-items: center; }
         .modal-box { background: #ffffff; border-radius: 10px; width: 680px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
         .form-group { margin-bottom: 14px; }
         .form-group label { display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px; }
         .form-input, .form-select { width: 100%; height: 38px; padding: 0 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
 
-        /* 문항 행 그리드 */
         .question-builder-row { display: grid; grid-template-columns: 45px 115px 1fr 55px 55px; gap: 6px; align-items: center; margin-bottom: 8px; }
     </style>
 </head>
@@ -49,7 +45,6 @@
 <th:block th:replace="~{layout/sidebar-teacher :: sidebar}"></th:block>
 
 <div class="page-content-wrapper">
-
     <div class="header-box">
         <div>
             <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #0f172a;">📋 반별 시험 및 OMR 채점 관리</h1>
@@ -60,10 +55,7 @@
         </div>
     </div>
 
-    <!-- 2열 스플릿 워크스페이스 레이아웃 -->
     <div class="workspace-layout">
-
-        <!-- 1. 좌측: 담당 반 사이드바 리스트 -->
         <div class="class-sidebar">
             <div class="sidebar-title">
                 <span>🏫 내 담당 반 목록</span>
@@ -86,7 +78,6 @@
             </div>
         </div>
 
-        <!-- 2. 우측: 시험 리스트 및 관리 테이블 -->
         <div class="card" style="margin-bottom: 0;">
             <table class="common-table">
                 <thead>
@@ -118,12 +109,9 @@
                 </tbody>
             </table>
         </div>
-
     </div>
-
 </div>
 
-<!-- 1. 새 시험 등록 모달 -->
 <div id="createExamModal" class="modal-overlay">
     <div class="modal-box">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -142,9 +130,7 @@
 
             <div class="form-group">
                 <label>시험 분류 유형</label>
-                <select id="examType" class="form-select">
-                    <!-- 마스터 API 동적 로드 -->
-                </select>
+                <select id="examType" class="form-select"></select>
             </div>
 
             <div class="form-group">
@@ -183,13 +169,11 @@
             <div id="customBox" class="form-group">
                 <label>총 문항 수 설정</label>
                 <input type="number" id="totalQuestionsInput" class="form-input" value="5" min="1" max="30" onchange="generateQuestionRows(this.value)">
-
-                <div style="margin-top: 10px; max-height: 220px; overflow-y: auto; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; background: #f8fafc;" id="questionRowsContainer">
-                </div>
+                <div style="margin-top: 10px; max-height: 220px; overflow-y: auto; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; background: #f8fafc;" id="questionRowsContainer"></div>
             </div>
 
             <datalist id="savedLargeCategories"></datalist>
-            <datalist id="savedSubCategoryTags"></datalist>
+            <datalist id="savedSmallCategories"></datalist>
 
             <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
                 <button type="button" class="btn-secondary" onclick="closeCreateModal()">취소</button>
@@ -199,7 +183,6 @@
     </div>
 </div>
 
-<!-- 2. ⚙️ 분류 항목 관리 모달 -->
 <div id="categoryManageModal" class="modal-overlay">
     <div class="modal-box" style="width: 500px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -223,8 +206,7 @@
 
         <div class="form-group">
             <label>현재 등록된 항목 목록</label>
-            <div id="manageCategoryListContainer" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; background: #f8fafc;">
-            </div>
+            <div id="manageCategoryListContainer" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; background: #f8fafc;"></div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
@@ -251,7 +233,6 @@
     }
 
     function updateAllCategoryUI(data) {
-        // 1. 시험 분류 유형 토글 채우기
         const examTypeSelect = document.getElementById('examType');
         if (examTypeSelect && data.examTypes) {
             examTypeSelect.innerHTML = '';
@@ -263,7 +244,6 @@
             });
         }
 
-        // 2. 대분류 datalist 확실하게 재생성 및 채우기
         let largeDatalist = document.getElementById('savedLargeCategories');
         if (!largeDatalist) {
             largeDatalist = document.createElement('datalist');
@@ -278,11 +258,10 @@
             largeDatalist.appendChild(opt);
         });
 
-        // 3. 소분류 datalist 확실하게 재생성 및 채우기
-        let smallDatalist = document.getElementById('savedSubCategoryTags');
+        let smallDatalist = document.getElementById('savedSmallCategories');
         if (!smallDatalist) {
             smallDatalist = document.createElement('datalist');
-            smallDatalist.id = 'savedSubCategoryTags';
+            smallDatalist.id = 'savedSmallCategories';
             document.body.appendChild(smallDatalist);
         }
         smallDatalist.innerHTML = '';
@@ -296,7 +275,7 @@
 
     function openCreateModal() {
         document.getElementById('createExamModal').style.display = 'flex';
-        loadMasterCategories(); // 팝업 열 때 최신 마스터 데이터 강제 동기화
+        loadMasterCategories();
         generateQuestionRows(5);
     }
 
@@ -311,7 +290,7 @@
 
     function closeCategoryManageModal() {
         document.getElementById('categoryManageModal').style.display = 'none';
-        loadMasterCategories(); // 관리 창 닫을 때 메인 화면 데이터 즉시 갱신
+        loadMasterCategories();
     }
 
     function renderManageCategoryList() {
@@ -365,7 +344,7 @@
                         .then(data => {
                             globalCategoryData = data;
                             renderManageCategoryList();
-                            updateAllCategoryUI(data); // 즉시 datalist 업데이트
+                            updateAllCategoryUI(data);
                         });
                 } else {
                     alert('추가 실패');
@@ -386,7 +365,7 @@
                         .then(data => {
                             globalCategoryData = data;
                             renderManageCategoryList();
-                            updateAllCategoryUI(data); // 즉시 datalist 업데이트
+                            updateAllCategoryUI(data);
                         });
                 } else {
                     alert('삭제 실패');
@@ -418,9 +397,8 @@
             row.className = 'question-builder-row';
             row.innerHTML = `
                 <span style="font-size: 11px; font-weight: 700; color: #64748b; text-align: center;">${i}번</span>
-                <!-- 💡 value="VOCAB"을 지우고 placeholder를 넣어 빈칸 상태로 변경 -->
-                <input type="text" class="form-input q-type" list="savedLargeCategories" value="" placeholder="대분류 선택" style="height: 32px; font-size: 11px;" title="대분류 입력/수정">
-                <input type="text" class="form-input q-tag" list="savedSubCategoryTags" placeholder="소분류 선택" style="height: 32px; font-size: 11px;" title="소분류 입력/수정">
+                <input type="text" class="form-input q-large-category" list="savedLargeCategories" value="" placeholder="대분류 선택" style="height: 32px; font-size: 11px;" title="대분류 입력/수정">
+                <input type="text" class="form-input q-small-category" list="savedSmallCategories" placeholder="소분류 선택" style="height: 32px; font-size: 11px;" title="소분류 입력/수정">
                 <input type="number" class="form-input q-score" value="5" style="height: 32px; font-size: 11px; text-align: center;" title="배점">
                 <input type="text" class="form-input q-ans" value="1" style="height: 32px; font-size: 11px; text-align: center;" title="정답">
             `;
@@ -456,15 +434,16 @@
             let customQuestions = [];
             const rows = document.querySelectorAll('.question-builder-row');
             rows.forEach((row, idx) => {
-                const type = row.querySelector('.q-type').value.trim() || 'VOCAB';
-                const tag = row.querySelector('.q-tag').value.trim() || '기본';
+                const largeCategory = row.querySelector('.q-large-category').value.trim() || 'VOCAB';
+                const smallCategory = row.querySelector('.q-small-category').value.trim() || '기본';
                 const score = parseInt(row.querySelector('.q-score').value) || 5;
                 const ans = row.querySelector('.q-ans').value.trim() || '1';
 
                 customQuestions.push({
                     questionNumber: idx + 1,
-                    questionType: type,
-                    questionTypeTag: tag,
+                    questionType: 'MULTIPLE_CHOICE',
+                    largeCategory: largeCategory,
+                    smallCategory: smallCategory,
                     score: score,
                     correctAnswer: ans
                 });
