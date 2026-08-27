@@ -3,69 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EduPOP - 학생 메인</title>
+
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/student-main.css}">
+    <link rel="stylesheet" th:href="@{/css/exp.css}">
 </head>
+
 <body>
 
 <div th:replace="~{layout/header :: header}"></div>
+
 <div th:replace="~{layout/sidebar-student :: sidebar}"></div>
 
 <main class="student-main-container">
+
     <section class="student-welcome">
+
         <div class="welcome-text">
             <p class="welcome-label">STUDENT</p>
+
             <h1>학생 페이지</h1>
+
             <p class="welcome-description">
                 시험 응시, 복습, 학습 결과 등 EduPOP의 학습 기능을 이용할 수 있습니다.
             </p>
         </div>
+
+    </section>
+
+    <!-- 학생의 캐릭터 성장 단계와 경험치 표시 영역 -->
+    <section class="exp-card"
+             id="expCard"
+             data-stage="1"
+             aria-labelledby="expCardTitle"
+             aria-busy="true">
+
+        <!-- 경험치 정보를 불러오는 동안 표시 -->
+        <div class="exp-loading"
+             id="expLoading">
+            성장 정보를 불러오는 중입니다.
+        </div>
+
+        <!-- 경험치 조회에 실패했을 때 표시 -->
+        <div class="exp-error"
+             id="expError"
+             role="alert"
+             hidden>
+
+            <p id="expErrorMessage">
+                성장 정보를 불러오지 못했습니다.
+            </p>
+
+            <button class="exp-retry-button"
+                    id="expRetryButton"
+                    type="button">
+                다시 불러오기
+            </button>
+
+        </div>
+
+        <!-- 경험치 조회가 끝나면 표시할 실제 내용 -->
+        <div class="exp-content"
+             id="expContent"
+             hidden>
+
+            <!-- 단계별 고정 배경과 움직이는 캐릭터 표시 영역 -->
+            <div class="exp-character-area">
+
+                <div class="exp-character-background"
+                     id="expCharacterBackground"
+                     aria-hidden="true">
+                </div>
+
+                <img class="exp-character-image"
+                     id="expCharacterImage"
+                     alt="현재 성장 단계 캐릭터"
+                     hidden>
+
+                <!-- 캐릭터 이미지를 만들기 전까지 표시할 임시 영역 -->
+                <div class="exp-character-placeholder"
+                     id="expCharacterPlaceholder">
+                    <span>성장 캐릭터 준비 중</span>
+                </div>
+
+                <!-- 2~5단계에서 캐릭터 앞에 표시할 투명 탁자 영역 -->
+                <div class="exp-character-foreground"
+                     aria-hidden="true">
+                </div>
+
+            </div>
+
+            <!-- 현재 성장 단계와 경험치 정보 표시 영역 -->
+            <div class="exp-info-area">
+
+                <p class="exp-label">
+                    MY GROWTH
+                </p>
+
+                <div class="exp-title-row">
+
+                    <h2 id="expCardTitle">
+                        나의 성장 캐릭터
+                    </h2>
+
+                    <span class="exp-stage-badge"
+                          id="expStageBadge">
+                        1단계
+                    </span>
+
+                </div>
+
+                <!-- G부터 GROW UP까지 현재 성장 이름 표시 -->
+                <strong class="exp-stage-name"
+                        id="expStageName">
+                    G
+                </strong>
+
+                <div class="exp-score-row">
+
+                    <strong class="exp-total"
+                            id="expTotal">
+                        0 EXP
+                    </strong>
+
+                    <span class="exp-next"
+                          id="expNext">
+                        다음 단계까지 100 EXP
+                    </span>
+
+                </div>
+
+                <!-- 현재 단계에서 다음 단계까지의 경험치 진행 정도 표시 -->
+                <div class="exp-progress"
+                     id="expProgress"
+                     role="progressbar"
+                     aria-label="다음 캐릭터 단계까지의 경험치 진행률"
+                     aria-valuemin="0"
+                     aria-valuemax="100"
+                     aria-valuenow="0">
+
+                    <div class="exp-progress-bar"
+                         id="expProgressBar">
+                    </div>
+
+                </div>
+
+                <p class="exp-progress-text"
+                   id="expProgressText">
+                    현재 단계 진행률 0%
+                </p>
+
+                <p class="exp-guide"
+                   id="expGuide">
+                    시험·복습·독서 활동으로 경험치를 모아 성장 공간을 완성해 보세요.
+                </p>
+
+            </div>
+
+        </div>
+
     </section>
 
     <section class="student-menu-grid">
+
         <a href="/student/exams" class="student-menu-card">
+
             <div class="menu-icon">📝</div>
+
             <div class="menu-content">
                 <h2>시험 및 복습</h2>
-                <p>등록된 시험에 응시하고 오늘의 복습 문제를 확인합니다.</p>
+
+                <p>
+                    등록된 시험에 응시하고 오늘의 복습 문제를 확인합니다.
+                </p>
             </div>
+
             <span class="menu-arrow">›</span>
+
         </a>
 
         <a href="/student/exams/results" class="student-menu-card">
+
             <div class="menu-icon">📊</div>
+
             <div class="menu-content">
                 <h2>응시 결과</h2>
-                <p>이전 시험과 복습 결과를 확인할 수 있습니다.</p>
+
+                <p>
+                    이전 시험과 복습 결과를 확인할 수 있습니다.
+                </p>
             </div>
+
             <span class="menu-arrow">›</span>
+
         </a>
+
     </section>
 
     <section class="account-area">
+
         <div class="account-header">
             <h2>계정 관리</h2>
-            <p>계정 정보를 확인하거나 로그아웃 및 회원 탈퇴를 할 수 있습니다.</p>
+
+            <p>
+                로그아웃하거나 계정을 탈퇴할 수 있습니다.
+            </p>
         </div>
 
         <div class="account-buttons">
-            <a href="/logout" class="logout-button">로그아웃</a>
 
-            <a href="/account" class="logout-button">계정정보 조회</a>
+            <a href="/logout" class="logout-button">
+                로그아웃
+            </a>
 
             <form th:action="@{/user/withdraw}"
                   method="post"
                   onsubmit="return confirm('정말 탈퇴하시겠습니까? 데이터는 1년간 안전하게 보관된 후 완전히 삭제됩니다.');">
-                <button type="submit" class="withdraw-button">회원 탈퇴하기</button>
+
+                <button type="submit" class="withdraw-button">
+                    회원 탈퇴하기
+                </button>
+
             </form>
+
         </div>
 
         <p class="withdraw-warning">
             회원 탈퇴 시 계정 사용이 중지되며, 관련 데이터는 정책에 따라 보관 후 삭제됩니다.
         </p>
+
     </section>
+
 </main>
+
+<script th:src="@{/js/exp.js}" defer></script>
 
 </body>
 </html>

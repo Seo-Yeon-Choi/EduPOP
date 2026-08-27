@@ -217,68 +217,6 @@ document.addEventListener("DOMContentLoaded", function () {
         ); // 현재 단계에 맞는 배경 이미지 표시
     }
 
-
-    function changeStageName(
-        currentStageName
-    ) {
-        // changeStageName(체인지 스테이지 네임): 단계 이름을 글자별 색상 요소로 분리
-
-        const letterClassNames = {
-            G: "g",
-            R: "r",
-            O: "o",
-            W: "w",
-            U: "u",
-            P: "p"
-        };
-        // letterClassNames(레터 클래스 네임즈): 성장 글자와 CSS 클래스 이름 연결
-
-        stageName.textContent = "";
-        // 기존 단계 이름을 지우고 현재 단계 글자로 다시 구성
-
-        Array.from(
-            currentStageName
-        ).forEach(function (letter) {
-            // Array.from(어레이 프롬): GROW UP 단계 이름을 한 글자씩 분리
-
-            const className =
-                letterClassNames[letter];
-            // className(클래스 네임): 현재 글자에 사용할 고정 색상 클래스 이름
-
-            if (className === undefined) {
-                stageName.appendChild(
-                    document.createTextNode(
-                        letter
-                    )
-                );
-                // 띄어쓰기처럼 색상 클래스가 필요 없는 문자는 그대로 추가
-
-                return;
-            }
-
-            const letterElement =
-                document.createElement(
-                    "span"
-                );
-            // letterElement(레터 엘리먼트): 글자 하나의 색상과 네온을 담당할 span 요소
-
-            letterElement.classList.add(
-                "exp-stage-letter",
-                "exp-stage-letter-" + className
-            );
-            // 글자 공통 클래스와 글자별 고정 색상 클래스 추가
-
-            letterElement.textContent =
-                letter;
-            // span 요소에 현재 성장 글자 저장
-
-            stageName.appendChild(
-                letterElement
-            );
-            // 완성한 글자 요소를 단계 이름 영역에 순서대로 추가
-        });
-    }
-
     function changeStageName(
         currentStageName
     ) {
