@@ -55,9 +55,21 @@
                 <span class="score" th:text="|${question.score}점|">5점</span>
             </div>
 
-            <div class="question-tag" th:if="${question.questionTypeTag != null and !question.questionTypeTag.isEmpty()}"
-                 th:text="${question.questionTypeTag}">GRAMMAR</div>
+            <div class="question-category">
 
+            <span class="question-tag"
+                  th:if="${question.largeCategory != null and !question.largeCategory.isEmpty()}"
+                  th:text="${question.largeCategory}">
+                GRAMMAR
+            </span>
+
+            <span class="question-tag"
+                  th:if="${question.smallCategory != null and !question.smallCategory.isEmpty()}"
+                  th:text="${question.smallCategory}">
+                관계대명사
+             </span>
+
+            </div>
             <div class="content-block passage-block"
                  th:if="${question.passage != null and !question.passage.isEmpty()}">
                 <h3>지문</h3>

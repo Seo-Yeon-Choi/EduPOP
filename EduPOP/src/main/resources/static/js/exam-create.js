@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-
+    loadCategories();
     const tabs =
         document.querySelectorAll(".question-tab");
 
@@ -30,9 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const score =
         document.getElementById("score");
-
-    const questionTypeTag =
-        document.getElementById("questionTypeTag");
 
     const questionText =
         document.getElementById("questionText");
@@ -67,6 +64,131 @@ document.addEventListener("DOMContentLoaded", () => {
     const examTypeSelect =
         document.getElementById("examType");
 
+    const largeCategory =
+        document.getElementById('largeCategory');
+
+    const smallCategory =
+        document.getElementById('smallCategory');
+
+    let categoryData = null;
+
+    function isWordExamType(value) {
+        const normalized = String(value ?? "")
+            .replace(/\s+/g, "")
+            .toUpperCase();
+
+        return normalized === "WORD"
+            || normalized === "단어시험"
+            || normalized === "단어테스트";
+    }
+
+    async function loadCategories() {
+
+        try {
+
+            const response = await fetch('/exam/api/categories');
+
+            if (!response.ok) {
+                throw new Error('분류 목록 조회 실패');
+            }
+
+            categoryData = await response.json();
+
+            renderExamTypes(categoryData.examTypes);
+            renderLargeCategories(categoryData.largeCategories);
+            renderSmallCategories(categoryData.smallCategories);
+
+        } catch (error) {
+
+            console.error('분류 조회 오류:', error);
+
+        }
+    }
+
+    function renderExamTypes(examTypes) {
+
+        const select = document.getElementById('examType');
+
+        if (!select) {
+            console.error('examType 요소를 찾을 수 없습니다.');
+            return;
+        }
+
+        select.innerHTML =
+            '<option value="">시험 종류를 선택하세요</option>';
+
+        if (!examTypes) {
+            return;
+        }
+
+        examTypes.forEach(category => {
+
+            const option = document.createElement('option');
+
+            option.value = category.categoryName;
+            option.textContent = category.categoryName;
+
+            select.appendChild(option);
+        });
+    }
+
+    function renderLargeCategories(categories) {
+
+        const select =
+            document.getElementById('largeCategory');
+
+        if (!select) {
+            console.error('largeCategory 요소를 찾을 수 없습니다.');
+            return;
+        }
+
+        select.innerHTML =
+            '<option value="">대분류 선택</option>';
+
+        if (!categories) {
+            return;
+        }
+
+        categories.forEach(category => {
+
+            const option =
+                document.createElement('option');
+
+            option.value = category.categoryName;
+            option.textContent = category.categoryName;
+
+            select.appendChild(option);
+        });
+    }
+
+    function renderSmallCategories(categories) {
+
+        const select =
+            document.getElementById('smallCategory');
+
+        if (!select) {
+            console.error('smallCategory 요소를 찾을 수 없습니다.');
+            return;
+        }
+
+        select.innerHTML =
+            '<option value="">소분류 선택</option>';
+
+        if (!categories) {
+            return;
+        }
+
+        categories.forEach(category => {
+
+            const option =
+                document.createElement('option');
+
+            option.value = category.categoryName;
+            option.textContent = category.categoryName;
+
+            select.appendChild(option);
+        });
+    }
 
     // ============================
     // 객관식 / 주관식
@@ -236,7 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // 시험 종류에 따라 UI 적용
                 // =================================
 
-                if (examType === "WORD") {
+                if (isWordExamType(examType)) {
                     applyParsedWordQuestions(parsedQuestions);
                 } else {
                     applyParsedQuestions(parsedQuestions);
@@ -259,8 +381,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         index + 1,
                     score:
                         question.score ?? 5,
-                    questionTypeTag:
-                        question.questionTypeTag ?? "OTHER",
+                    largeCategory:
+                        question.largeCategory ?? "",
+                    smallCategory:
+                        question.smallCategory ?? "",
                     questionType:
                         question.questionType
                         ?? "MULTIPLE_CHOICE",
@@ -370,8 +494,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 Number(questionNumber.value),
             score:
                 Number(score.value),
-            questionTypeTag:
-            questionTypeTag.value,
+            largeCategory:
+                largeCategory ? largeCategory.value : "",
+            smallCategory:
+                smallCategory ? smallCategory.value : "",
             questionType:
             questionType.value,
             questionText:
@@ -508,8 +634,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     wordQuestions.length + 1,
                 questionType:
                     "SHORT_ANSWER",
-                questionTypeTag:
-                    "WORD_TO_MEANING",
+                largeCategory:
+                    "",
+                smallCategory:
+                    "",
                 score:
                     1,
                 questionText:
@@ -537,27 +665,31 @@ document.addEventListener("DOMContentLoaded", () => {
         const question = questions[index];
 
         questionNumber.value =
-            question.questionNumber;
+            question.questionNumber ?? index + 1;
 
         score.value =
-            question.score;
+            question.score ?? 5;
 
-        questionTypeTag.value =
-            question.questionTypeTag;
+        if (largeCategory) {
+            largeCategory.value = question.largeCategory ?? "";
+        }
+
+        if (smallCategory) {
+            smallCategory.value = question.smallCategory ?? "";
+        }
 
         questionText.value =
-            question.questionText;
+            question.questionText ?? "";
 
         passage.value =
-            question.passage;
+            question.passage ?? "";
 
         correctAnswer.value =
-            question.correctAnswer;
+            question.correctAnswer ?? "";
 
+        setQuestionType(question.questionType ?? "MULTIPLE_CHOICE");
 
-        setQuestionType(question.questionType);
-
-        renderChoices(question.choices);
+        renderChoices(question.choices ?? []);
 
         renderQuestionNumbers();
 
@@ -573,12 +705,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.querySelectorAll(".question-tab").forEach(tab => {
 
-                tab.classList.remove("active");
+            tab.classList.remove("active");
 
-                if (tab.dataset.type === type) {
-                    tab.classList.add("active");
-                }
-            });
+            if (tab.dataset.type === type) {
+                tab.classList.add("active");
+            }
+        });
 
         const choiceSection = document.getElementById("choiceSection");
 
@@ -641,7 +773,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 단어 시험
         // =========================================
 
-        if (examTypeValue === "WORD") {
+        if (isWordExamType(examTypeValue)) {
             normalExamSection.style.display = "none";
 
             wordExamSection.style.display = "block";
@@ -650,7 +782,7 @@ document.addEventListener("DOMContentLoaded", () => {
             examMode.value = "ONLINE";
         }
 
-        // =========================================
+            // =========================================
             // 일반 시험
         // =========================================
 
@@ -686,7 +818,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return {
             questionNumber: number,
             score: 5,
-            questionTypeTag: "",
+            largeCategory: "",
+            smallCategory: "",
             questionType: "MULTIPLE_CHOICE",
             questionText: "",
             passage: "",
@@ -762,6 +895,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            if (examType === "") {
+                alert("시험 종류를 선택해주세요.");
+                return;
+            }
+
             // =====================================
             // 4. 문제 배열 생성
             // =====================================
@@ -772,7 +910,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // 단어 시험
             // =====================================
 
-            if (examType === "WORD") {
+            if (isWordExamType(examType)) {
 
                 examQuestions = buildWordQuestions();
 
@@ -836,9 +974,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
-                    // 문제 유형 태그
-                    if (!question.questionTypeTag || question.questionTypeTag.trim() === "") {
-                        alert(`${i + 1}번 문제의 유형 태그를 입력해주세요.`);
+                    // 대분류
+                    if (!question.largeCategory || question.largeCategory.trim() === "") {
+                        alert(`${i + 1}번 문제의 대분류를 선택해주세요.`);
+                        return;
+                    }
+
+                    // 소분류
+                    if (!question.smallCategory || question.smallCategory.trim() === "") {
+                        alert(`${i + 1}번 문제의 소분류를 선택해주세요.`);
                         return;
                     }
 
@@ -887,7 +1031,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // 단어시험은 온라인
                 examMode:
-                    examType === "WORD"
+                    isWordExamType(examType)
                         ? "ONLINE"
                         : examMode,
 
@@ -909,15 +1053,15 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
 
                 const response = await fetch("/teacher/exams",
-                        {
-                            method:
-                                "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify(exam)
-                        }
-                    );
+                    {
+                        method:
+                            "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(exam)
+                    }
+                );
 
                 // =================================
                 // 오류
@@ -961,7 +1105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     function updateExamTypeDisplay() {
-        const isWordExam = examTypeSelect.value === "WORD";
+        const isWordExam = isWordExamType(examTypeSelect.value);
 
         normalExamSection.style.display = isWordExam ? "none" : "block";
         wordExamSection.style.display = isWordExam ? "block" : "none";

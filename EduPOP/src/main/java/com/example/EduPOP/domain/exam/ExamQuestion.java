@@ -19,7 +19,9 @@ public class ExamQuestion {
 
     private String questionType;
 
-    private String questionTypeTag;
+    private String largeCategory;
+
+    private String smallCategory;
 
     private BigDecimal score;
 

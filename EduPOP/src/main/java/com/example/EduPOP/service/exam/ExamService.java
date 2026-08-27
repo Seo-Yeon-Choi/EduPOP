@@ -125,9 +125,12 @@ public class ExamService {
             );
 
             validateQuestion(requestedQuestion);
+            savedQuestion.setLargeCategory(
+                    trimToNull(requestedQuestion.getLargeCategory())
+            );
 
-            savedQuestion.setQuestionTypeTag(
-                    trimToNull(requestedQuestion.getQuestionTypeTag())
+            savedQuestion.setSmallCategory(
+                    trimToNull(requestedQuestion.getSmallCategory())
             );
             savedQuestion.setScore(requestedQuestion.getScore());
             savedQuestion.setCorrectAnswer(
@@ -484,12 +487,17 @@ public class ExamService {
         }
     }
 
-    private void validateQuestion(ExamQuestion question) {
+    private void validateQuestion(
+            ExamQuestion question
+    ) {
+
         if (question == null
                 || isBlank(question.getQuestionText())
-                || isBlank(question.getQuestionTypeTag())) {
+                || isBlank(question.getLargeCategory())
+                || isBlank(question.getSmallCategory())) {
+
             throw new IllegalArgumentException(
-                    "문제 내용과 유형 태그를 모두 입력해주세요."
+                    "문제 내용과 대분류/소분류를 모두 입력해주세요."
             );
         }
     }

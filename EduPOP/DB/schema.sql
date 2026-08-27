@@ -502,3 +502,10 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD CONSTRAINT uk_users_naver_id UNIQUE (naverId);
+
+ALTER TABLE exam_questions
+    ADD COLUMN large_category VARCHAR(100) NULL,
+    ADD COLUMN small_category VARCHAR(100) NULL;
+
+ALTER TABLE exam_questions
+DROP COLUMN question_type_tag;

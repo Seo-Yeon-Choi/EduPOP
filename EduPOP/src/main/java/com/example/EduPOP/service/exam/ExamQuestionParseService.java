@@ -129,7 +129,8 @@ public class ExamQuestionParseService {
 
             question.setQuestionType("SHORT_ANSWER");
 
-            question.setQuestionTypeTag("WORD_TO_MEANING");
+            question.setLargeCategory("");
+            question.setSmallCategory("");
 
             question.setQuestionText(wordPair.word());
 
@@ -164,8 +165,6 @@ public class ExamQuestionParseService {
         question.setQuestionNumber(number);
 
         question.setScore(new BigDecimal("5.00"));
-
-        question.setQuestionTypeTag("OTHER");
 
         question.setSortOrder(number);
 
