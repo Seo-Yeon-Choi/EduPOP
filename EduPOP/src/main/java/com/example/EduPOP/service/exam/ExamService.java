@@ -69,7 +69,7 @@ public class ExamService {
 
             examQuestionMapper.insert(question);
 
-            if (question.getQuestionType() == QuestionType.MULTIPLE_CHOICE
+            if ("MULTIPLE_CHOICE".equalsIgnoreCase(question.getQuestionType())
                     && question.getChoices() != null) {
                 int number = 1;
 
@@ -159,7 +159,7 @@ public class ExamService {
 
         examQuestionMapper.insert(question);
 
-        if (question.getQuestionType() == QuestionType.MULTIPLE_CHOICE
+        if ("MULTIPLE_CHOICE".equalsIgnoreCase(question.getQuestionType())
                 && question.getChoices() != null) {
             int number = 1;
 

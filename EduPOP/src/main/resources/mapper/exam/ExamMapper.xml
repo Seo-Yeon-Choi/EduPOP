@@ -4,6 +4,19 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.EduPOP.repository.exam.ExamMapper">
+    <select id="findTemplatesByAcademyId" resultType="com.example.EduPOP.controller.exam.dto.ExamTemplateResponse">
+        SELECT
+        e.exam_id AS examId,
+        e.title AS title,
+        COALESCE(e.exam_type, 'MONTH') AS examType,
+        COALESCE(SUM(eq.score), 100.0) AS totalScore,
+        COALESCE(COUNT(eq.question_id), 0) AS totalQuestions
+        FROM exams e
+        LEFT JOIN exam_questions eq ON e.exam_id = eq.exam_id
+        WHERE (e.template_exam_id IS NULL OR e.class_id IS NULL)
+        GROUP BY e.exam_id, e.title, e.exam_type
+        ORDER BY e.exam_id ASC
+    </select>
 
     <insert id="insert" parameterType="Exam" useGeneratedKeys="true" keyProperty="examId">
         INSERT INTO exams
@@ -38,43 +51,59 @@
         LEFT JOIN classes c ON c.class_id = e.class_id
         WHERE e.exam_id = #{examId}
     </select>
+
+    <!-- 💡 2. [ERD 정밀 일치] 신규 시험지 생성 (academy_id 제외) -->
+    <insert id="insertExam" parameterType="com.example.EduPOP.controller.exam.dto.ExamCreateOrCopyRequest"
+            useGeneratedKeys="true" keyProperty="generatedExamId" keyColumn="exam_id">
+        INSERT INTO exams (
+        class_id,
+        teacher_id,
+        template_exam_id,
+        title,
+        exam_type,
+        exam_mode,
+        exam_round,
+        status,
+        exam_date,
+        created_at,
+        updated_at
+        ) VALUES (
+        #{classId},
+        1,
+        #{templateExamId},
+        #{title},
+        'MONTH',
+        'PAPER',
+        #{examRound},
+        'ACTIVE',
+        #{examDate},
+        NOW(),
+        NOW()
+        )
+    </insert>
     <!-- 3. 템플릿 문항 복제 -->
     <insert id="copyQuestionsFromTemplate">
         INSERT INTO exam_questions (
-            exam_id,
-            section_id,
-            question_number,
-            question_text,
-            question_type,
-            question_type_tag,
-            score,
-            correct_answer,
-            sort_order
+        exam_id,
+        section_id,
+        question_number,
+        question_text,
+        question_type,
+        question_type_tag,
+        score,
+        correct_answer,
+        sort_order
         )
         SELECT
-            e.exam_id,
-            e.class_id,
-            c.name AS class_name,
-            e.teacher_id,
-            e.template_exam_id,
-            e.title,
-            e.exam_type,
-            e.exam_mode,
-            e.exam_round,
-            e.status,
-            e.exam_date,
-            e.file_url,
-            e.created_at,
-            e.updated_at
-            #{newExamId},
-            section_id,
-            question_number,
-            COALESCE(question_text, CONCAT(question_number, '번 문항')),
-            question_type,
-            COALESCE(question_type_tag, question_type, 'VOCAB'),
-            score,
-            correct_answer,
-            sort_order
+        #{newExamId},
+        section_id,
+        question_number,
+        COALESCE(question_text, CONCAT(question_number, '번 문항')),
+        question_type,
+        COALESCE(question_type_tag, question_type, 'VOCAB'),
+        score,
+        correct_answer,
+        sort_order
         FROM exam_questions
         WHERE exam_id = #{templateExamId}
         ORDER BY question_number ASC
@@ -93,7 +122,6 @@
             (SELECT COUNT(DISTINCT ea.student_id) FROM exam_attempts ea WHERE ea.exam_id = e.exam_id) AS gradedStudentCount
         FROM exams e
         LEFT JOIN classes c ON c.class_id = e.class_id
-                 LEFT JOIN classes c ON e.class_id = c.class_id
         ORDER BY e.exam_date DESC, e.exam_id DESC
     </select>
 

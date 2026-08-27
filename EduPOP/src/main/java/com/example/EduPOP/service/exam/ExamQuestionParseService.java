@@ -127,7 +127,7 @@ public class ExamQuestionParseService {
 
             question.setSortOrder(questionNumber);
 
-            question.setQuestionType(QuestionType.SHORT_ANSWER);
+            question.setQuestionType("SHORT_ANSWER");
 
             question.setQuestionTypeTag("WORD_TO_MEANING");
 
@@ -198,7 +198,7 @@ public class ExamQuestionParseService {
 
             String choicesText = block.substring(choiceStart).trim();
 
-            question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
+            question.setQuestionType("MULTIPLE_CHOICE");
 
             question.setChoices(parseChoices(choicesText));
         }
@@ -210,7 +210,7 @@ public class ExamQuestionParseService {
         else {
             beforeChoices = block.trim();
 
-            question.setQuestionType(QuestionType.SHORT_ANSWER);
+            question.setQuestionType("SHORT_ANSWER");
 
             question.setChoices(new ArrayList<>());
         }

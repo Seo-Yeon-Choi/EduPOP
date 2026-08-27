@@ -314,10 +314,10 @@
 
         e.title
         AS examTitle,
-
+        <!--
         e.exam_type
         AS examType,
-
+        -->
         a.attempt_type
         AS attemptType,
 
@@ -368,10 +368,10 @@
 
         '오늘의 복습'
         AS examTitle,
-
+        <!--
         NULL
         AS examType,
-
+        -->
         NULL
         AS attemptType,
 

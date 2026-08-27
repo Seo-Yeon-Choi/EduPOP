@@ -3,7 +3,6 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-
     <meta charset="UTF-8">
 
     <title th:text="${exam.title}">
@@ -15,7 +14,6 @@
 
     <link rel="stylesheet"
           th:href="@{/css/student-exam-take.css}">
-
 </head>
 
 <body>
@@ -25,9 +23,7 @@
 <main class="exam-take-container">
 
     <header class="exam-header">
-
         <div>
-
             <h1 th:text="${exam.title}">
                 시험 제목
             </h1>
@@ -36,12 +32,12 @@
                 이전 시험에서 틀린 문제를 다시 풀어보세요.
             </p>
 
-            <p th:if="${exam.examType == T(com.example.EduPOP.domain.exam.ExamType).WORD}">
-                제한 시간은 15분 입니다.
+            <p th:if="${exam.examType == 'WORD'}">
+                제한 시간은 15분입니다.
             </p>
 
-            <!-- 단어시험에서만 표시 -->
-            <div th:if="${exam.examType == T(com.example.EduPOP.domain.exam.ExamType).WORD}"
+            <!-- 단어 시험에서만 표시 -->
+            <div th:if="${exam.examType == 'WORD'}"
                  id="examTimer"
                  class="exam-timer">
 
@@ -50,18 +46,18 @@
                 <strong id="timerDisplay">
                     15:00
                 </strong>
-
             </div>
         </div>
-
     </header>
 
     <input type="hidden"
            id="attemptId"
            th:value="${attempt.attemptId}">
+
     <input type="hidden"
            id="wordExam"
-           th:value="${exam.examType == T(com.example.EduPOP.domain.exam.ExamType).WORD}">
+           th:value="${exam.examType == 'WORD'}">
+
     <section class="question-list">
 
         <article class="question-card"
@@ -80,10 +76,11 @@
 
             <div class="question-text"
                  th:text="${question.questionText}">
+                문제 내용
             </div>
 
             <!-- 객관식 -->
-            <div th:if="${question.questionType == T(com.example.EduPOP.domain.exam.QuestionType).MULTIPLE_CHOICE}"
+            <div th:if="${question.questionType == 'MULTIPLE_CHOICE'}"
                  class="choice-list">
 
                 <label th:each="choice : ${question.choices}"
@@ -104,12 +101,14 @@
                 </label>
 
             </div>
+
             <!-- 주관식 -->
-            <div th:if="${question.questionType == T(com.example.EduPOP.domain.exam.QuestionType).SHORT_ANSWER}"
+            <div th:if="${question.questionType == 'SHORT_ANSWER'}"
                  class="short-answer">
 
                 <input type="text"
                        class="student-answer"
+                       th:name="'question-' + ${question.questionId}"
                        placeholder="정답을 입력하세요">
 
             </div>
@@ -119,14 +118,10 @@
     </section>
 
     <div class="submit-area">
-
         <button type="button"
                 id="submitExamButton">
-
             제출하기
-
         </button>
-
     </div>
 
 </main>

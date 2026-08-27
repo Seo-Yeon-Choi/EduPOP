@@ -83,7 +83,7 @@ class ExamServiceTest {
         exam.setTeacherId(7L);
         exam.setClassId(2L);
         exam.setTitle("기존 시험");
-        exam.setExamType(ExamType.MONTHLY);
+        exam.setExamType("MONTHLY");
         exam.setExamMode(ExamMode.PAPER);
         exam.setExamRound(1);
         exam.setStatus(ExamStatus.DRAFT);
@@ -94,7 +94,7 @@ class ExamServiceTest {
         Exam exam = new Exam();
         exam.setClassId(2L);
         exam.setTitle("수정한 시험");
-        exam.setExamType(ExamType.MONTHLY);
+        exam.setExamType("MONTHLY");
         exam.setExamMode(ExamMode.PAPER);
         exam.setStatus(ExamStatus.OPEN);
         exam.setQuestions(questions);
@@ -106,7 +106,7 @@ class ExamServiceTest {
         question.setQuestionId(questionId);
         question.setExamId(1L);
         question.setQuestionNumber(1);
-        question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
+        question.setQuestionType("MULTIPLE_CHOICE");
         question.setQuestionTypeTag("GRAMMAR");
         question.setQuestionText("기존 문제");
         question.setSortOrder(1);

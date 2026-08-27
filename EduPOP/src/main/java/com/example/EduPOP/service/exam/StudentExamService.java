@@ -129,7 +129,7 @@ public class StudentExamService {
 
         for (ExamQuestion question : questions) {
 
-            if (question.getQuestionType() == QuestionType.MULTIPLE_CHOICE) {
+            if ("MULTIPLE_CHOICE".equalsIgnoreCase(question.getQuestionType())) {
 
                 question.setChoices(
                         studentExamMapper.findChoices(
@@ -147,7 +147,7 @@ public class StudentExamService {
 
         Exam exam = studentExamMapper.findExamById(examId);
 
-        if (exam.getExamType()!=ExamType.WORD) {
+        if (!"WORD".equalsIgnoreCase(exam.getExamType())) {
             throw new IllegalArgumentException(
                     "단어 시험이 아닙니다."
             );
