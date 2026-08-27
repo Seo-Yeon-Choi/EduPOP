@@ -3,7 +3,6 @@ package com.example.EduPOP.controller.exam.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -28,7 +27,8 @@ public class ExamCreateOrCopyRequest {
     public static class CustomQuestionDto {
         private Integer questionNumber;
         private String questionType;
-        private String questionTypeTag;
+        private String largeCategory;
+        private String smallCategory;
         private Integer score;
         private String correctAnswer;
     }
