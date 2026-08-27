@@ -1,5 +1,6 @@
 package com.example.EduPOP.service.exam;
 
+import com.example.EduPOP.controller.exam.dto.ExamBulkGradeRequest;
 import com.example.EduPOP.domain.exam.*;
 import com.example.EduPOP.repository.exam.ExamMapper;
 import com.example.EduPOP.repository.exam.ExamQuestionChoiceMapper;
@@ -7,13 +8,14 @@ import com.example.EduPOP.repository.exam.ExamQuestionMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -75,6 +77,70 @@ class ExamServiceTest {
         verify(examMapper, never()).update(any());
         verify(examQuestionMapper, never()).update(any());
         verify(examQuestionMapper, never()).insert(any());
+    }
+
+    @Test
+    void saveBulkGrades_completesManualAttemptForStudentResults() {
+        ExamBulkGradeRequest.AnswerPayload answer =
+                new ExamBulkGradeRequest.AnswerPayload();
+        answer.setQuestionId(10L);
+        answer.setSubmittedAnswer("2");
+        answer.setCorrectAnswer("2");
+        answer.setScore(5);
+        answer.setQuestionType("VOCAB");
+
+        ExamBulkGradeRequest.StudentGradePayload student =
+                new ExamBulkGradeRequest.StudentGradePayload();
+        student.setStudentId(20L);
+        student.setAnswers(List.of(answer));
+
+        ExamBulkGradeRequest request = new ExamBulkGradeRequest();
+        request.setExamId(1L);
+        request.setStudentGrades(List.of(student));
+
+        when(examMapper.findExamAttempt(1L, 20L))
+                .thenReturn(null);
+        when(examMapper.insertExamAttempt(any(ExamAttempt.class)))
+                .thenAnswer(invocation -> {
+                    ExamAttempt attempt = invocation.getArgument(0);
+                    attempt.setAttemptId(99L);
+                    return 1;
+                });
+
+        examService.saveBulkGrades(request);
+
+        ArgumentCaptor<ExamAttempt> attemptCaptor =
+                ArgumentCaptor.forClass(ExamAttempt.class);
+        verify(examMapper).insertExamAttempt(attemptCaptor.capture());
+
+        ExamAttempt savedAttempt = attemptCaptor.getValue();
+
+        assertAll(
+                () -> assertEquals(1L, savedAttempt.getExamId()),
+                () -> assertEquals(20L, savedAttempt.getStudentId()),
+                () -> assertEquals(1, savedAttempt.getAttemptNo()),
+                () -> assertEquals("EXAM", savedAttempt.getAttemptType()),
+                () -> assertEquals("MANUAL", savedAttempt.getEntryMethod()),
+                () -> assertEquals("GRADED", savedAttempt.getStatus()),
+                () -> assertEquals(
+                        BigDecimal.valueOf(5),
+                        savedAttempt.getTotalScore()
+                ),
+                () -> assertEquals(
+                        BigDecimal.valueOf(5),
+                        savedAttempt.getMaxScore()
+                ),
+                () -> assertNotNull(savedAttempt.getSubmittedAt()),
+                () -> assertEquals(
+                        savedAttempt.getSubmittedAt(),
+                        savedAttempt.getGradedAt()
+                )
+        );
+
+        verify(examMapper).batchInsertExamAnswers(
+                eq(99L),
+                anyList()
+        );
     }
 
     private Exam savedExam() {
