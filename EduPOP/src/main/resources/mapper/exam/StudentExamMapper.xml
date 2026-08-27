@@ -4,68 +4,44 @@
 
 <mapper namespace="com.example.EduPOP.repository.exam.StudentExamMapper">
 
-    <select id="findStudentExams"
-            resultType="com.example.EduPOP.domain.exam.StudentExam">
-
+    <select id="findStudentExams" resultType="com.example.EduPOP.domain.exam.StudentExam">
         SELECT
-        e.exam_id AS examId,
-        e.title AS title,
-        e.exam_type AS examType,
-        e.exam_date AS examDate,
-
-        (
-        SELECT COUNT(*)
-        FROM exam_answers ea
-        JOIN exam_attempts a
-        ON ea.attempt_id = a.attempt_id
-        WHERE a.exam_id = e.exam_id
-        AND a.student_id = #{studentId}
-        AND a.attempt_type = 'EXAM'
-        AND a.status = 'GRADED'
-        AND ea.is_correct = FALSE
-        ) AS wrongCount
-
+            e.exam_id AS examId,
+            e.title AS title,
+            e.exam_type AS examType,
+            e.exam_date AS examDate,
+            (
+                SELECT COUNT(*)
+                FROM exam_answers ea
+                JOIN exam_attempts a ON ea.attempt_id = a.attempt_id
+                WHERE a.exam_id = e.exam_id
+                  AND a.student_id = #{studentId}
+                  AND a.attempt_type = 'EXAM'
+                  AND a.status = 'GRADED'
+                  AND ea.is_correct = FALSE
+            ) AS wrongCount
         FROM exams e
-
-        JOIN class_students cs
-        ON e.class_id = cs.class_id
-
+        JOIN class_students cs ON e.class_id = cs.class_id
         WHERE cs.student_id = #{studentId}
-
         <if test="date != null">
             AND e.exam_date = #{date}
         </if>
-
-        ORDER BY
-        e.exam_date DESC,
-        e.exam_id DESC
-
+        ORDER BY e.exam_date DESC, e.exam_id DESC
         LIMIT #{limit}
         OFFSET #{offset}
-
     </select>
 
-    <select id="countStudentExams"
-            resultType="int">
-
+    <select id="countStudentExams" resultType="int">
         SELECT COUNT(*)
-
         FROM exams e
-
-        JOIN class_students cs
-        ON e.class_id = cs.class_id
-
+        JOIN class_students cs ON e.class_id = cs.class_id
         WHERE cs.student_id = #{studentId}
-
         <if test="date != null">
             AND e.exam_date = #{date}
         </if>
-
     </select>
 
-    <select id="findExamById"
-            resultType="com.example.EduPOP.domain.exam.Exam">
-
+    <select id="findExamById" resultType="com.example.EduPOP.domain.exam.Exam">
         SELECT
             exam_id AS examId,
             class_id AS classId,
@@ -77,111 +53,81 @@
             status,
             exam_date AS examDate,
             file_url AS fileUrl
-
         FROM exams
-
         WHERE exam_id = #{examId}
-
     </select>
 
-
-    <select id="findAllQuestions"
-            resultType="com.example.EduPOP.domain.exam.ExamQuestion">
-
+    <select id="findAllQuestions" resultType="com.example.EduPOP.domain.exam.ExamQuestion">
         SELECT
             question_id AS questionId,
             exam_id AS examId,
             section_id AS sectionId,
             question_number AS questionNumber,
             question_type AS questionType,
-            question_type_tag AS questionTypeTag,
+            large_category AS largeCategory,
+            small_category AS smallCategory,
             score,
             correct_answer AS correctAnswer,
             question_text AS questionText,
             passage,
             sort_order AS sortOrder
-
         FROM exam_questions
-
         WHERE exam_id = #{examId}
-
         ORDER BY sort_order, question_number
-
     </select>
 
-
-    <select id="findWrongQuestions"
-            resultType="com.example.EduPOP.domain.exam.ExamQuestion">
-
+    <select id="findWrongQuestions" resultType="com.example.EduPOP.domain.exam.ExamQuestion">
         SELECT
             q.question_id AS questionId,
             q.exam_id AS examId,
             q.section_id AS sectionId,
             q.question_number AS questionNumber,
             q.question_type AS questionType,
-            q.question_type_tag AS questionTypeTag,
+            q.large_category AS largeCategory,
+            q.small_category AS smallCategory,
             q.score,
             q.correct_answer AS correctAnswer,
             q.question_text AS questionText,
             q.passage,
             q.sort_order AS sortOrder
-
         FROM exam_answers a
-
-                 JOIN exam_questions q
-                      ON a.question_id = q.question_id
-
+        JOIN exam_questions q ON a.question_id = q.question_id
         WHERE a.attempt_id = #{attemptId}
           AND a.is_correct = FALSE
-
         ORDER BY q.question_number
-
     </select>
 
-    <select id="findChoices"
-            resultType="com.example.EduPOP.domain.exam.ExamQuestionChoice">
-
+    <select id="findChoices" resultType="com.example.EduPOP.domain.exam.ExamQuestionChoice">
         SELECT
             choice_id AS choiceId,
             question_id AS questionId,
             choice_number AS choiceNumber,
             choice_text AS choiceText,
             sort_order AS sortOrder
-
         FROM exam_question_choices
-
         WHERE question_id = #{questionId}
-
         ORDER BY sort_order, choice_number
-
     </select>
 
-    <select id="findQuestionById"
-            resultType="com.example.EduPOP.domain.exam.ExamQuestion">
-
+    <select id="findQuestionById" resultType="com.example.EduPOP.domain.exam.ExamQuestion">
         SELECT
-            question_id,
-            exam_id,
-            section_id,
-            question_number,
-            question_type,
-            question_type_tag,
+            question_id AS questionId,
+            exam_id AS examId,
+            section_id AS sectionId,
+            question_number AS questionNumber,
+            question_type AS questionType,
+            large_category AS largeCategory,
+            small_category AS smallCategory,
             score,
-            correct_answer,
-            question_text,
+            correct_answer AS correctAnswer,
+            question_text AS questionText,
             passage,
-            sort_order
-
+            sort_order AS sortOrder
         FROM exam_questions
-
         WHERE question_id = #{questionId}
-
     </select>
 
-
-    <select id="findLatestOriginalAttempt"
-            resultType="com.example.EduPOP.domain.exam.ExamAttempt">
-
+    <select id="findLatestOriginalAttempt" resultType="com.example.EduPOP.domain.exam.ExamAttempt">
         SELECT
             attempt_id,
             exam_id,
@@ -198,24 +144,16 @@
             started_at,
             submitted_at,
             graded_at
-
         FROM exam_attempts
-
         WHERE exam_id = #{examId}
           AND student_id = #{studentId}
           AND attempt_type = 'EXAM'
           AND status = 'GRADED'
-
         ORDER BY attempt_id DESC
-
         LIMIT 1
-
     </select>
 
-
-    <select id="findInProgressAttempt"
-            resultType="com.example.EduPOP.domain.exam.ExamAttempt">
-
+    <select id="findInProgressAttempt" resultType="com.example.EduPOP.domain.exam.ExamAttempt">
         SELECT
             attempt_id,
             exam_id,
@@ -232,238 +170,94 @@
             started_at,
             submitted_at,
             graded_at
-
         FROM exam_attempts
-
         WHERE exam_id = #{examId}
           AND student_id = #{studentId}
           AND attempt_type = #{attemptType}
           AND status = 'IN_PROGRESS'
-
         ORDER BY attempt_id DESC
-
         LIMIT 1
-
     </select>
 
-
-    <select id="findNextAttemptNo"
-            resultType="int">
-
+    <select id="findNextAttemptNo" resultType="int">
         SELECT COALESCE(MAX(attempt_no), 0) + 1
-
         FROM exam_attempts
-
         WHERE exam_id = #{examId}
           AND student_id = #{studentId}
-
     </select>
 
-    <select id="findStudentExamResults"
-            resultType="com.example.EduPOP.domain.exam.StudentExamResult">
-
-        SELECT
-            a.attempt_id AS attemptId,
-            a.exam_id AS examId,
-
-            e.title AS examTitle,
-            e.exam_type AS examType,
-
-            a.attempt_type AS attemptType,
-
-            'EXAM' AS resultType,
-
-            a.total_score AS totalScore,
-            a.max_score AS maxScore,
-
-            a.correct_count AS correctCount,
-            a.total_question_count AS totalQuestionCount,
-
-            a.submitted_at AS submittedAt
-
-        FROM exam_attempts a
-
-                 JOIN exams e
-                      ON a.exam_id = e.exam_id
-
-        WHERE a.student_id = #{studentId}
-          AND a.status = 'GRADED'
-
-        ORDER BY a.submitted_at DESC,
-                 a.attempt_id DESC
-
-    </select>
-
-    <select id="findStudentResults"
-            resultType="com.example.EduPOP.domain.exam.StudentExamResult">
-
+    <select id="findStudentResults" resultType="com.example.EduPOP.domain.exam.StudentExamResult">
         SELECT *
-
         FROM (
+            SELECT
+                a.attempt_id AS attemptId,
+                NULL AS dailyReviewAttemptId,
+                e.exam_id AS examId,
+                e.title AS examTitle,
+                a.attempt_type AS attemptType,
+                'EXAM' AS resultType,
+                e.exam_date AS resultDate,
+                a.total_score AS totalScore,
+                a.max_score AS maxScore,
+                a.correct_count AS correctCount,
+                a.total_question_count AS totalQuestionCount,
+                a.submitted_at AS submittedAt
+            FROM exam_attempts a
+            JOIN exams e ON a.exam_id = e.exam_id
+            WHERE a.student_id = #{studentId}
+              AND a.status = 'GRADED'
 
-        SELECT
+            UNION ALL
 
-        a.attempt_id
-        AS attemptId,
-
-        NULL
-        AS dailyReviewAttemptId,
-
-        e.exam_id
-        AS examId,
-
-        e.title
-        AS examTitle,
-        <!--
-        e.exam_type
-        AS examType,
-        -->
-        a.attempt_type
-        AS attemptType,
-
-        'EXAM'
-        AS resultType,
-
-        e.exam_date
-        AS resultDate,
-
-        a.total_score
-        AS totalScore,
-
-        a.max_score
-        AS maxScore,
-
-        a.correct_count
-        AS correctCount,
-
-        a.total_question_count
-        AS totalQuestionCount,
-
-        a.submitted_at
-        AS submittedAt
-
-        FROM exam_attempts a
-
-        JOIN exams e
-        ON a.exam_id = e.exam_id
-
-        WHERE a.student_id = #{studentId}
-
-        AND a.status = 'GRADED'
-
-
-        UNION ALL
-
-
-        SELECT
-
-        NULL
-        AS attemptId,
-
-        dra.daily_review_attempt_id
-        AS dailyReviewAttemptId,
-
-        NULL
-        AS examId,
-
-        '오늘의 복습'
-        AS examTitle,
-        <!--
-        NULL
-        AS examType,
-        -->
-        NULL
-        AS attemptType,
-
-        'DAILY_REVIEW'
-        AS resultType,
-
-        dra.review_date
-        AS resultDate,
-
-        dra.total_score
-        AS totalScore,
-
-        dra.max_score
-        AS maxScore,
-
-        dra.correct_count
-        AS correctCount,
-
-        dra.total_question_count
-        AS totalQuestionCount,
-
-        dra.submitted_at
-        AS submittedAt
-
-        FROM daily_review_attempts dra
-
-        WHERE dra.student_id = #{studentId}
-
-        AND dra.status = 'GRADED'
-
+            SELECT
+                NULL AS attemptId,
+                dra.daily_review_attempt_id AS dailyReviewAttemptId,
+                NULL AS examId,
+                '오늘의 복습' AS examTitle,
+                NULL AS attemptType,
+                'DAILY_REVIEW' AS resultType,
+                dra.review_date AS resultDate,
+                dra.total_score AS totalScore,
+                dra.max_score AS maxScore,
+                dra.correct_count AS correctCount,
+                dra.total_question_count AS totalQuestionCount,
+                dra.submitted_at AS submittedAt
+            FROM daily_review_attempts dra
+            WHERE dra.student_id = #{studentId}
+              AND dra.status = 'GRADED'
         ) r
-
         WHERE 1 = 1
-
         <if test="date != null">
             AND r.resultDate = #{date}
         </if>
-
-        ORDER BY
-        r.resultDate DESC,
-        r.submittedAt DESC
-
+        ORDER BY r.resultDate DESC, r.submittedAt DESC
         LIMIT #{limit}
         OFFSET #{offset}
-
     </select>
 
-    <select id="countStudentResults"
-            resultType="int">
-
+    <select id="countStudentResults" resultType="int">
         SELECT COUNT(*)
-
         FROM (
+            SELECT e.exam_date AS resultDate
+            FROM exam_attempts a
+            JOIN exams e ON a.exam_id = e.exam_id
+            WHERE a.student_id = #{studentId}
+              AND a.status = 'GRADED'
 
-        SELECT
-        e.exam_date AS resultDate
+            UNION ALL
 
-        FROM exam_attempts a
-
-        JOIN exams e
-        ON a.exam_id = e.exam_id
-
-        WHERE a.student_id = #{studentId}
-
-        AND a.status = 'GRADED'
-
-
-        UNION ALL
-
-
-        SELECT
-        dra.review_date AS resultDate
-
-        FROM daily_review_attempts dra
-
-        WHERE dra.student_id = #{studentId}
-
-        AND dra.status = 'GRADED'
-
+            SELECT dra.review_date AS resultDate
+            FROM daily_review_attempts dra
+            WHERE dra.student_id = #{studentId}
+              AND dra.status = 'GRADED'
         ) r
-
         WHERE 1 = 1
-
         <if test="date != null">
             AND r.resultDate = #{date}
         </if>
-
     </select>
 
-    <select id="findStudentGrowthSummary"
-            resultType="com.example.EduPOP.domain.exam.StudentGrowthSummary">
-
+    <select id="findStudentGrowthSummary" resultType="com.example.EduPOP.domain.exam.StudentGrowthSummary">
         SELECT
             COALESCE(
                 ROUND(
@@ -489,13 +283,11 @@
                 ),
                 0
             ) AS previousAverageScore,
-
             COALESCE(
                 ROUND(
                     SUM(
                         CASE
-                            WHEN growth.completedDate BETWEEN #{recentStart}
-                                AND #{periodEnd}
+                            WHEN growth.completedDate BETWEEN #{recentStart} AND #{periodEnd}
                             THEN growth.totalScore
                             ELSE 0
                         END
@@ -503,8 +295,7 @@
                     / NULLIF(
                         SUM(
                             CASE
-                                WHEN growth.completedDate BETWEEN #{recentStart}
-                                    AND #{periodEnd}
+                                WHEN growth.completedDate BETWEEN #{recentStart} AND #{periodEnd}
                                 THEN growth.maxScore
                                 ELSE 0
                             END
@@ -514,7 +305,6 @@
                 ),
                 0
             ) AS recentAverageScore,
-
             COALESCE(
                 SUM(
                     CASE
@@ -526,48 +316,30 @@
                 ),
                 0
             ) AS previousAttemptCount,
-
             COALESCE(
                 SUM(
                     CASE
-                        WHEN growth.completedDate BETWEEN #{recentStart}
-                            AND #{periodEnd}
+                        WHEN growth.completedDate BETWEEN #{recentStart} AND #{periodEnd}
                         THEN 1
                         ELSE 0
                     END
                 ),
                 0
             ) AS recentAttemptCount,
-
             COUNT(*) AS completedAttemptCount,
-            COALESCE(SUM(growth.reviewCorrectCount), 0)
-                AS reviewCorrectCount,
-            COALESCE(SUM(growth.reviewQuestionCount), 0)
-                AS reviewQuestionCount
-
+            COALESCE(SUM(growth.reviewCorrectCount), 0) AS reviewCorrectCount,
+            COALESCE(SUM(growth.reviewQuestionCount), 0) AS reviewQuestionCount
         FROM (
-
             SELECT
                 DATE(a.submitted_at) AS completedDate,
                 a.total_score AS totalScore,
                 a.max_score AS maxScore,
-                CASE
-                    WHEN a.attempt_type = 'REVIEW'
-                    THEN a.correct_count
-                    ELSE 0
-                END AS reviewCorrectCount,
-                CASE
-                    WHEN a.attempt_type = 'REVIEW'
-                    THEN a.total_question_count
-                    ELSE 0
-                END AS reviewQuestionCount
-
+                CASE WHEN a.attempt_type = 'REVIEW' THEN a.correct_count ELSE 0 END AS reviewCorrectCount,
+                CASE WHEN a.attempt_type = 'REVIEW' THEN a.total_question_count ELSE 0 END AS reviewQuestionCount
             FROM exam_attempts a
-
             WHERE a.student_id = #{studentId}
               AND a.status = 'GRADED'
-              AND DATE(a.submitted_at)
-                    BETWEEN #{periodStart} AND #{periodEnd}
+              AND DATE(a.submitted_at) BETWEEN #{periodStart} AND #{periodEnd}
 
             UNION ALL
 
@@ -577,56 +349,35 @@
                 dra.max_score AS maxScore,
                 dra.correct_count AS reviewCorrectCount,
                 dra.total_question_count AS reviewQuestionCount
-
             FROM daily_review_attempts dra
-
             WHERE dra.student_id = #{studentId}
               AND dra.status = 'GRADED'
-              AND DATE(dra.submitted_at)
-                    BETWEEN #{periodStart} AND #{periodEnd}
-
+              AND DATE(dra.submitted_at) BETWEEN #{periodStart} AND #{periodEnd}
         ) growth
-
     </select>
 
-    <select id="findStudentGrowthStudyDates"
-            resultType="java.time.LocalDate">
-
+    <select id="findStudentGrowthStudyDates" resultType="java.time.LocalDate">
         SELECT DISTINCT completedDate
-
         FROM (
-
             SELECT DATE(a.submitted_at) AS completedDate
-
             FROM exam_attempts a
-
             WHERE a.student_id = #{studentId}
               AND a.status = 'GRADED'
-              AND DATE(a.submitted_at)
-                    BETWEEN #{periodStart} AND #{periodEnd}
+              AND DATE(a.submitted_at) BETWEEN #{periodStart} AND #{periodEnd}
 
             UNION ALL
 
             SELECT DATE(dra.submitted_at) AS completedDate
-
             FROM daily_review_attempts dra
-
             WHERE dra.student_id = #{studentId}
               AND dra.status = 'GRADED'
-              AND DATE(dra.submitted_at)
-                    BETWEEN #{periodStart} AND #{periodEnd}
-
+              AND DATE(dra.submitted_at) BETWEEN #{periodStart} AND #{periodEnd}
         ) study
-
         ORDER BY completedDate
-
     </select>
 
-    <insert id="insertAttempt"
-            parameterType="com.example.EduPOP.domain.exam.ExamAttempt"
-            useGeneratedKeys="true"
-            keyProperty="attemptId">
-
+    <insert id="insertAttempt" parameterType="com.example.EduPOP.domain.exam.ExamAttempt"
+            useGeneratedKeys="true" keyProperty="attemptId">
         INSERT INTO exam_attempts (
             exam_id,
             student_id,
@@ -642,26 +393,22 @@
             started_at
         )
         VALUES (
-                   #{examId},
-                   #{studentId},
-                   #{attemptNo},
-                   #{attemptType},
-                   #{sourceAttemptId},
-                   'ONLINE',
-                   'IN_PROGRESS',
-                   0,
-                   #{maxScore},
-                   0,
-                   #{totalQuestionCount},
-                   NOW()
-               )
-
+            #{examId},
+            #{studentId},
+            #{attemptNo},
+            #{attemptType},
+            #{sourceAttemptId},
+            'ONLINE',
+            'IN_PROGRESS',
+            0,
+            #{maxScore},
+            0,
+            #{totalQuestionCount},
+            NOW()
+        )
     </insert>
 
-
-    <insert id="insertAnswer"
-            parameterType="com.example.EduPOP.domain.exam.ExamAnswer">
-
+    <insert id="insertAnswer" parameterType="com.example.EduPOP.domain.exam.ExamAnswer">
         INSERT INTO exam_answers (
             attempt_id,
             question_id,
@@ -670,21 +417,16 @@
             earned_score
         )
         VALUES (
-                   #{attemptId},
-                   #{questionId},
-                   #{studentAnswer},
-                   #{isCorrect},
-                   #{earnedScore}
-               )
-
+            #{attemptId},
+            #{questionId},
+            #{studentAnswer},
+            #{isCorrect},
+            #{earnedScore}
+        )
     </insert>
 
-
-    <update id="completeAttempt"
-            parameterType="com.example.EduPOP.domain.exam.ExamAttempt">
-
+    <update id="completeAttempt" parameterType="com.example.EduPOP.domain.exam.ExamAttempt">
         UPDATE exam_attempts
-
         SET status = 'GRADED',
             total_score = #{totalScore},
             max_score = #{maxScore},
@@ -692,15 +434,10 @@
             total_question_count = #{totalQuestionCount},
             submitted_at = NOW(),
             graded_at = NOW()
-
         WHERE attempt_id = #{attemptId}
-
     </update>
 
-
-    <select id="findAttemptById"
-            resultType="com.example.EduPOP.domain.exam.ExamAttempt">
-
+    <select id="findAttemptById" resultType="com.example.EduPOP.domain.exam.ExamAttempt">
         SELECT
             attempt_id,
             exam_id,
@@ -717,61 +454,27 @@
             started_at,
             submitted_at,
             graded_at
-
         FROM exam_attempts
-
         WHERE attempt_id = #{attemptId}
-
     </select>
 
-
-    <resultMap id="answerResultMap"
-               type="com.example.EduPOP.domain.exam.ExamAnswer">
-
-        <id property="answerId"
-            column="answer_id"/>
-
-        <result property="attemptId"
-                column="attempt_id"/>
-
-        <result property="questionId"
-                column="question_id"/>
-
-        <result property="studentAnswer"
-                column="student_answer"/>
-
-        <result property="isCorrect"
-                column="is_correct"/>
-
-        <result property="earnedScore"
-                column="earned_score"/>
-
-        <association property="question"
-                     javaType="com.example.EduPOP.domain.exam.ExamQuestion">
-
-            <id property="questionId"
-                column="q_question_id"/>
-
-            <result property="questionNumber"
-                    column="question_number"/>
-
-            <result property="questionText"
-                    column="question_text"/>
-
-            <result property="correctAnswer"
-                    column="correct_answer"/>
-
-            <result property="score"
-                    column="question_score"/>
-
+    <resultMap id="answerResultMap" type="com.example.EduPOP.domain.exam.ExamAnswer">
+        <id property="answerId" column="answer_id"/>
+        <result property="attemptId" column="attempt_id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="studentAnswer" column="student_answer"/>
+        <result property="isCorrect" column="is_correct"/>
+        <result property="earnedScore" column="earned_score"/>
+        <association property="question" javaType="com.example.EduPOP.domain.exam.ExamQuestion">
+            <id property="questionId" column="q_question_id"/>
+            <result property="questionNumber" column="question_number"/>
+            <result property="questionText" column="question_text"/>
+            <result property="correctAnswer" column="correct_answer"/>
+            <result property="score" column="question_score"/>
         </association>
-
     </resultMap>
 
-
-    <select id="findAnswersByAttemptId"
-            resultMap="answerResultMap">
-
+    <select id="findAnswersByAttemptId" resultMap="answerResultMap">
         SELECT
             a.answer_id,
             a.attempt_id,
@@ -779,101 +482,58 @@
             a.student_answer,
             a.is_correct,
             a.earned_score,
-
             q.question_id AS q_question_id,
             q.question_number,
             q.question_text,
             q.correct_answer,
             q.score AS question_score
-
         FROM exam_answers a
-
-                 JOIN exam_questions q
-                      ON a.question_id = q.question_id
-
+        JOIN exam_questions q ON a.question_id = q.question_id
         WHERE a.attempt_id = #{attemptId}
-
         ORDER BY q.question_number
-
     </select>
-    <!-- 오늘의 복습 문제 조회 -->
-    <select id="findTodayReviewQuestions"
-            resultType="com.example.EduPOP.domain.exam.ExamQuestion">
 
+    <select id="findTodayReviewQuestions" resultType="com.example.EduPOP.domain.exam.ExamQuestion">
         SELECT DISTINCT
             q.question_id AS questionId,
             q.exam_id AS examId,
             q.section_id AS sectionId,
             q.question_number AS questionNumber,
             q.question_type AS questionType,
-            q.question_type_tag AS questionTypeTag,
+            q.large_category AS largeCategory,
+            q.small_category AS smallCategory,
             q.score,
             q.correct_answer AS correctAnswer,
             q.question_text AS questionText,
             q.passage,
             q.sort_order AS sortOrder
-
         FROM exam_answers ea
-
-                 JOIN exam_attempts a
-                      ON ea.attempt_id = a.attempt_id
-
-                 JOIN exams e
-                      ON a.exam_id = e.exam_id
-
-                 JOIN exam_questions q
-                      ON ea.question_id = q.question_id
-
+        JOIN exam_attempts a ON ea.attempt_id = a.attempt_id
+        JOIN exams e ON a.exam_id = e.exam_id
+        JOIN exam_questions q ON ea.question_id = q.question_id
         WHERE a.student_id = #{studentId}
-
           AND a.attempt_type = 'EXAM'
-
           AND a.status = 'GRADED'
-
           AND ea.is_correct = FALSE
-
           AND e.exam_type != 'WORD'
-
-          AND e.exam_date BETWEEN
-            DATE_SUB(CURDATE(), INTERVAL 2 DAY)
-            AND CURDATE()
-
+          AND e.exam_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 2 DAY) AND CURDATE()
         ORDER BY questionId
-
     </select>
-    <!-- 문제 개수 -->
-    <select id="countTodayReviewQuestions"
-            resultType="int">
 
+    <select id="countTodayReviewQuestions" resultType="int">
         SELECT COUNT(DISTINCT ea.question_id)
-
         FROM exam_answers ea
-
-                 JOIN exam_attempts a
-                      ON ea.attempt_id = a.attempt_id
-
-                 JOIN exams e
-                      ON a.exam_id = e.exam_id
-
+        JOIN exam_attempts a ON ea.attempt_id = a.attempt_id
+        JOIN exams e ON a.exam_id = e.exam_id
         WHERE a.student_id = #{studentId}
-
           AND a.attempt_type = 'EXAM'
-
           AND a.status = 'GRADED'
-
           AND ea.is_correct = FALSE
-
           AND e.exam_type != 'WORD'
-
-          AND e.exam_date BETWEEN
-            DATE_SUB(CURDATE(), INTERVAL 2 DAY)
-            AND CURDATE()
-
+          AND e.exam_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 2 DAY) AND CURDATE()
     </select>
-    <!-- 오늘 진행 중인 복습 찾기 -->
-    <select id="findTodayInProgressReview"
-            resultType="com.example.EduPOP.domain.exam.DailyReviewAttempt">
 
+    <select id="findTodayInProgressReview" resultType="com.example.EduPOP.domain.exam.DailyReviewAttempt">
         SELECT
             daily_review_attempt_id AS dailyReviewAttemptId,
             student_id AS studentId,
@@ -886,24 +546,16 @@
             started_at AS startedAt,
             submitted_at AS submittedAt,
             graded_at AS gradedAt
-
         FROM daily_review_attempts
-
         WHERE student_id = #{studentId}
           AND review_date = CURDATE()
           AND status = 'IN_PROGRESS'
-
         ORDER BY daily_review_attempt_id DESC
-
         LIMIT 1
-
     </select>
-    <!-- 응시 시작 -->
-    <insert id="insertDailyReviewAttempt"
-            parameterType="com.example.EduPOP.domain.exam.DailyReviewAttempt"
-            useGeneratedKeys="true"
-            keyProperty="dailyReviewAttemptId">
 
+    <insert id="insertDailyReviewAttempt" parameterType="com.example.EduPOP.domain.exam.DailyReviewAttempt"
+            useGeneratedKeys="true" keyProperty="dailyReviewAttemptId">
         INSERT INTO daily_review_attempts (
             student_id,
             review_date,
@@ -915,21 +567,18 @@
             started_at
         )
         VALUES (
-                   #{studentId},
-                   CURDATE(),
-                   'IN_PROGRESS',
-                   0,
-                   #{maxScore},
-                   0,
-                   #{totalQuestionCount},
-                   NOW()
-               )
-
+            #{studentId},
+            CURDATE(),
+            'IN_PROGRESS',
+            0,
+            #{maxScore},
+            0,
+            #{totalQuestionCount},
+            NOW()
+        )
     </insert>
-    <!-- 답안 저장 -->
-    <insert id="insertDailyReviewAnswer"
-            parameterType="com.example.EduPOP.domain.exam.DailyReviewAnswer">
 
+    <insert id="insertDailyReviewAnswer" parameterType="com.example.EduPOP.domain.exam.DailyReviewAnswer">
         INSERT INTO daily_review_answers (
             daily_review_attempt_id,
             question_id,
@@ -938,20 +587,16 @@
             earned_score
         )
         VALUES (
-                   #{dailyReviewAttemptId},
-                   #{questionId},
-                   #{studentAnswer},
-                   #{isCorrect},
-                   #{earnedScore}
-               )
-
+            #{dailyReviewAttemptId},
+            #{questionId},
+            #{studentAnswer},
+            #{isCorrect},
+            #{earnedScore}
+        )
     </insert>
-    <!-- 제출 완료 -->
-    <update id="completeDailyReviewAttempt"
-            parameterType="com.example.EduPOP.domain.exam.DailyReviewAttempt">
 
+    <update id="completeDailyReviewAttempt" parameterType="com.example.EduPOP.domain.exam.DailyReviewAttempt">
         UPDATE daily_review_attempts
-
         SET status = 'GRADED',
             total_score = #{totalScore},
             max_score = #{maxScore},
@@ -959,14 +604,10 @@
             total_question_count = #{totalQuestionCount},
             submitted_at = NOW(),
             graded_at = NOW()
-
-        WHERE daily_review_attempt_id =
-              #{dailyReviewAttemptId}
-
+        WHERE daily_review_attempt_id = #{dailyReviewAttemptId}
     </update>
-    <select id="findDailyReviewAttemptById"
-            resultType="com.example.EduPOP.domain.exam.DailyReviewAttempt">
 
+    <select id="findDailyReviewAttemptById" resultType="com.example.EduPOP.domain.exam.DailyReviewAttempt">
         SELECT
             daily_review_attempt_id AS dailyReviewAttemptId,
             student_id AS studentId,
@@ -979,59 +620,27 @@
             started_at AS startedAt,
             submitted_at AS submittedAt,
             graded_at AS gradedAt
-
         FROM daily_review_attempts
-
         WHERE daily_review_attempt_id = #{dailyReviewAttemptId}
-
     </select>
 
-    <resultMap id="dailyReviewAnswerResultMap"
-               type="com.example.EduPOP.domain.exam.DailyReviewAnswer">
-
-        <id property="dailyReviewAnswerId"
-            column="daily_review_answer_id"/>
-
-        <result property="dailyReviewAttemptId"
-                column="daily_review_attempt_id"/>
-
-        <result property="questionId"
-                column="question_id"/>
-
-        <result property="studentAnswer"
-                column="student_answer"/>
-
-        <result property="isCorrect"
-                column="is_correct"/>
-
-        <result property="earnedScore"
-                column="earned_score"/>
-
-        <association property="question"
-                     javaType="com.example.EduPOP.domain.exam.ExamQuestion">
-
-            <id property="questionId"
-                column="q_question_id"/>
-
-            <result property="questionNumber"
-                    column="question_number"/>
-
-            <result property="questionText"
-                    column="question_text"/>
-
-            <result property="correctAnswer"
-                    column="correct_answer"/>
-
-            <result property="score"
-                    column="question_score"/>
-
+    <resultMap id="dailyReviewAnswerResultMap" type="com.example.EduPOP.domain.exam.DailyReviewAnswer">
+        <id property="dailyReviewAnswerId" column="daily_review_answer_id"/>
+        <result property="dailyReviewAttemptId" column="daily_review_attempt_id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="studentAnswer" column="student_answer"/>
+        <result property="isCorrect" column="is_correct"/>
+        <result property="earnedScore" column="earned_score"/>
+        <association property="question" javaType="com.example.EduPOP.domain.exam.ExamQuestion">
+            <id property="questionId" column="q_question_id"/>
+            <result property="questionNumber" column="question_number"/>
+            <result property="questionText" column="question_text"/>
+            <result property="correctAnswer" column="correct_answer"/>
+            <result property="score" column="question_score"/>
         </association>
-
     </resultMap>
 
-    <select id="findDailyReviewAnswers"
-            resultMap="dailyReviewAnswerResultMap">
-
+    <select id="findDailyReviewAnswers" resultMap="dailyReviewAnswerResultMap">
         SELECT
             dra.daily_review_answer_id,
             dra.daily_review_attempt_id,
@@ -1039,62 +648,15 @@
             dra.student_answer,
             dra.is_correct,
             dra.earned_score,
-
             q.question_id AS q_question_id,
             q.question_number,
             q.question_text,
             q.correct_answer,
             q.score AS question_score
-
         FROM daily_review_answers dra
-
-                 JOIN exam_questions q
-                      ON dra.question_id = q.question_id
-
-        WHERE dra.daily_review_attempt_id =
-              #{dailyReviewAttemptId}
-
+        JOIN exam_questions q ON dra.question_id = q.question_id
+        WHERE dra.daily_review_attempt_id = #{dailyReviewAttemptId}
         ORDER BY dra.daily_review_answer_id
-
     </select>
 
-    <select id="findDailyReviewResults"
-            resultType="com.example.EduPOP.domain.exam.StudentExamResult">
-
-        SELECT
-            NULL AS attemptId,
-
-            daily_review_attempt_id
-                 AS dailyReviewAttemptId,
-
-            NULL AS examId,
-
-            '오늘의 복습' AS examTitle,
-
-            NULL AS examType,
-
-            NULL AS attemptType,
-
-            'DAILY_REVIEW' AS resultType,
-
-            total_score AS totalScore,
-
-            max_score AS maxScore,
-
-            correct_count AS correctCount,
-
-            total_question_count
-                AS totalQuestionCount,
-
-            submitted_at AS submittedAt
-
-        FROM daily_review_attempts
-
-        WHERE student_id = #{studentId}
-
-          AND status = 'GRADED'
-
-        ORDER BY submitted_at DESC
-
-    </select>
 </mapper>
