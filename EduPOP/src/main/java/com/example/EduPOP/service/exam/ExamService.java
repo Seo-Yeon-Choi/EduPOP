@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -330,10 +331,15 @@ public class ExamService {
                 );
             }
 
+            LocalDateTime gradedAt = LocalDateTime.now();
+
             ExamAttempt attempt = new ExamAttempt();
             attempt.setExamId(examId);
             attempt.setStudentId(student.getStudentId());
             attempt.setAttemptNo(1);
+            attempt.setAttemptType("EXAM");
+            attempt.setEntryMethod("MANUAL");
+            attempt.setStatus("GRADED");
             attempt.setTotalScore(totalScore);
             attempt.setMaxScore(maxScore);
             attempt.setCorrectCount(correctCount);
@@ -343,6 +349,8 @@ public class ExamService {
                             : 0
             );
             attempt.setPrimaryWeakTag(primaryWeakTag);
+            attempt.setSubmittedAt(gradedAt);
+            attempt.setGradedAt(gradedAt);
 
             examMapper.insertExamAttempt(attempt);
 
