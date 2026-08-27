@@ -1,0 +1,715 @@
+/* ========================================
+   메인 화면 경험치·캐릭터 카드
+======================================== */
+
+.exp-card {
+    width: 100%;
+    max-width: 1050px;
+    margin-bottom: 30px;
+    border: 1px solid #dfe4f1;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(32, 46, 84, 0.08);
+    overflow: hidden;
+}
+
+.exp-card *,
+.exp-card *::before,
+.exp-card *::after {
+    box-sizing: border-box;
+}
+
+.exp-loading,
+.exp-error {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    padding: 30px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.exp-loading {
+    color: #667085;
+}
+
+.exp-error {
+    color: #b93131;
+    background: #fff7f7;
+}
+
+.exp-error p {
+    margin: 0;
+}
+
+.exp-retry-button {
+    min-height: 38px;
+    padding: 8px 16px;
+    border: 1px solid #e09b9b;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #b93131;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.exp-retry-button:hover {
+    background: #fff0f0;
+}
+
+.exp-loading[hidden],
+.exp-error[hidden],
+.exp-content[hidden],
+.exp-character-image[hidden],
+.exp-character-placeholder[hidden] {
+    display: none;
+}
+
+
+/* ========================================
+   경험치 카드 본문
+======================================== */
+
+.exp-content {
+    display: grid;
+    grid-template-columns: minmax(360px, 48%) 1fr;
+    min-height: 390px;
+}
+
+
+/* ========================================
+   캐릭터와 단계별 배경 영역
+======================================== */
+
+.exp-character-area {
+    position: relative;
+    min-height: 390px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 30px 30px 0;
+    background: #eee7d9;
+    overflow: hidden;
+}
+
+.exp-character-area::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+            linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.04) 42%,
+                    rgba(30, 35, 55, 0.16) 100%
+            );
+    pointer-events: none;
+}
+
+.exp-character-area::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: 8px;
+    z-index: 1;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(30, 34, 48, 0.22);
+    filter: blur(7px);
+}
+
+.exp-character-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.exp-character-foreground {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0;
+    pointer-events: none;
+    /* foreground(포어그라운드): 캐릭터보다 앞에 표시할 투명 탁자 영역 */
+}
+
+.exp-character-image {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: auto;
+    max-width: 88%;
+    height: 335px;
+    object-fit: contain;
+    object-position: center bottom;
+    filter:
+            contrast(1.08)
+            drop-shadow(0 8px 10px rgba(8, 12, 22, 0.26))
+            drop-shadow(0 -1px 1px rgba(255, 255, 255, 0.42));
+}
+
+.exp-character-placeholder {
+    position: relative;
+    z-index: 2;
+    width: 190px;
+    height: 265px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+    border: 1px dashed rgba(57, 54, 49, 0.38);
+    border-radius: 90px 90px 26px 26px;
+    background: rgba(255, 255, 255, 0.38);
+    color: #625f58;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* ========================================
+   성장 단계와 경험치 정보 영역
+======================================== */
+
+.exp-info-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 42px 46px;
+}
+
+.exp-label {
+    margin: 0 0 9px;
+    color: #5d6d90;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.exp-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.exp-title-row h2 {
+    margin: 0;
+    color: #202534;
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.exp-stage-badge {
+    flex-shrink: 0;
+    padding: 8px 13px;
+    border: 1px solid #d9d1c3;
+    border-radius: 999px;
+    background: #f7f3eb;
+    color: #685f50;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.exp-stage-name {
+    display: block;
+    margin-bottom: 27px;
+    color: #343a4d;
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+.exp-score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 13px;
+}
+
+.exp-total {
+    color: #1e2540;
+    font-size: 29px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+}
+
+.exp-next {
+    padding-bottom: 3px;
+    color: #7a8295;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+}
+
+
+/* ========================================
+   경험치 진행 막대
+======================================== */
+
+.exp-progress {
+    width: 100%;
+    height: 14px;
+    border-radius: 999px;
+    background: #e8ebf3;
+    overflow: hidden;
+}
+
+.exp-progress-bar {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(
+            90deg,
+            #9c8b70 0%,
+            #c6ae88 100%
+    );
+    transition: width 0.6s ease;
+}
+
+.exp-progress-text {
+    margin: 9px 0 0;
+    color: #858c9c;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: right;
+}
+
+.exp-guide {
+    margin: 18px 0 0;
+    color: #727b91;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+/* ========================================
+   1단계 G
+======================================== */
+
+.exp-card[data-stage="1"] .exp-character-area {
+    background: linear-gradient(145deg, #f7f1e6, #ded3bf);
+}
+
+.exp-card[data-stage="1"] .exp-stage-name {
+    color: #6f6557;
+}
+
+
+/* ========================================
+   2단계 GR
+======================================== */
+
+.exp-card[data-stage="2"] .exp-character-area {
+    background: linear-gradient(145deg, #f9f0e8, #dfcbbd);
+}
+
+.exp-card[data-stage="2"] .exp-stage-badge {
+    border-color: #e7c7b9;
+    background: #fff1ea;
+    color: #a15c47;
+}
+.exp-card[data-stage="2"] .exp-stage-name {
+    color: #b95a45;
+}
+
+.exp-card[data-stage="2"] .exp-character-foreground {
+    background-image: url("../images/exp/stage2-foreground.png");
+    opacity: 1;
+    /* foreground(포어그라운드, 전경): 2단계 책상을 캐릭터보다 앞에 표시 */
+}
+
+.exp-card[data-stage="2"] .exp-progress-bar {
+    background: linear-gradient(90deg, #c9856e, #e2ae94);
+}
+
+
+/* ========================================
+   3단계 GRO
+======================================== */
+
+.exp-card[data-stage="3"] .exp-character-area {
+    background: linear-gradient(145deg, #eef4e8, #cbd9c0);
+}
+
+.exp-card[data-stage="3"] .exp-stage-badge {
+    border-color: #bcd7b6;
+    background: #edf8e9;
+    color: #4f8150;
+}
+
+.exp-card[data-stage="3"] .exp-stage-name {
+    color: #3f876f;
+}
+
+.exp-card[data-stage="3"] .exp-character-foreground {
+    background-image: url("../images/exp/stage3-foreground.png");
+    opacity: 1;
+    /* foreground(포어그라운드, 전경): 3단계 책상을 캐릭터보다 앞에 표시 */
+}
+
+.exp-card[data-stage="3"] .exp-progress-bar {
+    background: linear-gradient(90deg, #71a16f, #a6c98d);
+}
+
+/* ========================================
+   4단계 GROW
+======================================== */
+
+.exp-card[data-stage="4"] .exp-character-area {
+    background: linear-gradient(145deg, #f3eadc, #ccbda9);
+}
+
+.exp-card[data-stage="4"] .exp-stage-badge {
+    border-color: #cebade;
+    background: #f6effb;
+    color: #76518e;
+}
+
+.exp-card[data-stage="4"] .exp-stage-name {
+    color: #76518e;
+}
+
+.exp-card[data-stage="4"] .exp-character-foreground {
+    background-image: url("../images/exp/stage4-foreground.png");
+    /* 4단계 책상을 캐릭터보다 앞에 표시 */
+}
+
+.exp-card[data-stage="4"] .exp-progress-bar {
+    background: linear-gradient(90deg, #8c65a5, #b58dc8);
+}
+
+
+/* ========================================
+   5단계 GROW U
+======================================== */
+
+.exp-card[data-stage="5"] .exp-character-area {
+    background: linear-gradient(145deg, #23334f, #101b31);
+}
+
+.exp-card[data-stage="5"] .exp-stage-badge {
+    border-color: #a9bddc;
+    background: #edf3fb;
+    color: #294c7b;
+}
+
+.exp-card[data-stage="5"] .exp-stage-name {
+    color: #294c7b;
+}
+
+.exp-card[data-stage="5"] .exp-character-foreground {
+    background-image: url("../images/exp/stage5-foreground.png");
+    opacity: 1;
+    /* 5단계 우주 탁자를 캐릭터보다 앞에 표시 */
+}
+
+.exp-card[data-stage="5"] .exp-progress-bar {
+    background: linear-gradient(90deg, #315f94, #6f9bc3);
+}
+
+
+/* ========================================
+   6단계 GROW UP
+======================================== */
+
+.exp-card[data-stage="6"] {
+    border-color: #d7bd6d;
+    box-shadow: 0 12px 34px rgba(115, 86, 20, 0.16);
+}
+
+.exp-card[data-stage="6"] .exp-character-area {
+    background: linear-gradient(145deg, #172b4d, #071329);
+}
+
+.exp-card[data-stage="6"] .exp-character-image {
+    filter:
+            contrast(1.13)
+            drop-shadow(0 10px 14px rgba(0, 0, 0, 0.38))
+            drop-shadow(0 0 8px rgba(244, 210, 112, 0.34));
+}
+.exp-card[data-stage="6"] .exp-character-foreground {
+    background-image: url("../images/exp/stage6-foreground.png");
+    opacity: 1;
+    filter:
+            drop-shadow(0 0 3px rgba(244, 210, 112, 0.58))
+            drop-shadow(0 0 9px rgba(201, 155, 39, 0.36));
+    /* foreground(포어그라운드, 전경): 6단계 책상을 캐릭터보다 앞에 표시 */
+}
+
+.exp-card[data-stage="6"] .exp-stage-badge {
+    border-color: #e1c66f;
+    background: #fff8dc;
+    color: #8c650c;
+}
+
+.exp-card[data-stage="6"] .exp-stage-name {
+    color: #9b7114;
+}
+
+.exp-card[data-stage="6"] .exp-progress-bar {
+    background: linear-gradient(90deg, #c99b27, #f0cf68);
+}
+
+
+/* ========================================
+   성장 캐릭터 움직임
+======================================== */
+
+.exp-character-image:not([hidden]) {
+    animation: expCharacterMove 3s ease-in-out infinite;
+    transform-origin: center bottom;
+}
+
+/* expCharacterMove(이엑스피 캐릭터 무브): 캐릭터가 천천히 위아래로 움직이는 효과 */
+@keyframes expCharacterMove {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-7px) scale(1.01);
+    }
+}
+
+
+/* ========================================
+   움직임 최소화 설정
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .exp-character-image:not([hidden]) {
+        animation: none;
+    }
+
+    .exp-card[data-stage="2"] .exp-stage-name,
+    .exp-card[data-stage="3"] .exp-stage-name {
+        animation: none;
+    }
+}
+
+
+/* ========================================
+   반응형 화면
+======================================== */
+
+@media (max-width: 850px) {
+
+    .exp-content {
+        grid-template-columns: 1fr;
+    }
+
+    .exp-character-area {
+        min-height: 330px;
+    }
+
+    .exp-character-image {
+        height: 295px;
+    }
+
+    .exp-info-area {
+        padding: 34px 30px 38px;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .exp-card {
+        border-radius: 14px;
+    }
+
+    .exp-character-area {
+        min-height: 280px;
+    }
+
+    .exp-character-image {
+        height: 250px;
+    }
+
+    .exp-character-placeholder {
+        width: 155px;
+        height: 215px;
+    }
+
+    .exp-info-area {
+        padding: 28px 22px 32px;
+    }
+
+    .exp-title-row,
+    .exp-score-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .exp-title-row {
+        margin-bottom: 22px;
+    }
+
+    .exp-stage-name {
+        margin-bottom: 24px;
+        font-size: 31px;
+    }
+
+    .exp-total {
+        font-size: 27px;
+    }
+
+    .exp-next,
+    .exp-progress-text {
+        text-align: left;
+    }
+}
+    /* ========================================
+   성장 단계 글자별 고정 색상과 네온
+======================================== */
+
+    .exp-stage-letter {
+        --exp-letter-color: 52, 58, 77;
+        --exp-letter-delay: 0s;
+
+        display: inline-block;
+        color: rgb(var(--exp-letter-color));
+        -webkit-text-stroke:
+                0.35px
+                rgba(var(--exp-letter-color), 1);
+
+        text-shadow:
+                0 1px 0
+                rgba(var(--exp-letter-color), 0.95),
+                0 2px 2px
+                rgba(var(--exp-letter-color), 0.48),
+                0 0 4px
+                rgba(var(--exp-letter-color), 0.78),
+                0 0 10px
+                rgba(var(--exp-letter-color), 0.52),
+                0 0 20px
+                rgba(var(--exp-letter-color), 0.30);
+
+        animation:
+                expLetterNeon
+                1.9s
+                ease-in-out
+                infinite;
+
+        animation-delay:
+                var(--exp-letter-delay);
+
+        transform-origin:
+                center bottom;
+
+        /* expLetterNeon(이엑스피 레터 네온):
+           글자 원래 색과 같은 네온빛이 반짝이는 효과 */
+    }
+
+
+    /* G: 1단계부터 모든 단계에서 같은 갈색 유지 */
+    .exp-stage-letter-g {
+        --exp-letter-color: 111, 101, 87;
+        --exp-letter-delay: 0s;
+    }
+
+
+    /* R: 2단계부터 모든 단계에서 같은 코랄색 유지 */
+    .exp-stage-letter-r {
+        --exp-letter-color: 185, 90, 69;
+        --exp-letter-delay: -0.24s;
+    }
+
+
+    /* O: 3단계부터 모든 단계에서 같은 초록색 유지 */
+    .exp-stage-letter-o {
+        --exp-letter-color: 63, 135, 111;
+        --exp-letter-delay: -0.48s;
+    }
+
+
+    /* W: 4단계부터 모든 단계에서 같은 보라색 유지 */
+    .exp-stage-letter-w {
+        --exp-letter-color: 118, 81, 142;
+        --exp-letter-delay: -0.72s;
+    }
+
+
+    /* U: 5단계부터 모든 단계에서 같은 파란색 유지 */
+    .exp-stage-letter-u {
+        --exp-letter-color: 41, 76, 123;
+        --exp-letter-delay: -0.96s;
+    }
+
+
+    /* P: 6단계에서 금색으로 추가 */
+    .exp-stage-letter-p {
+        --exp-letter-color: 155, 113, 20;
+        --exp-letter-delay: -1.20s;
+    }
+
+
+    /* expLetterNeon(이엑스피 레터 네온):
+       각 글자의 원래 색으로 네온 강도가 변하는 효과 */
+    @keyframes expLetterNeon {
+
+        0%,
+        100% {
+            text-shadow:
+                    0 1px 0
+                    rgba(var(--exp-letter-color), 0.95),
+                    0 2px 2px
+                    rgba(var(--exp-letter-color), 0.48),
+                    0 0 4px
+                    rgba(var(--exp-letter-color), 0.72),
+                    0 0 10px
+                    rgba(var(--exp-letter-color), 0.48),
+                    0 0 20px
+                    rgba(var(--exp-letter-color), 0.28);
+
+            filter:
+                    brightness(1.05)
+                    saturate(1.08);
+        }
+
+        50% {
+            text-shadow:
+                    0 1px 0
+                    rgba(var(--exp-letter-color), 1),
+                    0 2px 3px
+                    rgba(var(--exp-letter-color), 0.62),
+                    0 0 5px
+                    rgba(var(--exp-letter-color), 1),
+                    0 0 13px
+                    rgba(var(--exp-letter-color), 0.92),
+                    0 0 27px
+                    rgba(var(--exp-letter-color), 0.66),
+                    0 0 40px
+                    rgba(var(--exp-letter-color), 0.38);
+
+            filter:
+                    brightness(1.24)
+                    saturate(1.18);
+        }
+    }
+
+
+    /* 사용자가 움직임 최소화를 설정했을 때 네온 움직임 중지 */
+    @media (prefers-reduced-motion: reduce) {
+
+        .exp-stage-letter {
+            animation: none;
+        }
+    }

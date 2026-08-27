@@ -73,6 +73,12 @@ public interface ReadingMapper {
             @Param("bookId") Long bookId
     ); // 한 학생이 같은 책으로 작성한 감상문 개수 조회
 
+    int countFeedbackReportsByStudentIdAndBookId(
+            @Param("studentId") Long studentId,
+            @Param("bookId") Long bookId
+    );
+    // 같은 학생이 같은 책으로 작성하고 교사 피드백까지 받은 감상문 개수 조회
+
     int updateReadingReportByStudentId(
             ReadingReport readingReport
     ); // 작성 학생 본인의 감상문 수정

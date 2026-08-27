@@ -593,7 +593,7 @@ public class ReadingController {
                 new LinkedHashMap<>(); // 도서 번호별 도서 정보 저장
 
         Map<Long, ReadingFeedback> feedbacksByReportId =
-                new LinkedHashMap<>(); // 감상문 번호별 첨삭 정보 저장
+                new LinkedHashMap<>(); // 감상문 번호별 피드백 정보 저장
 
         Map<Long, Integer> readingCountsByBookId =
                 new LinkedHashMap<>(); // 도서 번호별 전체 독서 횟수 저장
@@ -617,7 +617,7 @@ public class ReadingController {
                     readingService.getReadingFeedback(
                             readingReportId
                     )
-            ); // 현재 감상문에 등록된 첨삭 저장
+            ); // 현재 감상문에 등록된 피드백 저장
 
             if (!readingCountsByBookId.containsKey(bookId)) {
                 readingCountsByBookId.put(
