@@ -3,6 +3,7 @@ package com.example.EduPOP.service.exam;
 import com.example.EduPOP.domain.common.Paging;
 import com.example.EduPOP.domain.exam.*;
 import com.example.EduPOP.repository.exam.StudentExamMapper;
+import com.example.EduPOP.service.exp.ExpService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.util.List;
 public class StudentExamService {
 
     private final StudentExamMapper studentExamMapper;
+    private final ExpService expService;
 
     private static final int PAGE_SIZE=10;
 
@@ -355,6 +357,14 @@ public class StudentExamService {
         );
 
         studentExamMapper.completeAttempt(attempt);
+
+        expService.giveAttemptExp(
+                studentId,
+                attempt.getExamId(),
+                attempt.getAttemptType(),
+                totalScore,
+                maxScore
+        );
 
         return attempt.getAttemptId();
     }
