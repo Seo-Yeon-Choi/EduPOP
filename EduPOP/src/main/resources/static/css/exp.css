@@ -132,6 +132,18 @@
     background-size: cover;
 }
 
+.exp-character-foreground {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0;
+    pointer-events: none;
+    /* foreground(포어그라운드): 캐릭터보다 앞에 표시할 투명 탁자 영역 */
+}
+
 .exp-character-image {
     position: relative;
     z-index: 2;
@@ -141,6 +153,10 @@
     height: 335px;
     object-fit: contain;
     object-position: center bottom;
+    filter:
+            contrast(1.08)
+            drop-shadow(0 8px 10px rgba(8, 12, 22, 0.26))
+            drop-shadow(0 -1px 1px rgba(255, 255, 255, 0.42));
 }
 
 .exp-character-placeholder {
@@ -307,9 +323,14 @@
     background: #fff1ea;
     color: #a15c47;
 }
-
 .exp-card[data-stage="2"] .exp-stage-name {
-    color: #a15c47;
+    color: #b95a45;
+}
+
+.exp-card[data-stage="2"] .exp-character-foreground {
+    background-image: url("../images/exp/stage2-foreground.png");
+    opacity: 1;
+    /* foreground(포어그라운드, 전경): 2단계 책상을 캐릭터보다 앞에 표시 */
 }
 
 .exp-card[data-stage="2"] .exp-progress-bar {
@@ -332,13 +353,18 @@
 }
 
 .exp-card[data-stage="3"] .exp-stage-name {
-    color: #4f8150;
+    color: #3f876f;
+}
+
+.exp-card[data-stage="3"] .exp-character-foreground {
+    background-image: url("../images/exp/stage3-foreground.png");
+    opacity: 1;
+    /* foreground(포어그라운드, 전경): 3단계 책상을 캐릭터보다 앞에 표시 */
 }
 
 .exp-card[data-stage="3"] .exp-progress-bar {
     background: linear-gradient(90deg, #71a16f, #a6c98d);
 }
-
 
 /* ========================================
    4단계 GROW
@@ -356,6 +382,11 @@
 
 .exp-card[data-stage="4"] .exp-stage-name {
     color: #76518e;
+}
+
+.exp-card[data-stage="4"] .exp-character-foreground {
+    background-image: url("../images/exp/stage4-foreground.png");
+    /* 4단계 책상을 캐릭터보다 앞에 표시 */
 }
 
 .exp-card[data-stage="4"] .exp-progress-bar {
@@ -381,6 +412,12 @@
     color: #294c7b;
 }
 
+.exp-card[data-stage="5"] .exp-character-foreground {
+    background-image: url("../images/exp/stage5-foreground.png");
+    opacity: 1;
+    /* 5단계 우주 탁자를 캐릭터보다 앞에 표시 */
+}
+
 .exp-card[data-stage="5"] .exp-progress-bar {
     background: linear-gradient(90deg, #315f94, #6f9bc3);
 }
@@ -399,6 +436,21 @@
     background: linear-gradient(145deg, #172b4d, #071329);
 }
 
+.exp-card[data-stage="6"] .exp-character-image {
+    filter:
+            contrast(1.13)
+            drop-shadow(0 10px 14px rgba(0, 0, 0, 0.38))
+            drop-shadow(0 0 8px rgba(244, 210, 112, 0.34));
+}
+.exp-card[data-stage="6"] .exp-character-foreground {
+    background-image: url("../images/exp/stage6-foreground.png");
+    opacity: 1;
+    filter:
+            drop-shadow(0 0 3px rgba(244, 210, 112, 0.58))
+            drop-shadow(0 0 9px rgba(201, 155, 39, 0.36));
+    /* foreground(포어그라운드, 전경): 6단계 책상을 캐릭터보다 앞에 표시 */
+}
+
 .exp-card[data-stage="6"] .exp-stage-badge {
     border-color: #e1c66f;
     background: #fff8dc;
@@ -412,8 +464,6 @@
 .exp-card[data-stage="6"] .exp-progress-bar {
     background: linear-gradient(90deg, #c99b27, #f0cf68);
 }
-
-
 
 
 /* ========================================
@@ -446,6 +496,11 @@
 @media (prefers-reduced-motion: reduce) {
 
     .exp-character-image:not([hidden]) {
+        animation: none;
+    }
+
+    .exp-card[data-stage="2"] .exp-stage-name,
+    .exp-card[data-stage="3"] .exp-stage-name {
         animation: none;
     }
 }
@@ -521,3 +576,140 @@
         text-align: left;
     }
 }
+    /* ========================================
+   성장 단계 글자별 고정 색상과 네온
+======================================== */
+
+    .exp-stage-letter {
+        --exp-letter-color: 52, 58, 77;
+        --exp-letter-delay: 0s;
+
+        display: inline-block;
+        color: rgb(var(--exp-letter-color));
+        -webkit-text-stroke:
+                0.35px
+                rgba(var(--exp-letter-color), 1);
+
+        text-shadow:
+                0 1px 0
+                rgba(var(--exp-letter-color), 0.95),
+                0 2px 2px
+                rgba(var(--exp-letter-color), 0.48),
+                0 0 4px
+                rgba(var(--exp-letter-color), 0.78),
+                0 0 10px
+                rgba(var(--exp-letter-color), 0.52),
+                0 0 20px
+                rgba(var(--exp-letter-color), 0.30);
+
+        animation:
+                expLetterNeon
+                1.9s
+                ease-in-out
+                infinite;
+
+        animation-delay:
+                var(--exp-letter-delay);
+
+        transform-origin:
+                center bottom;
+
+        /* expLetterNeon(이엑스피 레터 네온):
+           글자 원래 색과 같은 네온빛이 반짝이는 효과 */
+    }
+
+
+    /* G: 1단계부터 모든 단계에서 같은 갈색 유지 */
+    .exp-stage-letter-g {
+        --exp-letter-color: 111, 101, 87;
+        --exp-letter-delay: 0s;
+    }
+
+
+    /* R: 2단계부터 모든 단계에서 같은 코랄색 유지 */
+    .exp-stage-letter-r {
+        --exp-letter-color: 185, 90, 69;
+        --exp-letter-delay: -0.24s;
+    }
+
+
+    /* O: 3단계부터 모든 단계에서 같은 초록색 유지 */
+    .exp-stage-letter-o {
+        --exp-letter-color: 63, 135, 111;
+        --exp-letter-delay: -0.48s;
+    }
+
+
+    /* W: 4단계부터 모든 단계에서 같은 보라색 유지 */
+    .exp-stage-letter-w {
+        --exp-letter-color: 118, 81, 142;
+        --exp-letter-delay: -0.72s;
+    }
+
+
+    /* U: 5단계부터 모든 단계에서 같은 파란색 유지 */
+    .exp-stage-letter-u {
+        --exp-letter-color: 41, 76, 123;
+        --exp-letter-delay: -0.96s;
+    }
+
+
+    /* P: 6단계에서 금색으로 추가 */
+    .exp-stage-letter-p {
+        --exp-letter-color: 155, 113, 20;
+        --exp-letter-delay: -1.20s;
+    }
+
+
+    /* expLetterNeon(이엑스피 레터 네온):
+       각 글자의 원래 색으로 네온 강도가 변하는 효과 */
+    @keyframes expLetterNeon {
+
+        0%,
+        100% {
+            text-shadow:
+                    0 1px 0
+                    rgba(var(--exp-letter-color), 0.95),
+                    0 2px 2px
+                    rgba(var(--exp-letter-color), 0.48),
+                    0 0 4px
+                    rgba(var(--exp-letter-color), 0.72),
+                    0 0 10px
+                    rgba(var(--exp-letter-color), 0.48),
+                    0 0 20px
+                    rgba(var(--exp-letter-color), 0.28);
+
+            filter:
+                    brightness(1.05)
+                    saturate(1.08);
+        }
+
+        50% {
+            text-shadow:
+                    0 1px 0
+                    rgba(var(--exp-letter-color), 1),
+                    0 2px 3px
+                    rgba(var(--exp-letter-color), 0.62),
+                    0 0 5px
+                    rgba(var(--exp-letter-color), 1),
+                    0 0 13px
+                    rgba(var(--exp-letter-color), 0.92),
+                    0 0 27px
+                    rgba(var(--exp-letter-color), 0.66),
+                    0 0 40px
+                    rgba(var(--exp-letter-color), 0.38);
+
+            filter:
+                    brightness(1.24)
+                    saturate(1.18);
+        }
+    }
+
+
+    /* 사용자가 움직임 최소화를 설정했을 때 네온 움직임 중지 */
+    @media (prefers-reduced-motion: reduce) {
+
+        .exp-stage-letter {
+            animation: none;
+        }
+    }
