@@ -209,6 +209,7 @@
             exam_id,
             student_id,
             attempt_no,
+            attempt_type,
             entry_method,
             status,
             total_score,
@@ -216,19 +217,22 @@
             correct_count,
             total_question_count,
             primary_weak_tag,
+            submitted_at,
             graded_at
         ) VALUES (
                      #{examId},
                      #{studentId},
-                     1,
-                     'MANUAL',
-                     'GRADED',
+                     #{attemptNo},
+                     #{attemptType},
+                     #{entryMethod},
+                     #{status},
                      #{totalScore},
                      #{maxScore},
                      #{correctCount},
                      #{totalQuestionCount},
                      #{primaryWeakTag},
-                     NOW()
+                     #{submittedAt},
+                     #{gradedAt}
                  )
     </insert>
 
