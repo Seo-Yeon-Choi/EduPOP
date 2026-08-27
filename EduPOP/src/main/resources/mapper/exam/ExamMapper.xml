@@ -4,13 +4,14 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.EduPOP.repository.exam.ExamMapper">
+
     <select id="findTemplatesByAcademyId" resultType="com.example.EduPOP.controller.exam.dto.ExamTemplateResponse">
         SELECT
-        e.exam_id AS examId,
-        e.title AS title,
-        COALESCE(e.exam_type, 'MONTH') AS examType,
-        COALESCE(SUM(eq.score), 100.0) AS totalScore,
-        COALESCE(COUNT(eq.question_id), 0) AS totalQuestions
+            e.exam_id AS examId,
+            e.title AS title,
+            COALESCE(e.exam_type, 'MONTH') AS examType,
+            COALESCE(SUM(eq.score), 100.0) AS totalScore,
+            COALESCE(COUNT(eq.question_id), 0) AS totalQuestions
         FROM exams e
         LEFT JOIN exam_questions eq ON e.exam_id = eq.exam_id
         WHERE (e.template_exam_id IS NULL OR e.class_id IS NULL)
@@ -19,97 +20,112 @@
     </select>
 
     <insert id="insert" parameterType="Exam" useGeneratedKeys="true" keyProperty="examId">
-        INSERT INTO exams
-        (
-            class_id, teacher_id, template_exam_id, title, exam_type,
-            exam_mode, exam_round, status, exam_date, file_url
+        INSERT INTO exams (
+            class_id,
+            teacher_id,
+            template_exam_id,
+            title,
+            exam_type,
+            exam_mode,
+            exam_round,
+            status,
+            exam_date,
+            file_url
         )
-        VALUES
-        (
-            #{classId}, #{teacherId}, #{templateExamId}, #{title}, #{examType},
-            #{examMode}, #{examRound}, #{status}, #{examDate}, #{fileUrl}
+        VALUES (
+            #{classId},
+            #{teacherId},
+            #{templateExamId},
+            #{title},
+            #{examType},
+            #{examMode},
+            #{examRound},
+            #{status},
+            #{examDate},
+            #{fileUrl}
         )
     </insert>
 
     <select id="findById" parameterType="long" resultType="Exam">
         SELECT
-        e.exam_id,
-        e.class_id,
-        c.name AS class_name,
-        e.teacher_id,
-        e.template_exam_id,
-        e.title,
-        e.exam_type,
-        e.exam_mode,
-        e.exam_round,
-        e.status,
-        e.exam_date,
-        e.file_url,
-        e.created_at,
-        e.updated_at
+            e.exam_id,
+            e.class_id,
+            c.name AS class_name,
+            e.teacher_id,
+            e.template_exam_id,
+            e.title,
+            e.exam_type,
+            e.exam_mode,
+            e.exam_round,
+            e.status,
+            e.exam_date,
+            e.file_url,
+            e.created_at,
+            e.updated_at
         FROM exams e
         LEFT JOIN classes c ON c.class_id = e.class_id
         WHERE e.exam_id = #{examId}
     </select>
 
-    <!-- 💡 2. [ERD 정밀 일치] 신규 시험지 생성 (academy_id 제외) -->
     <insert id="insertExam" parameterType="com.example.EduPOP.controller.exam.dto.ExamCreateOrCopyRequest"
             useGeneratedKeys="true" keyProperty="generatedExamId" keyColumn="exam_id">
         INSERT INTO exams (
-        class_id,
-        teacher_id,
-        template_exam_id,
-        title,
-        exam_type,
-        exam_mode,
-        exam_round,
-        status,
-        exam_date,
-        created_at,
-        updated_at
-        ) VALUES (
-        #{classId},
-        1,
-        #{templateExamId},
-        #{title},
-        'MONTH',
-        'PAPER',
-        #{examRound},
-        'ACTIVE',
-        #{examDate},
-        NOW(),
-        NOW()
+            class_id,
+            teacher_id,
+            template_exam_id,
+            title,
+            exam_type,
+            exam_mode,
+            exam_round,
+            status,
+            exam_date,
+            created_at,
+            updated_at
+        )
+        VALUES (
+            #{classId},
+            1,
+            #{templateExamId},
+            #{title},
+            'MONTH',
+            'PAPER',
+            #{examRound},
+            'ACTIVE',
+            #{examDate},
+            NOW(),
+            NOW()
         )
     </insert>
-    <!-- 3. 템플릿 문항 복제 -->
+
     <insert id="copyQuestionsFromTemplate">
         INSERT INTO exam_questions (
-        exam_id,
-        section_id,
-        question_number,
-        question_text,
-        question_type,
-        question_type_tag,
-        score,
-        correct_answer,
-        sort_order
+            exam_id,
+            section_id,
+            question_number,
+            question_text,
+            question_type,
+            large_category,
+            small_category,
+            score,
+            correct_answer,
+            sort_order
         )
         SELECT
-        #{newExamId},
-        section_id,
-        question_number,
-        COALESCE(question_text, CONCAT(question_number, '번 문항')),
-        question_type,
-        COALESCE(question_type_tag, question_type, 'VOCAB'),
-        score,
-        correct_answer,
-        sort_order
+            #{newExamId},
+            section_id,
+            question_number,
+            COALESCE(question_text, CONCAT(question_number, '번 문항')),
+            question_type,
+            large_category,
+            small_category,
+            score,
+            correct_answer,
+            sort_order
         FROM exam_questions
         WHERE exam_id = #{templateExamId}
         ORDER BY question_number ASC
     </insert>
 
-    <!-- 4. 전체 시험지 목록 조회 -->
     <select id="findAllExams" resultType="com.example.EduPOP.controller.exam.dto.ExamListResponse">
         SELECT
             e.exam_id AS examId,
@@ -125,7 +141,6 @@
         ORDER BY e.exam_date DESC, e.exam_id DESC
     </select>
 
-    <!-- 5. 시험 기본 정보 조회 -->
     <select id="findExamBaseInfoById" resultType="com.example.EduPOP.controller.exam.dto.ExamDetailResponse">
         SELECT
             e.exam_id AS examId,
@@ -135,14 +150,13 @@
             COALESCE(c.name, '미배정') AS className,
             DATE_FORMAT(e.exam_date, '%Y-%m-%d') AS examDate
         FROM exams e
-                 LEFT JOIN classes c ON e.class_id = c.class_id
+        LEFT JOIN classes c ON e.class_id = c.class_id
         WHERE e.exam_id = #{examId}
     </select>
 
     <update id="update" parameterType="Exam">
         UPDATE exams
-        SET
-            class_id = #{classId},
+        SET class_id = #{classId},
             title = #{title},
             exam_type = #{examType},
             exam_mode = #{examMode},
@@ -160,20 +174,30 @@
 
     <select id="findAll" resultType="Exam">
         SELECT
-        exam_id, class_id, teacher_id, template_exam_id, title,
-        exam_type, exam_mode, exam_round, status, exam_date,
-        file_url, created_at, updated_at
+            exam_id,
+            class_id,
+            teacher_id,
+            template_exam_id,
+            title,
+            exam_type,
+            exam_mode,
+            exam_round,
+            status,
+            exam_date,
+            file_url,
+            created_at,
+            updated_at
         FROM exams
         ORDER BY created_at DESC
     </select>
-    <!-- 6. 시험 문항 목록 조회 -->
+
     <select id="findQuestionsByExamId" resultType="com.example.EduPOP.controller.exam.dto.ExamDetailResponse$QuestionMetaInfo">
         SELECT
-        eq.question_id AS questionId,
-        eq.question_number AS questionNumber,
-        COALESCE(eq.question_type, '공통') AS questionType,
-        eq.score AS score,
-        eq.correct_answer AS correctAnswer
+            eq.question_id AS questionId,
+            eq.question_number AS questionNumber,
+            COALESCE(eq.question_type, '공통') AS questionType,
+            eq.score AS score,
+            eq.correct_answer AS correctAnswer
         FROM exam_questions eq
         WHERE eq.exam_id = #{examId}
         ORDER BY eq.question_number ASC
@@ -181,28 +205,38 @@
 
     <select id="findByTeacherId" resultType="com.example.EduPOP.domain.exam.Exam">
         SELECT
-        exam_id, class_id, teacher_id, template_exam_id, title,
-        exam_type, exam_mode, exam_round, status, exam_date,
-        file_url, created_at, updated_at
+            exam_id,
+            class_id,
+            teacher_id,
+            template_exam_id,
+            title,
+            exam_type,
+            exam_mode,
+            exam_round,
+            status,
+            exam_date,
+            file_url,
+            created_at,
+            updated_at
         FROM exams
         WHERE teacher_id = #{teacherId}
         ORDER BY exam_id DESC
     </select>
-    <!-- 7. 반 소속 학생 명단 조회 -->
+
     <select id="findStudentsByClassId" resultType="com.example.EduPOP.controller.exam.dto.ExamDetailResponse$StudentRosterDto">
         SELECT
-        u.user_id AS studentId,
-        u.name AS studentName,
-        COALESCE(c.target_grade, '중2') AS schoolGrade,
-        COALESCE(u.phone, '010-0000-0000') AS parentPhone
+            u.user_id AS studentId,
+            u.name AS studentName,
+            COALESCE(c.target_grade, '중2') AS schoolGrade,
+            COALESCE(u.phone, '010-0000-0000') AS parentPhone
         FROM class_students cs
         JOIN users u ON cs.student_id = u.user_id
         JOIN classes c ON cs.class_id = c.class_id
-        WHERE cs.class_id = #{classId} AND cs.status = 'ACTIVE'
+        WHERE cs.class_id = #{classId}
+          AND cs.status = 'ACTIVE'
         ORDER BY u.name ASC
     </select>
 
-    <!-- 학생 응시 결과 원장 저장 -->
     <insert id="insertExamAttempt" parameterType="com.example.EduPOP.domain.exam.ExamAttempt"
             useGeneratedKeys="true" keyProperty="attemptId" keyColumn="attempt_id">
         INSERT INTO exam_attempts (
@@ -217,39 +251,44 @@
             total_question_count,
             primary_weak_tag,
             graded_at
-        ) VALUES (
-                     #{examId},
-                     #{studentId},
-                     1,
-                     'MANUAL',
-                     'GRADED',
-                     #{totalScore},
-                     #{maxScore},
-                     #{correctCount},
-                     #{totalQuestionCount},
-                     #{primaryWeakTag},
-                     NOW()
-                 )
+        )
+        VALUES (
+            #{examId},
+            #{studentId},
+            1,
+            'MANUAL',
+            'GRADED',
+            #{totalScore},
+            #{maxScore},
+            #{correctCount},
+            #{totalQuestionCount},
+            #{primaryWeakTag},
+            NOW()
+        )
     </insert>
 
-    <!-- 문항별 답안 상세 저장 -->
     <insert id="batchInsertExamAnswers">
         INSERT INTO exam_answers (
-        attempt_id, question_id, student_answer, is_correct, earned_score, created_at
-        ) VALUES
+            attempt_id,
+            question_id,
+            student_answer,
+            is_correct,
+            earned_score,
+            created_at
+        )
+        VALUES
         <foreach collection="answers" item="ans" separator=",">
             (
-            #{attemptId},
-            #{ans.questionId},
-            #{ans.studentAnswer},
-            #{ans.isCorrect},
-            #{ans.earnedScore},
-            NOW()
+                #{attemptId},
+                #{ans.questionId},
+                #{ans.studentAnswer},
+                #{ans.isCorrect},
+                #{ans.earnedScore},
+                NOW()
             )
         </foreach>
     </insert>
 
-    <!-- 반 수강생 명단 및 기존 채점 답안/총점 조회 -->
     <select id="findStudentsByExamAndClassId" resultType="com.example.EduPOP.controller.exam.dto.ExamDetailResponse$StudentRosterDto">
         SELECT
             u.user_id AS studentId,
@@ -261,35 +300,37 @@
             (
                 SELECT GROUP_CONCAT(COALESCE(eans.student_answer, '') ORDER BY eq.question_number ASC SEPARATOR ' ')
                 FROM exam_answers eans
-                         JOIN exam_questions eq ON eans.question_id = eq.question_id
+                JOIN exam_questions eq ON eans.question_id = eq.question_id
                 WHERE eans.attempt_id = ea.attempt_id
             ) AS savedAnswers
         FROM class_students cs
-                 JOIN users u ON cs.student_id = u.user_id
-                 JOIN classes c ON cs.class_id = c.class_id
-                 LEFT JOIN exam_attempts ea ON ea.exam_id = #{examId} AND ea.student_id = u.user_id
-        WHERE cs.class_id = #{classId} AND cs.status = 'ACTIVE'
+        JOIN users u ON cs.student_id = u.user_id
+        JOIN classes c ON cs.class_id = c.class_id
+        LEFT JOIN exam_attempts ea ON ea.exam_id = #{examId} AND ea.student_id = u.user_id
+        WHERE cs.class_id = #{classId}
+          AND cs.status = 'ACTIVE'
         ORDER BY u.name ASC
     </select>
 
-    <!-- 기존 학생 응시 답안 이력 삭제 -->
     <delete id="deleteExamAnswersByAttemptId">
-        DELETE FROM exam_answers WHERE attempt_id = #{attemptId}
+        DELETE FROM exam_answers
+        WHERE attempt_id = #{attemptId}
     </delete>
 
-    <!-- 기존 학생 응시 원장 조회 및 삭제를 위한 ID 확인 또는 직접 삭제 -->
     <delete id="deleteExamAttemptByExamAndStudent">
-        DELETE FROM exam_attempts WHERE exam_id = #{examId} AND student_id = #{studentId}
+        DELETE FROM exam_attempts
+        WHERE exam_id = #{examId}
+          AND student_id = #{studentId}
     </delete>
 
-    <!-- 기존 응시 원장 단건 조회 쿼리 -->
     <select id="findExamAttempt" resultType="com.example.EduPOP.domain.exam.ExamAttempt">
-        SELECT * FROM exam_attempts
-        WHERE exam_id = #{examId} AND student_id = #{studentId}
+        SELECT *
+        FROM exam_attempts
+        WHERE exam_id = #{examId}
+          AND student_id = #{studentId}
         LIMIT 1
     </select>
 
-    <!-- 학부모 리포트 코멘트 업데이트 (이미 데이터가 있을 때) -->
     <update id="updateTeacherComment">
         UPDATE parent_reports
         SET teacher_comment = #{comment}
@@ -297,39 +338,63 @@
           AND period_start = DATE_FORMAT(NOW(), '%Y-%m-01')
     </update>
 
-    <!-- 학부모 리포트 신규 생성 및 코멘트 인서트 (DB 에러 방어 로직 포함) -->
     <insert id="insertTeacherComment">
         INSERT INTO parent_reports (
-        student_id, created_by, period_start, period_end, access_token, teacher_comment, status, created_at
-        ) VALUES (
-        #{studentId},
-        (SELECT COALESCE(MAX(user_id), 1) FROM users WHERE role = 'TEACHER'),
-        DATE_FORMAT(NOW(), '%Y-%m-01'),
-        LAST_DAY(NOW()),
-        UUID(),
-        #{comment},
-        'DRAFT',
-        NOW()
+            student_id,
+            created_by,
+            period_start,
+            period_end,
+            access_token,
+            teacher_comment,
+            status,
+            created_at
+        )
+        VALUES (
+            #{studentId},
+            (SELECT COALESCE(MAX(user_id), 1) FROM users WHERE role = 'TEACHER'),
+            DATE_FORMAT(NOW(), '%Y-%m-01'),
+            LAST_DAY(NOW()),
+            UUID(),
+            #{comment},
+            'DRAFT',
+            NOW()
         )
     </insert>
 
-
-    <!-- 특정 시험의 전체 평균 및 특정 반 평균 동시 계산 쿼리 -->
     <select id="getExamStats" resultType="map">
         SELECT
             COALESCE(ROUND(AVG(CASE WHEN c.class_id = #{classId} THEN ea.total_score END), 1), 0) AS classAvg,
             COALESCE(ROUND(AVG(ea.total_score), 1), 0) AS totalAvg
         FROM exam_attempts ea
-                 LEFT JOIN class_students c ON ea.student_id = c.student_id
-        WHERE ea.exam_id = #{examId} AND ea.status = 'GRADED'
+        LEFT JOIN class_students c ON ea.student_id = c.student_id
+        WHERE ea.exam_id = #{examId}
+          AND ea.status = 'GRADED'
     </select>
 
-    <!-- 문항별 커스텀 정답 및 영역 일괄 등록 쿼리 -->
     <insert id="batchInsertCustomQuestions">
-        INSERT INTO exam_questions (exam_id, question_number, question_type, question_type_tag, score, correct_answer, question_text)
+        INSERT INTO exam_questions (
+            exam_id,
+            question_number,
+            question_type,
+            large_category,
+            small_category,
+            score,
+            correct_answer,
+            question_text
+        )
         VALUES
         <foreach collection="questions" item="q" separator=",">
-            (#{examId}, #{q.questionNumber}, #{q.questionType}, #{q.questionTypeTag}, #{q.score}, #{q.correctAnswer}, CONCAT(#{q.questionNumber}, '번 문항'))
+            (
+                #{examId},
+                #{q.questionNumber},
+                #{q.questionType},
+                #{q.largeCategory},
+                #{q.smallCategory},
+                #{q.score},
+                #{q.correctAnswer},
+                CONCAT(#{q.questionNumber}, '번 문항')
+            )
         </foreach>
     </insert>
+
 </mapper>
