@@ -70,8 +70,7 @@ public class SecurityConfig {
                                 "/admin/**",
                                 "/classroom/**",
                                 "/main/adminMain",
-                                "/adminMain",
-                                "/adminWaiting"
+                                "/adminMain"
                         ).hasRole("ADMIN")
 
                         // 로그인은 필요하지만 Role에 관계없는 페이지
@@ -81,6 +80,7 @@ public class SecurityConfig {
                                 "/academy/register",
                                 "/selectAcademy",
                                 "/blankPage",
+                                "/adminWaiting",
                                 "/user/withdraw",
                                 "/parent/**"
                         ).authenticated()
