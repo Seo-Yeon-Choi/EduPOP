@@ -1,5 +1,6 @@
 package com.example.EduPOP.controller.auth;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.domain.user.Academy;
 import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.domain.user.UserRole;
@@ -86,7 +87,7 @@ public class AuthControllerNaver {
             return "redirect:/login?error=naver-state";
         }
 
-        String requestedRole = (String) session.getAttribute("requestedRole");
+        String requestedRole = (String) session.getAttribute(SessionConst.REQUESTED_ROLE);
         if (requestedRole == null) {
             requestedRole = "NONE";
         }
@@ -103,7 +104,7 @@ public class AuthControllerNaver {
                 naverUser = latestUser;
             }
 
-            session.setAttribute("loginUser", naverUser);
+            session.setAttribute(SessionConst.LOGIN_USER, naverUser);
             session.removeAttribute("requestedRole");
 
             if ((naverUser.getRole() == UserRole.STUDENT

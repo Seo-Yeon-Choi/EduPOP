@@ -1,5 +1,6 @@
 package com.example.EduPOP.controller.classroom;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.controller.classroom.dto.ClassroomCreateRequest;
 import com.example.EduPOP.controller.classroom.dto.ClassroomDetailResponse;
 import com.example.EduPOP.controller.classroom.dto.ClassroomListResponse;
@@ -35,7 +36,7 @@ public class ClassroomController {
 
     private User getLoginUser(HttpSession session) {
 
-        return (User) session.getAttribute("loginUser");
+        return (User) session.getAttribute(SessionConst.LOGIN_USER);
     }
 
     // =========================================================

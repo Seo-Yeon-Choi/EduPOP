@@ -509,3 +509,11 @@ ALTER TABLE exam_questions
 
 ALTER TABLE exam_questions
 DROP COLUMN question_type_tag;
+
+ALTER TABLE academies
+    ADD COLUMN business_number VARCHAR(10) NULL COMMENT '사업자등록번호',
+ADD COLUMN representative_name VARCHAR(100) NULL COMMENT '대표자명',
+ADD COLUMN business_start_date DATE NULL COMMENT '개업일자';
+
+ALTER TABLE academies
+    MODIFY COLUMN business_cer VARCHAR(100) NULL;

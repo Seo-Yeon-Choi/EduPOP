@@ -5,10 +5,12 @@ import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.repository.user.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -24,12 +26,13 @@ import java.util.UUID;
 public class KakaoService {
 
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    private final String KAKAO_CLIENT_ID =
-            "f0d17d7cf78033e1ed7f979b9b09591b";
+    @Value("${kakao.client-id}")
+    private String clientId;
 
-    private final String REDIRECT_URI =
-            "http://localhost:8080/kakao/callback";
+    @Value("${kakao.redirect-uri}")
+    private String redirectUri;
 
     @Transactional
     public User loginWithKakao(String code, UserRole role) {
@@ -48,8 +51,8 @@ public class KakaoService {
                     new LinkedMultiValueMap<>();
 
             tokenBody.add("grant_type", "authorization_code");
-            tokenBody.add("client_id", KAKAO_CLIENT_ID);
-            tokenBody.add("redirect_uri", REDIRECT_URI);
+            tokenBody.add("client_id", clientId);
+            tokenBody.add("redirect_uri", redirectUri);
             tokenBody.add("code", code);
 
             HttpEntity<MultiValueMap<String, String>> tokenRequest =
@@ -116,7 +119,11 @@ public class KakaoService {
 
             newUser.setLoginId("kakao_" + kakaoId);
             newUser.setName("kakao_" + name);
-            newUser.setPasswordHash(UUID.randomUUID().toString());
+            newUser.setPasswordHash(
+                    passwordEncoder.encode(
+                            UUID.randomUUID().toString()
+                    )
+            );
 
             // 처음 온 사람은 PENDING 상태
             newUser.setStatus(UserStatus.PENDING);
@@ -138,4 +145,3 @@ public class KakaoService {
         }
     }
 }
-

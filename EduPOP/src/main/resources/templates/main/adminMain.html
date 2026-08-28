@@ -72,6 +72,44 @@
 
     </section>
 
+    <section class="account-area">
+
+        <div class="account-header">
+            <h2>계정 관리</h2>
+            <p>
+                계정 정보를 확인하거나 로그아웃 및 회원 탈퇴를 할 수 있습니다.
+            </p>
+        </div>
+
+        <div class="account-buttons">
+
+            <a th:href="@{/logout}" class="logout-button">
+                로그아웃
+            </a>
+
+            <a th:href="@{/account}" class="logout-button">
+                계정정보 조회
+            </a>
+
+            <form th:action="@{/user/withdraw}"
+                  method="post"
+                  onsubmit="return confirm('정말 탈퇴하시겠습니까? 데이터는 1년간 안전하게 보관된 후 완전히 삭제됩니다.');">
+
+                <button type="submit" class="withdraw-button">
+                    회원 탈퇴하기
+                </button>
+
+            </form>
+
+        </div>
+
+        <p class="withdraw-warning">
+            회원 탈퇴 시 계정 사용이 중지되며,
+            관련 데이터는 정책에 따라 보관 후 삭제됩니다.
+        </p>
+
+    </section>
+
 </main>
 
 </body>

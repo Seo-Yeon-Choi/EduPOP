@@ -1,5 +1,6 @@
 package com.example.EduPOP.controller.auth;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.domain.user.Academy;
 import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.domain.user.UserRole;
@@ -113,7 +114,7 @@ public class AuthControllerGoogle {
         }
 
         String requestedRole =
-                (String) session.getAttribute("requestedRole");
+                (String) session.getAttribute(SessionConst.REQUESTED_ROLE);
 
         /*
          * 역할을 미리 선택하지 않고 Google 로그인을 누른 경우
@@ -136,7 +137,7 @@ public class AuthControllerGoogle {
                 googleUser = latestUser;
             }
 
-            session.setAttribute("loginUser", googleUser);
+            session.setAttribute(SessionConst.LOGIN_USER, googleUser);
             session.removeAttribute("requestedRole");
 
             /*

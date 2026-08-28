@@ -1,5 +1,6 @@
 package com.example.EduPOP.controller.exam;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.controller.classroom.dto.ClassroomListResponse;
 import com.example.EduPOP.controller.exam.dto.*;
 import com.example.EduPOP.domain.user.User;
@@ -34,7 +35,7 @@ public class ExamGradingController {
     ) {
 
         User loginUser =
-                (User) session.getAttribute("loginUser");
+                (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
             return "redirect:/login";
@@ -102,7 +103,7 @@ public class ExamGradingController {
     ) {
 
         User loginUser =
-                (User) session.getAttribute("loginUser");
+                (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
             return "redirect:/login";
@@ -139,7 +140,7 @@ public class ExamGradingController {
     ) {
 
         User loginUser =
-                (User) session.getAttribute("loginUser");
+                (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
             return ResponseEntity
@@ -176,7 +177,7 @@ public class ExamGradingController {
     ) {
 
         User loginUser =
-                (User) session.getAttribute("loginUser");
+                (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
             return ResponseEntity
@@ -219,7 +220,7 @@ public class ExamGradingController {
     ) {
 
         User loginUser =
-                (User) session.getAttribute("loginUser");
+                (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
             return ResponseEntity
@@ -246,7 +247,7 @@ public class ExamGradingController {
     ) {
 
         User loginUser =
-                (User) session.getAttribute("loginUser");
+                (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
             return ResponseEntity

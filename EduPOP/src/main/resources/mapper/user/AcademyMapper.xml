@@ -13,6 +13,9 @@
             name,
             address,
             phone,
+            business_number,
+            representative_name,
+            business_start_date,
             business_cer,
             created_at,
             updated_at
@@ -21,6 +24,9 @@
                    #{name},
                    #{address},
                    #{phone},
+                   #{businessNumber},
+                   #{representativeName},
+                   #{businessStartDate},
                    #{businessCer},
                    NOW(),
                    NOW()
