@@ -134,6 +134,13 @@ function updateTimer(deadline, storageKey) {
 
 async function submitExam(autoSubmit) {
 
+    const csrfToken =
+        document.querySelector('meta[name="_csrf"]').content;
+
+    const csrfHeader =
+        document.querySelector('meta[name="_csrf_header"]').content;
+
+
     if (isSubmitting) {
         return;
     }
@@ -232,8 +239,8 @@ async function submitExam(autoSubmit) {
                     method: "POST",
 
                     headers: {
-                        "Content-Type":
-                            "application/json"
+                        "Content-Type": "application/json",
+                        [csrfHeader]: csrfToken
                     },
 
                     body: JSON.stringify({

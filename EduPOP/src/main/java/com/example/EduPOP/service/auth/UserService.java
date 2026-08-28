@@ -80,7 +80,7 @@ public class UserService {
             Long academyId,
             String email,
             String phone,
-            Integer schoolGrade
+            String schoolGrade
     ) {
         userMapper.updateKakaoUserInfo(userId, academyId, email, phone, schoolGrade);
     }

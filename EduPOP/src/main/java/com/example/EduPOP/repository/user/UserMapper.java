@@ -49,7 +49,7 @@ public interface UserMapper {
             @Param("academyId") Long academyId,
             @Param("email") String email,
             @Param("phone") String phone,
-            @Param("schoolGrade") Integer schoolGrade
+            @Param("schoolGrade") String schoolGrade
     );
 
     void updateLocalAccount(

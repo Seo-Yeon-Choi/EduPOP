@@ -1,0 +1,454 @@
+/* ================================
+   반 개설 페이지
+================================ */
+
+.classroom-create-container {
+    margin-left: 240px;
+
+    min-height: 100vh;
+
+    padding: 104px 40px 50px;
+
+    background: #f7f8fa;
+
+    box-sizing: border-box;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+
+/* ================================
+   폼 카드
+================================ */
+
+.classroom-form-card {
+    width: 100%;
+    max-width: 760px;
+
+    padding: 40px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+
+    box-shadow:
+            0 10px 25px rgba(0, 0, 0, 0.05),
+            0 4px 10px rgba(0, 0, 0, 0.03);
+
+    box-sizing: border-box;
+}
+
+
+/* ================================
+   폼 헤더
+================================ */
+
+.classroom-create-container .form-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.classroom-create-container .form-header h2 {
+    margin: 0 0 8px;
+
+    font-size: 24px;
+    font-weight: 700;
+
+    letter-spacing: -0.5px;
+
+    color: #0f172a;
+}
+
+.classroom-create-container .form-header p {
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 1.6;
+
+    color: #64748b;
+}
+
+
+/* ================================
+   폼 레이아웃
+================================ */
+
+.classroom-create-container .form-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    column-gap: 20px;
+    row-gap: 0;
+}
+
+.classroom-create-container .form-group {
+    margin-bottom: 24px;
+}
+
+.classroom-create-container .form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ================================
+   라벨
+================================ */
+
+.classroom-create-container .form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 13.5px;
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.classroom-create-container .required-star {
+    margin-left: 3px;
+
+    color: #ef4444;
+}
+
+
+/* ================================
+   입력창
+================================ */
+
+.classroom-create-container .form-input,
+.classroom-create-container .form-textarea,
+.classroom-create-container .form-select {
+    width: 100%;
+
+    padding: 11px 16px;
+
+    background: #ffffff;
+
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+
+    color: #1e293b;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    box-sizing: border-box;
+
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.classroom-create-container .form-textarea {
+    resize: vertical;
+
+    min-height: 100px;
+}
+
+.classroom-create-container .form-input::placeholder,
+.classroom-create-container .form-textarea::placeholder {
+    color: #94a3b8;
+
+    font-size: 13.5px;
+}
+
+.classroom-create-container .form-input:focus,
+.classroom-create-container .form-textarea:focus,
+.classroom-create-container .form-select:focus {
+    outline: none;
+
+    border-color: #4f6ef7;
+
+    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
+}
+
+
+/* ================================
+   입력 오류
+================================ */
+
+.classroom-create-container .field-error-input {
+    border-color: #ef4444 !important;
+
+    background: #fef2f2;
+}
+
+.classroom-create-container .error-message {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #ef4444;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* ================================
+   강사 배정
+================================ */
+
+.classroom-create-container .teacher-section {
+    margin-top: 8px;
+    padding: 20px;
+
+    background: #f8fafc;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+
+    box-sizing: border-box;
+}
+
+.classroom-create-container .teacher-row {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.classroom-create-container .teacher-row + .teacher-row {
+    margin-top: 10px;
+}
+
+.classroom-create-container .teacher-badge {
+    flex-shrink: 0;
+
+    padding: 5px 10px;
+
+    background: #e0f2fe;
+
+    border-radius: 6px;
+
+    color: #0284c7;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* ================================
+   강사 추가 헤더
+================================ */
+
+.classroom-create-container .teacher-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 8px;
+}
+
+.classroom-create-container .teacher-title-row label {
+    margin: 0;
+}
+
+.classroom-create-container .teacher-add-button {
+    padding: 6px 12px;
+
+    background: #eef1ff;
+
+    border: none;
+    border-radius: 6px;
+
+    color: #4f6ef7;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background 0.2s ease,
+            color 0.2s ease;
+}
+
+.classroom-create-container .teacher-add-button:hover {
+    background: #4f6ef7;
+
+    color: #ffffff;
+}
+
+
+/* ================================
+   강사 삭제 버튼
+================================ */
+
+.classroom-create-container .teacher-delete-button {
+    flex-shrink: 0;
+
+    padding: 7px 12px;
+
+    background: #fee2e2;
+
+    border: none;
+    border-radius: 6px;
+
+    color: #ef4444;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.classroom-create-container .teacher-delete-button:hover {
+    background: #ef4444;
+
+    color: #ffffff;
+}
+
+
+/* ================================
+   하단 버튼
+================================ */
+
+.classroom-create-container .btn-group {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 8px;
+    padding-top: 24px;
+
+    border-top: 1px solid #f1f5f9;
+}
+
+.classroom-create-container .btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 100px;
+
+    padding: 12px 24px;
+
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+
+    transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+
+/* 취소 */
+
+.classroom-create-container .btn-cancel {
+    background: #ffffff;
+
+    border: 1.5px solid #cbd5e1;
+
+    color: #64748b;
+}
+
+.classroom-create-container .btn-cancel:hover {
+    background: #f8fafc;
+
+    border-color: #94a3b8;
+
+    color: #334155;
+}
+
+
+/* 개설 완료 */
+
+.classroom-create-container .btn-primary {
+    background: #4f6ef7;
+
+    border: 1.5px solid #4f6ef7;
+
+    color: #ffffff;
+}
+
+.classroom-create-container .btn-primary:hover {
+    background: #4059d8;
+
+    border-color: #4059d8;
+
+    box-shadow: 0 4px 12px rgba(79, 110, 247, 0.25);
+}
+
+
+/* ================================
+   반응형
+================================ */
+
+@media (max-width: 900px) {
+
+    .classroom-create-container {
+        margin-left: 0;
+
+        padding: 90px 20px 40px;
+    }
+
+    .classroom-form-card {
+        max-width: 760px;
+
+        padding: 30px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .classroom-create-container {
+        padding: 86px 16px 30px;
+    }
+
+    .classroom-form-card {
+        padding: 24px 20px;
+
+        border-radius: 12px;
+    }
+
+    .classroom-create-container .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .classroom-create-container .form-group.full-width {
+        grid-column: auto;
+    }
+
+    .classroom-create-container .teacher-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .classroom-create-container .teacher-badge {
+        align-self: flex-start;
+    }
+
+    .classroom-create-container .btn-group {
+        flex-direction: column-reverse;
+    }
+
+    .classroom-create-container .btn {
+        width: 100%;
+    }
+}

@@ -1,5 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
     loadCategories();
+
+    const csrfToken =
+        document.querySelector('meta[name="_csrf"]').content;
+
+    const csrfHeader =
+        document.querySelector('meta[name="_csrf_header"]').content;
+
     const tabs =
         document.querySelectorAll(".question-tab");
 
@@ -329,7 +336,13 @@ document.addEventListener("DOMContentLoaded", () => {
             // =====================================
 
             try {
-                const response = await fetch("/teacher/exams/parse-pdf", { method: "POST", body: formData });
+                const response = await fetch("/teacher/exams/parse-pdf",
+                    {
+                        method: "POST",
+                        headers: {
+                            [csrfHeader]: csrfToken
+                        },
+                        body: formData });
 
                 // =================================
                 // 서버 오류
@@ -1057,7 +1070,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         method:
                             "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            [csrfHeader]: csrfToken
                         },
                         body: JSON.stringify(exam)
                     }
