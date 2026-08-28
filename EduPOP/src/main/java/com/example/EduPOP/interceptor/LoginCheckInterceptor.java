@@ -1,3 +1,4 @@
+/*
 package com.example.EduPOP.interceptor;
 
 import com.example.EduPOP.config.SessionConst;
@@ -98,3 +99,5 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 
 
 }
+
+ */

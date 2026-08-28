@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title th:text="|EduPOP - ${classroom.name} 상세 관리|">EduPOP - 반 상세 관리</title>
     <!-- 부트스트랩 5 & 아이콘 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -367,6 +369,9 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
     // 💡 [트렌드 UX] 비차단 토스트 알림 헬퍼 함수
     function showToast(message, isSuccess = true) {
         const toastEl = document.getElementById('actionToast');
@@ -427,7 +432,10 @@
 
         fetch(`/classroom/${classId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
             body: JSON.stringify(updateData)
         })
             .then(async response => {
@@ -451,7 +459,10 @@
 
         fetch(`/classroom/${classId}/teachers`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
             body: JSON.stringify({ teacherId: Number(teacherId), roleType: roleType })
         })
             .then(async response => {
@@ -477,7 +488,10 @@
             cancelButtonText: '취소'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`/classroom/${classId}/teachers/${teacherId}`, { method: 'DELETE' })
+                fetch(`/classroom/${classId}/teachers/${teacherId}`, {
+                    method: 'DELETE',
+                    headers: { [csrfHeader]: csrfToken }
+                })
                     .then(res => {
                         if (res.ok) {
                             buttonEl.closest('tr').remove();
@@ -673,7 +687,10 @@
 
         fetch(`/classroom/${classId}/students/sync`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
             body: JSON.stringify({ studentIds: studentIds })
         })
             .then(res => {

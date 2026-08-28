@@ -7,8 +7,10 @@ import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.service.auth.AcademyService;
 import com.example.EduPOP.service.auth.KakaoService;
+import com.example.EduPOP.service.auth.SecurityLoginService;
 import com.example.EduPOP.service.auth.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +29,7 @@ public class AuthControllerKakao {
     private final KakaoService kakaoService;
     private final UserService userService;
     private final AcademyService academyService;
+    private final SecurityLoginService securityLoginService;
 
     @Value("${kakao.client-id}")
     private String clientId;
@@ -84,6 +87,7 @@ public class AuthControllerKakao {
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String error,
             HttpServletRequest request,
+            HttpServletResponse response,
             HttpSession session
     ) {
         // 카카오 로그인 실패 또는 필수값 누락 확인
@@ -130,12 +134,21 @@ public class AuthControllerKakao {
         session.removeAttribute("requestedRole");
 
         // 로그인 성공 후 세션 ID 변경
-        request.changeSessionId();
+        // request.changeSessionId();
 
         // 로그인 사용자 세션 저장
+        /*
         session.setAttribute(
                 SessionConst.LOGIN_USER,
                 kakaoUser
+        );
+         */
+
+        // Spring Security 로그인
+        securityLoginService.login(
+                kakaoUser,
+                request,
+                response
         );
 
         //역할이 학생,교사이면서 학원Id가 없으면 학원 선택 페이지로 보냄

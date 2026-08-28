@@ -190,3 +190,161 @@
         font-size: 23px;
     }
 }
+
+/* 계정 관리 영역 */
+
+.account-area {
+    max-width: 1100px;
+
+    margin-top: 35px;
+    padding: 30px 32px;
+
+    background: #ffffff;
+
+    border: 1px solid #e6e8eb;
+    border-radius: 16px;
+
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+
+    box-sizing: border-box;
+}
+
+
+/* 계정 관리 헤더 */
+
+.account-header {
+    margin-bottom: 24px;
+}
+
+.account-header h2 {
+    margin: 0 0 8px;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.account-header p {
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 1.6;
+
+    color: #777777;
+}
+
+
+/* 계정 관리 버튼 영역 */
+
+.account-buttons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.account-buttons form {
+    margin: 0;
+}
+
+
+/* 로그아웃 / 계정정보 조회 버튼 */
+
+.logout-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 130px;
+    height: 44px;
+
+    padding: 0 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #dcdfe5;
+    border-radius: 8px;
+
+    color: #444444;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    box-sizing: border-box;
+
+    cursor: pointer;
+
+    transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease;
+}
+
+.logout-button:hover {
+    background: #f5f7ff;
+
+    border-color: #4f6ef7;
+
+    color: #4f6ef7;
+}
+
+
+/* 회원 탈퇴 버튼 */
+
+.withdraw-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 130px;
+    height: 44px;
+
+    padding: 0 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+
+    color: #ef4444;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    font-family: inherit;
+
+    box-sizing: border-box;
+
+    cursor: pointer;
+
+    transition:
+            background 0.2s ease,
+            color 0.2s ease;
+}
+
+.withdraw-button:hover {
+    background: #ef4444;
+
+    color: #ffffff;
+}
+
+
+/* 탈퇴 안내 문구 */
+
+.withdraw-warning {
+    margin: 0;
+    padding-top: 16px;
+
+    border-top: 1px solid #eeeeee;
+
+    font-size: 12px;
+    line-height: 1.6;
+
+    color: #999999;
+}

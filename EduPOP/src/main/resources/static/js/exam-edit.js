@@ -1,4 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const csrfToken =
+        document.querySelector('meta[name="_csrf"]').content;
+
+    const csrfHeader =
+        document.querySelector('meta[name="_csrf_header"]').content;
+
 
     const editPage =
         document.getElementById("examEditPage");
@@ -570,7 +576,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         headers: {
                             "Content-Type":
-                                "application/json"
+                                "application/json",
+                            [csrfHeader]: csrfToken
                         },
 
                         body:

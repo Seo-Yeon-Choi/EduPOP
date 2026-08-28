@@ -51,44 +51,143 @@
                         required>
             </div>
 
-            <div class="form-group">
-                <label for="schoolGrade">학년</label>
+            <!-- 학생일 때만 학년 선택 표시 -->
+            <div class="form-group"
+                 th:if="${requestedRole == 'STUDENT'}">
 
-                <select
-                        id="schoolGrade"
+                <label for="schoolGrade">
+                    학년
+                </label>
+
+                <select id="schoolGrade"
                         name="schoolGrade"
                         required>
 
-                    <option value="">학년을 선택하세요</option>
-                    <option value="1">1학년</option>
-                    <option value="2">2학년</option>
-                    <option value="3">3학년</option>
-                    <option value="4">4학년</option>
-                    <option value="5">5학년</option>
-                    <option value="6">6학년</option>
-
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="academyId">학원</label>
-
-                <select
-                        id="academyId"
-                        name="academyId"
-                        required>
-
-                    <option value="">학원을 선택하세요</option>
-
-                    <option
-                            th:each="academy : ${academies}"
-                            th:value="${academy.academyId}"
-                            th:text="${academy.name}">
+                    <option value="">
+                        학년을 선택해주세요
                     </option>
 
+                    <optgroup label="초등학교">
+                        <option value="초등학교 1학년">초등학교 1학년</option>
+                        <option value="초등학교 2학년">초등학교 2학년</option>
+                        <option value="초등학교 3학년">초등학교 3학년</option>
+                        <option value="초등학교 4학년">초등학교 4학년</option>
+                        <option value="초등학교 5학년">초등학교 5학년</option>
+                        <option value="초등학교 6학년">초등학교 6학년</option>
+                    </optgroup>
+
+                    <optgroup label="중학교">
+                        <option value="중학교 1학년">중학교 1학년</option>
+                        <option value="중학교 2학년">중학교 2학년</option>
+                        <option value="중학교 3학년">중학교 3학년</option>
+                    </optgroup>
+
                 </select>
+
             </div>
 
+            <div class="form-group academy-search-group"
+                 th:if="${requestedRole != 'ADMIN'}">
+
+                <label for="academySearch">
+                    학원 선택
+                </label>
+
+                <p class="academy-search-guide">
+                    학원 이름을 검색한 후 소속 학원을 선택해주세요.
+                </p>
+
+                <div class="academy-search-box">
+
+                    <input type="text"
+                           id="academySearch"
+                           class="academy-search-input"
+                           placeholder="학원 이름을 입력해주세요."
+                           autocomplete="off">
+
+                    <span class="academy-search-icon">
+            🔍
+        </span>
+
+                </div>
+
+                <!-- 실제 서버로 전달되는 값 -->
+                <input type="hidden"
+                       id="academyId"
+                       name="academyId">
+
+
+                <!-- 검색 결과 -->
+                <div id="academySearchResults"
+                     class="academy-search-results"
+                     hidden>
+
+                    <button type="button"
+                            class="academy-search-item"
+                            th:each="academy : ${academies}"
+                            th:data-id="${academy.academyId}"
+                            th:data-name="${academy.name}"
+                            th:data-address="${academy.address}"
+                            hidden>
+
+                        <strong class="academy-result-name"
+                                th:text="${academy.name}">
+                            EduPOP 학원
+                        </strong>
+
+                        <span class="academy-result-address"
+                              th:text="${academy.address != null
+                           and !#strings.isEmpty(academy.address)
+                           ? academy.address
+                           : '주소 정보 없음'}">
+                서울특별시 강남구
+            </span>
+
+                    </button>
+
+                    <div id="academyEmptyResult"
+                         class="academy-empty-result"
+                         hidden>
+                        검색 결과가 없습니다.
+                    </div>
+
+                </div>
+
+
+                <!-- 선택된 학원 -->
+                <div id="selectedAcademy"
+                     class="selected-academy"
+                     hidden>
+
+                    <div class="selected-academy-info">
+
+            <span class="selected-academy-label">
+                선택한 학원
+            </span>
+
+                        <strong id="selectedAcademyName"></strong>
+
+                        <span id="selectedAcademyAddress"
+                              class="selected-academy-address">
+            </span>
+
+                    </div>
+
+                    <button type="button"
+                            id="academyChangeButton"
+                            class="academy-change-button">
+                        변경
+                    </button>
+
+                </div>
+
+                <p id="academyError"
+                   class="academy-error"
+                   hidden>
+                    소속 학원을 선택해주세요.
+                </p>
+
+            </div>
             <button type="submit" class="submit-button">
                 선택 완료
             </button>
@@ -98,6 +197,242 @@
     </section>
 
 </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const form = document.querySelector('form');
+
+        const searchInput =
+            document.getElementById('academySearch');
+
+        const academyIdInput =
+            document.getElementById('academyId');
+
+        const resultsBox =
+            document.getElementById('academySearchResults');
+
+        const academyItems =
+            document.querySelectorAll('.academy-search-item');
+
+        const emptyResult =
+            document.getElementById('academyEmptyResult');
+
+        const selectedAcademy =
+            document.getElementById('selectedAcademy');
+
+        const selectedAcademyName =
+            document.getElementById('selectedAcademyName');
+
+        const selectedAcademyAddress =
+            document.getElementById('selectedAcademyAddress');
+
+        const changeButton =
+            document.getElementById('academyChangeButton');
+
+        const academyError =
+            document.getElementById('academyError');
+
+
+        /*
+         * ADMIN이면 학원 검색 영역이 없으므로 종료
+         */
+        if (!searchInput) {
+            return;
+        }
+
+
+        /*
+         * 학원 검색
+         */
+        searchInput.addEventListener('input', function () {
+
+            const keyword =
+                searchInput.value.trim().toLowerCase();
+
+            academyIdInput.value = '';
+
+            selectedAcademy.hidden = true;
+            academyError.hidden = true;
+
+
+            if (keyword.length === 0) {
+
+                resultsBox.hidden = true;
+
+                academyItems.forEach(function (item) {
+                    item.hidden = true;
+                });
+
+                emptyResult.hidden = true;
+
+                return;
+            }
+
+
+            resultsBox.hidden = false;
+
+            let resultCount = 0;
+
+
+            academyItems.forEach(function (item) {
+
+                const academyName =
+                    (item.dataset.name || '').toLowerCase();
+
+                /*
+                 * 학원 이름에 검색어가 포함됐는지 확인
+                 */
+                if (academyName.includes(keyword)) {
+
+                    item.hidden = false;
+                    resultCount++;
+
+                } else {
+
+                    item.hidden = true;
+
+                }
+
+            });
+
+
+            /*
+             * 결과가 하나도 없으면 메시지 표시
+             */
+            emptyResult.hidden =
+                resultCount > 0;
+
+        });
+
+
+        /*
+         * 학원 선택
+         */
+        academyItems.forEach(function (item) {
+
+            item.addEventListener('click', function () {
+
+                const academyId =
+                    item.dataset.id;
+
+                const academyName =
+                    item.dataset.name;
+
+                const academyAddress =
+                    item.dataset.address || '주소 정보 없음';
+
+
+                academyIdInput.value =
+                    academyId;
+
+                searchInput.value =
+                    academyName;
+
+
+                selectedAcademyName.textContent =
+                    academyName;
+
+                selectedAcademyAddress.textContent =
+                    academyAddress;
+
+
+                selectedAcademy.hidden =
+                    false;
+
+                resultsBox.hidden =
+                    true;
+
+                academyError.hidden =
+                    true;
+
+            });
+
+        });
+
+
+        /*
+         * 학원 변경
+         */
+        if (changeButton) {
+
+            changeButton.addEventListener('click', function () {
+
+                academyIdInput.value = '';
+
+                searchInput.value = '';
+
+                selectedAcademy.hidden = true;
+
+                resultsBox.hidden = true;
+
+                academyError.hidden = true;
+
+                searchInput.focus();
+
+            });
+
+        }
+
+
+        /*
+         * 검색창 바깥 클릭 시 결과창 닫기
+         */
+        document.addEventListener('click', function (event) {
+
+            const searchGroup =
+                document.querySelector('.academy-search-group');
+
+            if (searchGroup &&
+                !searchGroup.contains(event.target)) {
+
+                resultsBox.hidden = true;
+
+            }
+
+        });
+
+
+        /*
+         * 검색창을 다시 클릭했을 때 검색 재실행
+         */
+        searchInput.addEventListener('focus', function () {
+
+            if (searchInput.value.trim() !== '' &&
+                academyIdInput.value === '') {
+
+                searchInput.dispatchEvent(
+                    new Event('input')
+                );
+
+            }
+
+        });
+
+
+        /*
+         * 제출 전에 학원 선택 확인
+         */
+        if (form) {
+
+            form.addEventListener('submit', function (event) {
+
+                if (!academyIdInput.value) {
+
+                    event.preventDefault();
+
+                    academyError.hidden = false;
+
+                    searchInput.focus();
+
+                }
+
+            });
+
+        }
+
+    });
+</script>
 
 </body>
 </html>

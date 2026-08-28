@@ -6,8 +6,10 @@ import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.service.auth.AcademyService;
+import com.example.EduPOP.service.auth.SecurityLoginService;
 import com.example.EduPOP.service.auth.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -23,6 +25,7 @@ public class AuthController {
 
     private  final AcademyService academyService;
     private final UserService userService;
+    private final SecurityLoginService securityLoginService;
 
     // 기본 도메인 요청 시 로그인 페이지로 이동
     @GetMapping("/")
@@ -119,6 +122,7 @@ public class AuthController {
             @RequestParam("loginId") String loginId,
             @RequestParam("passwordHash") String passwordHash,
             HttpServletRequest request,
+            HttpServletResponse response,
             HttpSession session,
             RedirectAttributes redirectAttributes
     ) {
@@ -133,9 +137,12 @@ public class AuthController {
         } else if (loginUser.getStatus() == UserStatus.WITHDRAWN) {
             return "redirect:/";
         }
-        request.changeSessionId();
+        // request.changeSessionId();
         User latestUser = userService.findByUserId(loginUser.getUserId());
-        session.setAttribute(SessionConst.LOGIN_USER, latestUser);
+        // session.setAttribute(SessionConst.LOGIN_USER, latestUser);
+
+        // Spring Security 로그인
+        securityLoginService.login(latestUser, request, response);
 
         if (latestUser.getStatus() == UserStatus.PENDING) {
             if (latestUser.getRole() == UserRole.ADMIN) {
@@ -180,6 +187,7 @@ public class AuthController {
     }
 //--------------------------------------------------------------------------------
     // 로그아웃
+    /*
     @GetMapping("/logout")
     public String logout(
             HttpServletRequest request,
@@ -198,6 +206,8 @@ public class AuthController {
 
         return "redirect:/";
     }
+    */
+
 
     // 회원 탈퇴
     @PostMapping("/user/withdraw")
@@ -230,10 +240,13 @@ public class AuthController {
         if (loginUser == null){
             return "redirect:/";
         }
+
         //모든 학원을 가져와서 model에 담음
         List<Academy> academies = academyService.getAllAcademies();
         model.addAttribute("academies", academies);
         model.addAttribute("loginUser", loginUser);
+        model.addAttribute("requestedRole",loginUser.getRole().name());
+
         return "/selectAcademy";
     }
 
@@ -242,7 +255,7 @@ public class AuthController {
     public String selectAcademy(@RequestParam Long academyId,
                                 @RequestParam String email,
                                 @RequestParam String phone,
-                                @RequestParam Integer schoolGrade,
+                                @RequestParam(required = false) String schoolGrade,
                                 HttpSession session){
         User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
         if (loginUser == null){

@@ -35,10 +35,21 @@
                 STUDENT
             </span>
 
+            <!--
             <a th:href="@{/logout}"
                class="logout-link">
                 로그아웃
             </a>
+            -->
+            <form th:action="@{/logout}"
+                  method="post">
+
+                <button type="submit"
+                        class="logout-button">
+                    로그아웃
+                </button>
+
+            </form>
 
         </th:block>
 

@@ -7,7 +7,10 @@ import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.service.auth.AcademyService;
 import com.example.EduPOP.service.auth.NaverService;
+import com.example.EduPOP.service.auth.SecurityLoginService;
 import com.example.EduPOP.service.auth.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +29,7 @@ public class AuthControllerNaver {
     private final NaverService naverService;
     private final UserService userService;
     private final AcademyService academyService;
+    private final SecurityLoginService securityLoginService;
 
     @Value("${naver.client-id}")
     private String clientId;
@@ -74,6 +78,8 @@ public class AuthControllerNaver {
             @RequestParam(required = false) String code,
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String error,
+            HttpServletRequest request,
+            HttpServletResponse response,
             HttpSession session
     ) {
         if (error != null || code == null || state == null) {
@@ -104,8 +110,15 @@ public class AuthControllerNaver {
                 naverUser = latestUser;
             }
 
-            session.setAttribute(SessionConst.LOGIN_USER, naverUser);
+            // session.setAttribute(SessionConst.LOGIN_USER, naverUser);
             session.removeAttribute("requestedRole");
+
+            // Spring Security 로그인
+            securityLoginService.login(
+                    naverUser,
+                    request,
+                    response
+            );
 
             if ((naverUser.getRole() == UserRole.STUDENT
                     || naverUser.getRole() == UserRole.TEACHER)
