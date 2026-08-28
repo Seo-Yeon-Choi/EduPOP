@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title>EduPOP - 스마트 OMR 채점 및 의견 관리</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <style>
@@ -192,6 +194,9 @@
 </div>
 
 <script>
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
     // 💡 [에러 해결] 전역 함수로 확실하게 빼낸 모달 제어 및 API 함수들
     function openCommentModal() {
         var modal = document.getElementById('commentModal');
@@ -265,7 +270,10 @@
 
         fetch('/exam/api/save-grades', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
             body: JSON.stringify(payload)
         })
             .then(function(res) { if (!res.ok) throw new Error('서버 처리 실패'); return res.json(); })
@@ -295,7 +303,10 @@
 
         fetch('/exam/api/save-comments', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
             body: JSON.stringify({ comments: comments })
         })
             .then(res => {
@@ -491,7 +502,10 @@
 
                     fetch('/exam/api/save-grades', {
                         method: 'POST',
-                        headers: { 'Type': 'application/json', 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
                         body: JSON.stringify(payload)
                     })
                         .then(function(res) { if (!res.ok) throw new Error('서버 처리 실패'); return res.json(); })

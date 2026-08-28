@@ -43,9 +43,16 @@ public class SecurityConfig {
                                 "/error"
                         ).permitAll()
 
+                        // 외부 공유 링크
+                        .requestMatchers(
+                                "/share/**"
+                        ).permitAll()
+
                         // 학생 전용
                         .requestMatchers(
                                 "/student/**",
+                                "/api/student-reports/**",
+                                "/api/exp/**",
                                 "/main/studentMain"
                         ).hasRole("STUDENT")
 
@@ -53,24 +60,29 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/teacher/**",
                                 "/exam/**",
-                                //"/classroom/**",
+                                "/analytics/**",
+                                "/api/teacher/**",
                                 "/main/teacherMain"
                         ).hasRole("TEACHER")
 
                         // 관리자 전용
                         .requestMatchers(
                                 "/admin/**",
-                                "/main/adminMain",
                                 "/classroom/**",
+                                "/main/adminMain",
+                                "/adminMain",
                                 "/adminWaiting"
                         ).hasRole("ADMIN")
 
                         // 로그인은 필요하지만 Role에 관계없는 페이지
                         .requestMatchers(
                                 "/account/**",
+                                "/register-page",
+                                "/academy/register",
                                 "/selectAcademy",
                                 "/blankPage",
-                                "/user/withdraw"
+                                "/user/withdraw",
+                                "/parent/**"
                         ).authenticated()
 
                         // 나머지는 기본적으로 로그인 필요
