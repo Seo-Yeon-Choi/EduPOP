@@ -69,8 +69,7 @@
             </div>
 
             <!-- 객관식 -->
-            <div th:if="${question.questionType ==
-                         T(com.example.EduPOP.domain.exam.QuestionType).MULTIPLE_CHOICE}"
+            <div th:if="${question.questionType == 'MULTIPLE_CHOICE'}"
                  class="choice-list">
 
                 <label th:each="choice : ${question.choices}"
@@ -93,8 +92,7 @@
             </div>
 
             <!-- 주관식 -->
-            <div th:if="${question.questionType ==
-                         T(com.example.EduPOP.domain.exam.QuestionType).SHORT_ANSWER}"
+            <div th:if="${question.questionType == 'SHORT_ANSWER'}"
                  class="short-answer">
 
                 <input type="text"
