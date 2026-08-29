@@ -1,5 +1,6 @@
 package com.example.EduPOP.controller.auth;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.service.auth.UserService;
@@ -67,7 +68,7 @@ public class AccountController {
                     confirmPassword
             );
 
-            session.setAttribute("loginUser", updatedUser);
+            session.setAttribute(SessionConst.LOGIN_USER, updatedUser);
             redirectAttributes.addFlashAttribute("message", "계정 정보가 수정되었습니다.");
             return "redirect:/account";
         } catch (IllegalArgumentException e) {
@@ -77,7 +78,7 @@ public class AccountController {
     }
 
     private User getLoginUser(HttpSession session) {
-        return (User) session.getAttribute("loginUser");
+        return (User) session.getAttribute(SessionConst.LOGIN_USER);
     }
 
     private void addAccountModel(Model model, User accountUser) {

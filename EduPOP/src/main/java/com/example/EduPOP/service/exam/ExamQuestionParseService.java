@@ -127,9 +127,10 @@ public class ExamQuestionParseService {
 
             question.setSortOrder(questionNumber);
 
-            question.setQuestionType(QuestionType.SHORT_ANSWER);
+            question.setQuestionType("SHORT_ANSWER");
 
-            question.setQuestionTypeTag("WORD_TO_MEANING");
+            question.setLargeCategory("");
+            question.setSmallCategory("");
 
             question.setQuestionText(wordPair.word());
 
@@ -165,8 +166,6 @@ public class ExamQuestionParseService {
 
         question.setScore(new BigDecimal("5.00"));
 
-        question.setQuestionTypeTag("OTHER");
-
         question.setSortOrder(number);
 
         // -------------------------------------
@@ -198,7 +197,7 @@ public class ExamQuestionParseService {
 
             String choicesText = block.substring(choiceStart).trim();
 
-            question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
+            question.setQuestionType("MULTIPLE_CHOICE");
 
             question.setChoices(parseChoices(choicesText));
         }
@@ -210,7 +209,7 @@ public class ExamQuestionParseService {
         else {
             beforeChoices = block.trim();
 
-            question.setQuestionType(QuestionType.SHORT_ANSWER);
+            question.setQuestionType("SHORT_ANSWER");
 
             question.setChoices(new ArrayList<>());
         }

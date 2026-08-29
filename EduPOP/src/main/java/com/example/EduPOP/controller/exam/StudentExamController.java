@@ -80,10 +80,8 @@ public class StudentExamController {
 
         Exam exam = studentExamService.getExam(examId);
 
-        if (exam.getExamType() != ExamType.WORD) {
-            throw new IllegalArgumentException(
-                    "단어 시험만 응시할 수 있습니다."
-            );
+        if (!"WORD".equalsIgnoreCase(exam.getExamType())) {
+            throw new IllegalArgumentException("단어 시험만 응시할 수 있습니다.");
         }
 
         ExamAttempt attempt =
@@ -123,7 +121,7 @@ public class StudentExamController {
                         examId
                 );
 
-        if (exam.getExamType() == ExamType.WORD) {
+        if ("WORD".equalsIgnoreCase(exam.getExamType())) {
             throw new IllegalArgumentException(
                     "단어 시험은 복습 방식이 아닙니다."
             );

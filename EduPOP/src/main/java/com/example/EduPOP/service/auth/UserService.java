@@ -4,6 +4,7 @@ import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.repository.user.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ public class UserService {
     );
 
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public boolean registerLocalUser(User user) {
@@ -28,15 +30,20 @@ public class UserService {
             return false;
         }
 
+        validatePassword(user.getPasswordHash());
+
+        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+
         user.setStatus(UserStatus.PENDING);
         userMapper.saveUser(user);
         return true;
     }
 
-    public User login(String loginId, String passwordHash) {
+    public User login(String loginId, String rawPassword) {
         User user = userMapper.findByLoginId(loginId);
 
-        if (user == null || !passwordHash.equals(user.getPasswordHash())) {
+        if (user == null ||
+                !passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
             return null;
         }
 
@@ -73,7 +80,7 @@ public class UserService {
             Long academyId,
             String email,
             String phone,
-            Integer schoolGrade
+            String schoolGrade
     ) {
         userMapper.updateKakaoUserInfo(userId, academyId, email, phone, schoolGrade);
     }
@@ -106,7 +113,19 @@ public class UserService {
             }
 
             String password = validateNewPassword(newPassword, confirmPassword);
-            userMapper.updateLocalAccount(userId, password, name, email, phone, schoolGrade);
+            String encodedPassword =
+                    password == null
+                            ? null
+                            : passwordEncoder.encode(password);
+
+            userMapper.updateLocalAccount(
+                    userId,
+                    encodedPassword,
+                    name,
+                    email,
+                    phone,
+                    schoolGrade
+            );
         }
 
         return userMapper.findByUserId(userId);
@@ -134,6 +153,25 @@ public class UserService {
         return "일반 로그인";
     }
 
+    private void validatePassword(String password) {
+        if (!hasText(password)) {
+            throw new IllegalArgumentException("비밀번호를 입력해주세요.");
+        }
+
+        if (password.length() < 8 || password.length() > 64) {
+            throw new IllegalArgumentException(
+                    "비밀번호는 8자 이상 64자 이하로 입력해주세요."
+            );
+        }
+
+        if (!password.matches(".*[A-Za-z].*")
+                || !password.matches(".*\\d.*")) {
+            throw new IllegalArgumentException(
+                    "비밀번호에는 영문과 숫자를 모두 포함해주세요."
+            );
+        }
+    }
+
     private String validateNewPassword(String newPassword, String confirmPassword) {
         String password = trimToNull(newPassword);
         String confirmation = trimToNull(confirmPassword);
@@ -146,9 +184,7 @@ public class UserService {
             throw new IllegalArgumentException("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
 
-        if (password.length() < 4) {
-            throw new IllegalArgumentException("새 비밀번호는 4자 이상 입력해주세요.");
-        }
+        validatePassword(password);
 
         return password;
     }

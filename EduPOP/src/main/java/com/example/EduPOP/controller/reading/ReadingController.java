@@ -1,5 +1,6 @@
 package com.example.EduPOP.controller.reading;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.domain.reading.Book;
 import com.example.EduPOP.domain.reading.ReadingFeedback;
 import com.example.EduPOP.domain.reading.ReadingReport;
@@ -726,7 +727,7 @@ public class ReadingController {
 
     private Long getLoginUserId(HttpSession session) {
 
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
             return null;

@@ -248,3 +248,235 @@
         gap: 6px;
     }
 }
+
+/* =================================
+   학원 검색
+================================= */
+
+.academy-search-group {
+    position: relative;
+}
+
+.academy-search-guide {
+    margin: -2px 0 10px;
+
+    font-size: 12px;
+    line-height: 1.5;
+
+    color: #888888;
+}
+
+.academy-search-box {
+    position: relative;
+}
+
+.academy-search-input {
+    width: 100%;
+
+    padding-right: 44px !important;
+
+    box-sizing: border-box;
+}
+
+.academy-search-icon {
+    position: absolute;
+
+    top: 50%;
+    right: 15px;
+
+    transform: translateY(-50%);
+
+    font-size: 15px;
+
+    pointer-events: none;
+}
+
+
+/* 검색 결과 */
+
+.academy-search-results {
+    position: absolute;
+
+    top: calc(100% - 2px);
+    left: 0;
+    right: 0;
+
+    z-index: 100;
+
+    max-height: 260px;
+
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe3e8;
+    border-radius: 10px;
+
+    box-shadow:
+            0 12px 30px rgba(0, 0, 0, 0.12);
+
+    box-sizing: border-box;
+}
+
+.academy-search-results[hidden] {
+    display: none !important;
+}
+
+/* 개별 검색 결과 */
+
+.academy-search-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    width: 100%;
+
+    padding: 14px 16px;
+
+    background: #ffffff;
+
+    border: none;
+    border-bottom: 1px solid #eeeeee;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+
+    transition: background-color 0.15s ease;
+}
+
+.academy-search-item[hidden] {
+    display: none !important;
+}
+
+.academy-search-item:last-of-type {
+    border-bottom: none;
+}
+
+.academy-search-item:hover {
+    background: #f5f7ff;
+}
+
+.academy-result-name {
+    margin-bottom: 5px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    color: #222222;
+}
+
+.academy-result-address {
+    font-size: 12px;
+    line-height: 1.5;
+
+    color: #777777;
+}
+
+
+/* 결과 없음 */
+
+.academy-empty-result {
+    padding: 20px;
+
+    text-align: center;
+
+    font-size: 13px;
+
+    color: #999999;
+}
+
+.academy-empty-result[hidden] {
+    display: none !important;
+}
+
+/* 선택된 학원 */
+
+.selected-academy {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
+
+    margin-top: 10px;
+    padding: 13px 15px;
+
+    background: #f5f7ff;
+
+    border: 1px solid #dce3ff;
+    border-radius: 9px;
+}
+
+.selected-academy[hidden] {
+    display: none;
+}
+
+.selected-academy-info {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+.selected-academy-label {
+    margin-bottom: 3px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    color: #4f6ef7;
+}
+
+#selectedAcademyName {
+    margin-bottom: 3px;
+
+    font-size: 14px;
+
+    color: #222222;
+}
+
+.selected-academy-address {
+    font-size: 12px;
+
+    color: #777777;
+}
+
+
+/* 학원 변경 */
+
+.academy-change-button {
+    flex-shrink: 0;
+
+    padding: 7px 12px;
+
+    background: #ffffff;
+
+    border: 1px solid #cfd6f6;
+    border-radius: 7px;
+
+    color: #4f6ef7;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.academy-change-button:hover {
+    background: #eef1ff;
+}
+
+
+/* 학원 선택 오류 */
+
+.academy-error {
+    margin: 7px 0 0;
+
+    font-size: 12px;
+
+    color: #ef4444;
+}

@@ -301,6 +301,13 @@
     transform: translateY(0);
 }
 
+input.readonly-input {
+    background-color: #f3f4f6;
+    color: #777777;
+    border: 1px solid #d1d5db;
+    cursor: not-allowed;
+}
+
 
 /* 반응형 */
 

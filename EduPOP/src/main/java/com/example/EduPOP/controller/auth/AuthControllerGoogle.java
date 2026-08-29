@@ -1,12 +1,16 @@
 package com.example.EduPOP.controller.auth;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.domain.user.Academy;
 import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.service.auth.AcademyService;
 import com.example.EduPOP.service.auth.GoogleService;
+import com.example.EduPOP.service.auth.SecurityLoginService;
 import com.example.EduPOP.service.auth.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +29,7 @@ public class AuthControllerGoogle {
     private final GoogleService googleService;
     private final UserService userService;
     private final AcademyService academyService;
+    private final SecurityLoginService securityLoginService;
 
     @Value("${google.client-id}")
     private String clientId;
@@ -89,6 +94,8 @@ public class AuthControllerGoogle {
             @RequestParam(required = false) String code,
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String error,
+            HttpServletRequest request,
+            HttpServletResponse response,
             HttpSession session
     ) {
 
@@ -113,7 +120,7 @@ public class AuthControllerGoogle {
         }
 
         String requestedRole =
-                (String) session.getAttribute("requestedRole");
+                (String) session.getAttribute(SessionConst.REQUESTED_ROLE);
 
         /*
          * 역할을 미리 선택하지 않고 Google 로그인을 누른 경우
@@ -136,8 +143,15 @@ public class AuthControllerGoogle {
                 googleUser = latestUser;
             }
 
-            session.setAttribute("loginUser", googleUser);
+            // session.setAttribute(SessionConst.LOGIN_USER, googleUser);
             session.removeAttribute("requestedRole");
+
+            // SpringSecurity 로그인
+            securityLoginService.login(
+                    googleUser,
+                    request,
+                    response
+            );
 
             /*
              * 신규 소셜 회원이거나

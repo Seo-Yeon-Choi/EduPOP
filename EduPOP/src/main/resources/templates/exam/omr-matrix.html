@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>EduPOP - 스마트 OMR 채점 및 의견 관리</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; }
+        .page-content-wrapper { margin-left: 240px !important; margin-top: 70px !important; padding: 24px 32px; min-height: calc(100vh - 70px); background-color: #f8fafc; }
+        .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px; }
+        .header-top-box { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .master-container { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; }
+        .master-header { display: flex; justify-content: space-between; align-items: center; }
+        .master-title { font-size: 13px; font-weight: 700; color: #334155; }
+        .chip-info-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; background: #eff6ff; color: #1e40af; padding: 4px 10px; border-radius: 6px; border: 1px solid #bfdbfe; font-weight: 600; }
+        .master-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; margin-bottom: 12px; }
+        .chip { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 8px; min-width: 44px; cursor: pointer; transition: all 0.15s ease; }
+        .chip:hover { background: #f1f5f9; }
+        .chip.active { background: #2563eb !important; border-color: #1d4ed8 !important; }
+        .chip.active .q-label { color: #dbeafe !important; }
+        .chip.active .q-val { color: #ffffff !important; }
+        .chip .q-label { font-size: 10px; font-weight: 600; color: #64748b; }
+        .chip .q-val { font-size: 13px; font-weight: 700; color: #0f172a; }
+        .common-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .common-table th { background-color: #f8fafc; color: #475569; font-weight: 600; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 12px 10px; text-align: center; }
+        .common-table td { border-bottom: 1px solid #e2e8f0; padding: 12px 10px; text-align: center; vertical-align: middle; }
+        .form-input { width: 100%; max-width: 360px; height: 38px; padding: 0 12px; font-family: monospace; font-weight: 700; font-size: 14px; letter-spacing: 1.5px; color: #0f172a; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; text-align: left !important; }
+        .form-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+        .form-input[readonly] { background-color: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+        .ox-wrap { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-start; max-height: 80px; overflow-y: auto; }
+        .ox-item { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; min-width: 26px; height: 22px; font-size: 11px; font-weight: 700; border-radius: 4px; }
+        .ox-pass { background-color: #dcfce7; color: #15803d; }
+        .ox-fail { background-color: #fee2e2; color: #b91c1c; }
+        .ox-none { background-color: #f1f5f9; color: #94a3b8; }
+        .ox-curr { border: 1.5px solid #2563eb !important; background-color: #eff6ff !important; color: #1d4ed8 !important; }
+        .score-badge { font-weight: 700; font-size: 16px; color: #2563eb; background-color: #eff6ff; padding: 4px 12px; border-radius: 6px; }
+        .count-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+        .count-pill.done { background: #dcfce7; color: #15803d; border-color: #86efac; }
+        .btn-primary { background-color: #2563eb; color: #ffffff; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap; }
+        .btn-secondary { background-color: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap; }
+        .btn-secondary:hover { background-color: #f1f5f9; }
+        .btn-row-action { padding: 6px 10px; font-size: 12px; font-weight: 600; border-radius: 6px; cursor: pointer; border: 1px solid #cbd5e1; background-color: #ffffff; color: #334155; transition: all 0.15s ease; white-space: nowrap; }
+        .btn-row-action.edit-mode { background-color: #10b981; color: #ffffff; border-color: #059669; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-box { background: #ffffff; border-radius: 10px; width: 580px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .toast-container { position: fixed; top: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast-card { min-width: 280px; padding: 14px 18px; border-radius: 8px; background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: #1e293b; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: auto; border-left: 4px solid #2563eb; }
+        .toast-card.show { opacity: 1; transform: translateY(0); }
+        .toast-card.success { border-left-color: #10b981; }
+        .toast-card.error { border-left-color: #ef4444; }
+    </style>
+</head>
+<body>
+
+<th:block th:replace="~{layout/header :: header}"></th:block>
+<th:block th:replace="~{layout/sidebar-teacher :: sidebar}"></th:block>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<div class="page-content-wrapper">
+
+    <!-- 상단 헤더 영역 -->
+    <div class="card header-top-box" style="display: flex; flex-direction: column; gap: 12px; padding: 20px 24px;">
+        <div style="width: 100%;">
+            <a th:href="@{/exam/list}" style="text-decoration: none; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px; display: inline-block;">← 시험 목록으로 돌아가기</a>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
+            <div>
+                <h1 style="margin: 0 0 6px 0; font-size: 22px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 12px; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 6px;" th:text="${exam.examRound} + '회차'">1회차</span>
+                    <span th:text="${exam.title}">시험명</span>
+                </h1>
+                <p style="margin: 0; color: #64748b; font-size: 14px;">
+                    배정 반: <b style="color: #0f172a;" th:text="${exam.className}">반 이름</b>
+                    <span style="margin: 0 8px; color: #cbd5e1;">|</span>
+                    시행일: <span th:text="${exam.examDate}">2026-08-25</span>
+                    <span style="margin: 0 8px; color: #cbd5e1;">|</span>
+                    문항수: <span style="color: #2563eb; font-weight: bold;" th:text="${exam.questions.size()} + '문항'">20문항</span>
+                </p>
+            </div>
+
+            <div class="header-actions">
+                <a th:href="@{/analytics/class-trend(examId=${exam.examId}, classId=${exam.classId})}"
+                   class="btn-secondary" style="color: #2563eb; border-color: #bfdbfe; background: #eff6ff; text-decoration: none; padding: 8px 12px; height: 40px; display: inline-flex; align-items: center;">
+                    📊 반 성적 분석 보기
+                </a>
+                <button type="button" onclick="openCommentModal()" class="btn-secondary" style="height: 40px;">✍️ 학생별 의견작성</button>
+
+                <div style="width: 1px; height: 24px; background-color: #cbd5e1; margin: 0 4px;"></div>
+
+                <button type="button" id="btnSaveGrades" class="btn-primary" style="height: 40px; background-color: #4f46e5;">💾 반 전체 점수 일괄 저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 전체 정답 기준표 -->
+    <div class="master-container">
+        <div class="master-header">
+            <span class="master-title">📋 전체 정답 기준표 (<span th:text="${exam.questions.size()}">20</span>문항) - <span style="color: #64748b; font-weight: normal; font-size: 11px;">번호를 누르면 문항 정보를 볼 수 있습니다.</span></span>
+
+            <div id="chipInfoBadge" class="chip-info-badge" style="display: none;">
+                <span id="badgeQNum">1번 문항</span> |
+                <span>영역: <b id="badgeQType" style="color: #2563eb;">VOCAB</b></span> |
+                <span>배점: <b id="badgeQScore" style="color: #2563eb;">5점</b></span> |
+                <span>정답: <b id="badgeQAns" style="color: #15803d;">3</b></span>
+            </div>
+        </div>
+
+        <div class="master-grid" id="masterChipGrid">
+            <div th:each="q : ${exam.questions}" class="chip"
+                 th:data-qid="${q.questionId}"
+                 th:data-qnum="${q.questionNumber}"
+                 th:data-qtype="${q.questionType}"
+                 th:data-score="${q.score}"
+                 th:data-ans="${q.correctAnswer}">
+                <span class="q-label" th:text="${q.questionNumber} + '번'">1번</span>
+                <span class="q-val" th:text="${q.correctAnswer}">1</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="padding: 12px 20px;">
+        <table class="common-table" id="omrTable" th:data-exam-id="${exam.examId}">
+            <thead>
+            <tr>
+                <th style="width: 140px;">수강생</th>
+                <th style="width: 480px;">답안 고속 입력 및 개별 저장</th>
+                <th>실시간 정오답(O/X) 현황</th>
+                <th style="width: 100px;">총점</th>
+            </tr>
+            </thead>
+            <tbody id="studentRowList">
+            <tr th:each="stu : ${exam.students}" class="student-row"
+                th:data-student-id="${stu.studentId}"
+                th:data-student-name="${stu.studentName}">
+                <td>
+                    <div style="font-weight: 700; color: #0f172a;" th:text="${stu.studentName}">김철수</div>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px;">
+                        <span style="font-size: 11px; color: #94a3b8;" th:text="${stu.schoolGrade}">중2</span>
+                        <a th:href="@{/analytics/student-trend(studentId=${stu.studentId}, examId=${exam.examId})}"
+                           class="btn-secondary" style="padding: 2px 6px; font-size: 10px; color: #2563eb; border-color: #bfdbfe; background: #eff6ff; text-decoration: none;">
+                            📊 성적분석
+                        </a>
+                    </div>
+                </td>
+                <td style="text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="text" class="form-input" placeholder="답안을 입력하세요..."
+                               th:value="${stu.savedAnswers}"
+                               th:readonly="${stu.isGraded}">
+                        <span class="count-pill"><span class="curr-cnt">0</span>/<span th:text="${exam.questions.size()}">20</span></span>
+
+                        <button type="button" class="btn-row-action"
+                                onclick="handleRowAction(this)"
+                                th:text="${stu.isGraded != null and stu.isGraded ? '수정' : '💾 저장'}">수정</button>
+                    </div>
+                </td>
+                <td><div class="ox-wrap"></div></td>
+                <td><span class="score-badge student-total-score">0</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 학생별 의견 작성 모달창 -->
+<div id="commentModal" class="modal-overlay">
+    <div class="modal-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 16px; font-weight: 800;">✍️ 학부모 리포트용 코멘트 작성</h3>
+            <span style="cursor: pointer; font-size: 18px; color: #94a3b8;" onclick="closeCommentModal()">✕</span>
+        </div>
+        <div style="max-height: 400px; overflow-y: auto;">
+            <div th:each="stu : ${exam.students}" style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;" th:text="${stu.studentName} + ' 학생'"></label>
+                <!-- 💡 [에러 해결] teacherComment 바인딩 시 안전하게 출력 -->
+                <textarea class="form-input comment-textarea"
+                          th:data-student-id="${stu.studentId}"
+                          th:text="${stu.teacherComment != null ? stu.teacherComment : ''}"
+                          style="height: 60px; padding: 8px 12px; resize: vertical; line-height: 1.4; font-family: sans-serif; letter-spacing: normal;"
+                          placeholder="학부모 리포트에 반영될 코멘트를 작성해주세요."></textarea>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+            <button type="button" class="btn-secondary" onclick="closeCommentModal()">취소</button>
+            <button type="button" class="btn-primary" onclick="saveComments()">의견 저장하기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+    // 💡 [에러 해결] 전역 함수로 확실하게 빼낸 모달 제어 및 API 함수들
+    function openCommentModal() {
+        var modal = document.getElementById('commentModal');
+        if(modal) modal.style.display = 'flex';
+    }
+
+    function closeCommentModal() {
+        var modal = document.getElementById('commentModal');
+        if(modal) modal.style.display = 'none';
+    }
+
+    function showToast(message, type) {
+        type = type || 'success';
+        var container = document.getElementById('toastContainer');
+        var toast = document.createElement('div');
+        toast.className = 'toast-card ' + type;
+        var icon = (type === 'success') ? '✅' : '⚠️';
+        toast.innerHTML = '<span>' + icon + '</span> <span>' + message + '</span>';
+        container.appendChild(toast);
+        setTimeout(function() { toast.classList.add('show'); }, 10);
+        setTimeout(function() {
+            toast.classList.remove('show');
+            setTimeout(function() { toast.remove(); }, 300);
+        }, 2500);
+    }
+
+    function handleRowAction(btn) {
+        var row = btn.closest('.student-row');
+        var input = row.querySelector('.form-input');
+        var isReadOnly = input.hasAttribute('readonly');
+
+        if (isReadOnly) {
+            input.removeAttribute('readonly');
+            input.focus();
+            var valLen = input.value.length;
+            input.setSelectionRange(valLen, valLen);
+            btn.innerText = '💾 저장';
+            btn.classList.add('edit-mode');
+            showToast(row.getAttribute('data-student-name') + ' 학생의 답안 수정 모드가 활성화되었습니다.', 'success');
+        } else {
+            saveSingleStudent(row, btn);
+        }
+    }
+
+    function saveSingleStudent(row, btn) {
+        var examId = parseInt(document.getElementById('omrTable').getAttribute('data-exam-id')) || 1;
+        var studentId = parseInt(row.getAttribute('data-student-id')) || 0;
+        var studentName = row.getAttribute('data-student-name') || '';
+        var input = row.querySelector('.form-input');
+        var tokens = extractTokens(input.value);
+
+        var ta = document.querySelector('.comment-textarea[data-student-id="' + studentId + '"]');
+        var comment = ta ? ta.value.trim() : "";
+
+        var chips = document.querySelectorAll('.chip');
+        var answers = [];
+
+        for (var i = 0; i < chips.length; i++) {
+            var c = chips[i];
+            answers.push({
+                questionId: parseInt(c.getAttribute('data-qid')) || 0,
+                questionNumber: parseInt(c.getAttribute('data-qnum')) || (i + 1),
+                submittedAnswer: tokens[i] || '',
+                correctAnswer: (c.getAttribute('data-ans') || '').trim(),
+                score: parseFloat(c.getAttribute('data-score')) || 5,
+                questionType: c.getAttribute('data-qtype') || 'VOCAB'
+            });
+        }
+
+        var payload = { examId: examId, studentGrades: [{ studentId: studentId, answers: answers, teacherComment: comment }] };
+
+        fetch('/exam/api/save-grades', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(function(res) { if (!res.ok) throw new Error('서버 처리 실패'); return res.json(); })
+            .then(function(data) {
+                input.setAttribute('readonly', 'readonly');
+                btn.innerText = '수정';
+                btn.classList.remove('edit-mode');
+                showToast(studentName + ' 학생의 채점 결과가 성공적으로 저장되었습니다!', 'success');
+            })
+            .catch(function(err) {
+                showToast(studentName + ' 학생의 성적 저장 중 오류가 발생했습니다.', 'error');
+            });
+    }
+
+    function saveComments() {
+        var comments = [];
+        document.querySelectorAll('.comment-textarea').forEach(function(ta) {
+            var sid = parseInt(ta.getAttribute('data-student-id'));
+            var txt = ta.value.trim();
+            if (txt.length >= 0) { comments.push({ studentId: sid, comment: txt }); }
+        });
+
+        if(comments.length === 0) {
+            closeCommentModal();
+            return;
+        }
+
+        fetch('/exam/api/save-comments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify({ comments: comments })
+        })
+            .then(res => {
+                if(!res.ok) throw new Error();
+                showToast('작성하신 학생별 의견이 성공적으로 저장되었습니다.', 'success');
+                closeCommentModal();
+            })
+            .catch(err => {
+                showToast('의견 저장 중 서버 오류가 발생했습니다.', 'error');
+            });
+    }
+
+    function showExamStats(examId, classId) {
+        if (!classId) classId = 1;
+        fetch(`/exam/api/stats?examId=${examId}&classId=${classId}`)
+            .then(res => res.json())
+            .then(data => {
+                alert(`📊 [성적 통계 요약]\n\n해당 반 평균: ${data.classAvg}점\n시험 전체 응시자 평균: ${data.totalAvg}점`);
+            })
+            .catch(err => {
+                alert('통계 데이터를 불러올 수 없습니다.');
+            });
+    }
+
+    (function() {
+        function getQuestionList() {
+            var chips = document.querySelectorAll('.chip');
+            var list = [];
+            for (var i = 0; i < chips.length; i++) {
+                var c = chips[i];
+                list.push({
+                    id: parseInt(c.getAttribute('data-qid')) || 0,
+                    num: parseInt(c.getAttribute('data-qnum')) || (i + 1),
+                    type: c.getAttribute('data-qtype') || 'VOCAB',
+                    score: parseFloat(c.getAttribute('data-score')) || 5,
+                    ans: (c.getAttribute('data-ans') || '').trim()
+                });
+            }
+            return list;
+        }
+
+        window.extractTokens = function(val) {
+            if (!val) return [];
+            var trimmed = val.trim();
+            if (!trimmed) return [];
+            var rawSegments = [];
+            var quoteRegex = /"([^"]*)"|([^"]+)/g;
+            var match;
+            while ((match = quoteRegex.exec(trimmed)) !== null) {
+                if (match[1] !== undefined) { if (match[1].trim().length > 0) rawSegments.push({ isQuote: true, text: match[1].trim() }); }
+                else if (match[2] !== undefined) { if (match[2].trim().length > 0) rawSegments.push({ isQuote: false, text: match[2].trim() }); }
+            }
+            var finalTokens = [];
+            rawSegments.forEach(function(seg) {
+                if (seg.isQuote) { finalTokens.push(seg.text); }
+                else {
+                    var parts = seg.text.split(/[\s/]+/).filter(function(p) { return p.length > 0; });
+                    parts.forEach(function(part) {
+                        if (/^[\d\-]+$/.test(part)) { for (var j = 0; j < part.length; j++) finalTokens.push(part[j]); }
+                        else { finalTokens.push(part); }
+                    });
+                }
+            });
+            return finalTokens;
+        };
+
+        function evaluateRow(row, input, qList) {
+            var tokens = extractTokens(input.value);
+            var totalQ = qList.length;
+            if (tokens.length > totalQ && totalQ > 0) tokens = tokens.slice(0, totalQ);
+            var oxBox = row.querySelector('.ox-wrap');
+            oxBox.innerHTML = '';
+            var score = 0;
+            var tokenLen = tokens.length;
+            var currCntSpan = row.querySelector('.curr-cnt');
+            var progBadge = row.querySelector('.count-pill');
+            if (currCntSpan) currCntSpan.innerText = tokenLen;
+            if (progBadge) {
+                if (tokenLen >= totalQ && totalQ > 0) {
+                    progBadge.classList.add('done');
+                    progBadge.innerText = totalQ + '/' + totalQ + ' 완료 ✓';
+                } else {
+                    progBadge.classList.remove('done');
+                    progBadge.innerHTML = '<span class="curr-cnt">' + tokenLen + '</span>/' + totalQ;
+                }
+            }
+            for (var idx = 0; idx < qList.length; idx++) {
+                var q = qList[idx];
+                var sub = tokens[idx];
+                var isAnswered = (sub !== undefined && sub !== '');
+                var isSkipped = (sub === '0' || sub === '-');
+                var isCorrect = isAnswered && !isSkipped && (String(sub).trim().toLowerCase() === String(q.ans).trim().toLowerCase());
+                var badge = document.createElement('span');
+                badge.className = 'ox-item';
+                if (!isAnswered) {
+                    if (idx === tokenLen) { badge.className += ' ox-curr'; badge.innerText = (idx + 1) + '번▶'; }
+                    else { badge.className += ' ox-none'; badge.innerText = (idx + 1) + ':-'; }
+                } else if (isCorrect) {
+                    badge.className += ' ox-pass'; badge.innerText = (idx + 1) + ':O'; score += q.score;
+                } else if (isSkipped) {
+                    badge.className += ' ox-fail'; badge.style.backgroundColor = '#fef3c7'; badge.style.color = '#b45309'; badge.innerText = (idx + 1) + ':미응시';
+                } else {
+                    badge.className += ' ox-fail'; badge.innerText = (idx + 1) + ':X(' + sub + ')';
+                }
+                oxBox.appendChild(badge);
+            }
+            var scoreSpan = row.querySelector('.student-total-score');
+            if (scoreSpan) scoreSpan.innerText = score;
+        }
+
+        function initApp() {
+            var qList = getQuestionList();
+            var rows = document.querySelectorAll('.student-row');
+            var inputs = document.querySelectorAll('.form-input');
+
+            var chips = document.querySelectorAll('.chip');
+            var infoBadge = document.getElementById('chipInfoBadge');
+            var bNum = document.getElementById('badgeQNum');
+            var bType = document.getElementById('badgeQType');
+            var bScore = document.getElementById('badgeQScore');
+            var bAns = document.getElementById('badgeQAns');
+
+            chips.forEach(function(chip) {
+                chip.addEventListener('click', function() {
+                    chips.forEach(function(c) { c.classList.remove('active'); });
+                    chip.classList.add('active');
+                    if(bNum) bNum.innerText = (chip.getAttribute('data-qnum') || '1') + '번 문항';
+                    if(bType) bType.innerText = chip.getAttribute('data-qtype') || '공통';
+                    if(bScore) bScore.innerText = (chip.getAttribute('data-score') || '5') + '점';
+                    if(bAns) bAns.innerText = chip.getAttribute('data-ans') || '-';
+                    if(infoBadge) infoBadge.style.display = 'inline-flex';
+                });
+            });
+
+            rows.forEach(function(row, rIdx) {
+                var input = row.querySelector('.form-input');
+                evaluateRow(row, input, qList);
+
+                input.addEventListener('input', function() { evaluateRow(row, input, qList); });
+                input.addEventListener('keydown', function(e) {
+                    if (input.hasAttribute('readonly')) return;
+                    var currentTokens = extractTokens(input.value);
+                    var totalQ = qList.length;
+                    var allowKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab', 'Enter'];
+                    if (allowKeys.indexOf(e.key) !== -1 || e.ctrlKey || e.metaKey) {
+                        if (e.key === 'Enter' || e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            if (rIdx + 1 < inputs.length) { inputs[rIdx + 1].focus(); inputs[rIdx + 1].select(); }
+                        } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            if (rIdx - 1 >= 0) { inputs[rIdx - 1].focus(); inputs[rIdx - 1].select(); }
+                        }
+                        return;
+                    }
+                    if (currentTokens.length >= totalQ && totalQ > 0) e.preventDefault();
+                });
+            });
+
+            var btnSave = document.getElementById('btnSaveGrades');
+            if (btnSave) {
+                btnSave.addEventListener('click', function() {
+                    var examId = parseInt(document.getElementById('omrTable').getAttribute('data-exam-id')) || 1;
+                    var studentGrades = [];
+
+                    var commentsMap = {};
+                    document.querySelectorAll('.comment-textarea').forEach(function(ta) {
+                        var sid = parseInt(ta.getAttribute('data-student-id'));
+                        commentsMap[sid] = ta.value.trim();
+                    });
+
+                    rows.forEach(function(row) {
+                        var studentId = parseInt(row.getAttribute('data-student-id')) || 0;
+                        var tokens = extractTokens(row.querySelector('.form-input').value);
+                        var answers = [];
+                        qList.forEach(function(q, idx) {
+                            answers.push({
+                                questionId: q.id,
+                                questionNumber: q.num,
+                                submittedAnswer: tokens[idx] || '',
+                                correctAnswer: q.ans,
+                                score: q.score,
+                                questionType: q.type
+                            });
+                        });
+                        studentGrades.push({
+                            studentId: studentId,
+                            answers: answers,
+                            teacherComment: commentsMap[studentId] || ""
+                        });
+                    });
+
+                    var payload = { examId: examId, studentGrades: studentGrades };
+
+                    fetch('/exam/api/save-grades', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                        .then(function(res) { if (!res.ok) throw new Error('서버 처리 실패'); return res.json(); })
+                        .then(function(data) {
+                            showToast('반 전체 채점 결과가 성공적으로 저장되었습니다.', 'success');
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
+                        })
+                        .catch(function(err) {
+                            showToast('채점 결과 저장 중 오류가 발생했습니다.', 'error');
+                        });
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+    })();
+</script>
+</body>
+</html>

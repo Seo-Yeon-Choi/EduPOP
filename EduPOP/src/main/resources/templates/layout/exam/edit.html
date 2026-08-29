@@ -3,141 +3,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="|EduPOP - ${exam.title} 수정|">EduPOP - 시험지 수정</title>
+
+    <meta name="_csrf"
+          th:content="${_csrf.token}">
+
+    <meta name="_csrf_header"
+          th:content="${_csrf.headerName}">
+
+    <title th:text="|EduPOP - ${exam.title} 수정|">
+        EduPOP - 시험지 수정
+    </title>
+
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/exam-detail.css}">
 </head>
+
 <body>
 
 <div th:replace="~{layout/header :: header}"></div>
 <div th:replace="~{layout/sidebar-teacher :: sidebar}"></div>
 
-<main id="examEditPage" class="exam-detail-container" th:attr="data-exam-id=${exam.examId}">
+<main id="examEditPage"
+      class="exam-detail-container"
+      th:attr="data-exam-id=${exam.examId}">
+
     <header class="page-header">
+
         <div>
-            <span class="page-eyebrow">시험지 수정</span>
-            <h1 th:text="${exam.title}">8월 월말 평가</h1>
-            <p>기존 시험 정보와 문항 내용만 수정할 수 있습니다.</p>
+            <span class="page-eyebrow">
+                시험지 수정
+            </span>
+
+            <h1 th:text="${exam.title}">
+                8월 월말 평가
+            </h1>
+
+            <p>
+                기존 시험 정보와 문항 내용만 수정할 수 있습니다.
+            </p>
         </div>
+
         <div class="header-actions">
+
             <a class="secondary-button"
-               th:href="@{/teacher/exams/{examId}(examId=${exam.examId})}">취소</a>
-            <button type="button" id="saveExamButton" class="primary-button">변경사항 저장</button>
+               th:href="@{/teacher/exams/{examId}(examId=${exam.examId})}">
+                취소
+            </a>
+
+            <button type="button"
+                    id="saveExamButton"
+                    class="primary-button">
+                변경사항 저장
+            </button>
+
         </div>
+
     </header>
+
 
     <div class="safety-notice">
         학생 채점 데이터 보호를 위해 문항과 선지의 추가·삭제 및 문제 유형 변경은 지원하지 않습니다.
     </div>
 
+
+    <!-- ========================================= -->
+    <!-- 시험 기본 정보 -->
+    <!-- ========================================= -->
+
     <section class="info-card">
+
         <h2>시험 기본 정보</h2>
+
         <div class="edit-grid">
+
+            <!-- 대상 반 -->
             <div class="form-group">
-                <label for="classId">대상 반</label>
+
+                <label for="classId">
+                    대상 반
+                </label>
+
                 <select id="classId" required>
+
                     <option th:each="classItem : ${classes}"
                             th:value="${classItem.classId}"
                             th:selected="${classItem.classId == exam.classId}"
-                            th:text="|${classItem.name} (${classItem.targetGrade})|">중등 심화 A반</option>
+                            th:text="|${classItem.name} (${classItem.targetGrade})|">
+                        중등 심화 A반
+                    </option>
+
                 </select>
+
             </div>
+
+
+            <!-- 시험명 -->
             <div class="form-group wide-field">
-                <label for="examTitle">시험명</label>
-                <input type="text" id="examTitle" th:value="${exam.title}" required>
+
+                <label for="examTitle">
+                    시험명
+                </label>
+
+                <input type="text"
+                       id="examTitle"
+                       th:value="${exam.title}"
+                       required>
+
             </div>
+
+
+            <!-- 시험 종류 -->
             <div class="form-group">
-                <label for="examType">시험 종류</label>
-                <select id="examType">
-                    <option value="WORD" th:selected="${exam.examType.name() == 'WORD'}">단어 시험</option>
-                    <option value="MONTHLY" th:selected="${exam.examType.name() == 'MONTHLY'}">월말 평가</option>
-                    <option value="REVIEW" th:selected="${exam.examType.name() == 'REVIEW'}">복습 시험</option>
-                    <option value="OTHER" th:selected="${exam.examType.name() == 'OTHER'}">기타</option>
+
+                <label for="examType">
+                    시험 종류
+                </label>
+
+                <!--
+                    실제 option은 /exam/api/categories 결과로 생성한다.
+                    기존 시험의 시험분류 값은 data-current-value에 보관.
+                -->
+                <select id="examType"
+                        required
+                        th:attr="data-current-value=${exam.examType}">
+
+                    <option value="">
+                        시험 종류를 선택하세요
+                    </option>
+
                 </select>
+
             </div>
+
+
+            <!-- 시험 방식 -->
             <div class="form-group">
-                <label for="examMode">시험 방식</label>
+
+                <label for="examMode">
+                    시험 방식
+                </label>
+
                 <select id="examMode">
-                    <option value="PAPER" th:selected="${exam.examMode.name() == 'PAPER'}">종이 시험</option>
-                    <option value="ONLINE" th:selected="${exam.examMode.name() == 'ONLINE'}">온라인 시험</option>
+
+                    <option value="PAPER"
+                            th:selected="${exam.examMode != null and exam.examMode.name() == 'PAPER'}">
+                        종이 시험
+                    </option>
+
+                    <option value="ONLINE"
+                            th:selected="${exam.examMode != null and exam.examMode.name() == 'ONLINE'}">
+                        온라인 시험
+                    </option>
+
                 </select>
+
             </div>
+
+
+            <!-- 시험일 -->
             <div class="form-group">
-                <label for="examDate">시험일</label>
-                <input type="date" id="examDate" th:value="${exam.examDate}">
+
+                <label for="examDate">
+                    시험일
+                </label>
+
+                <input type="date"
+                       id="examDate"
+                       th:value="${exam.examDate}">
+
             </div>
+
+
+            <!-- 시험 상태 -->
             <div class="form-group">
-                <label for="examStatus">상태</label>
+
+                <label for="examStatus">
+                    상태
+                </label>
+
                 <select id="examStatus">
-                    <option value="DRAFT" th:selected="${exam.status.name() == 'DRAFT'}">작성 중</option>
-                    <option value="OPEN" th:selected="${exam.status.name() == 'OPEN'}">응시 가능</option>
-                    <option value="CLOSED" th:selected="${exam.status.name() == 'CLOSED'}">종료</option>
+
+                    <option value="DRAFT"
+                            th:selected="${exam.status != null and exam.status.name() == 'DRAFT'}">
+                        작성 중
+                    </option>
+
+                    <option value="OPEN"
+                            th:selected="${exam.status != null and exam.status.name() == 'OPEN'}">
+                        응시 가능
+                    </option>
+
+                    <option value="CLOSED"
+                            th:selected="${exam.status != null and exam.status.name() == 'CLOSED'}">
+                        종료
+                    </option>
+
                 </select>
+
             </div>
+
         </div>
+
     </section>
 
+
+    <!-- ========================================= -->
+    <!-- 문항 수정 -->
+    <!-- ========================================= -->
+
     <section class="question-section">
+
         <div class="section-title-row">
-            <h2>문항 수정</h2>
-            <span class="question-count" th:text="|총 ${#lists.size(exam.questions)}문항|">총 10문항</span>
+
+            <h2>
+                문항 수정
+            </h2>
+
+            <span class="question-count"
+                  th:text="|총 ${#lists.size(exam.questions)}문항|">
+                총 10문항
+            </span>
+
         </div>
+
+
+        <div class="empty-question"
+             th:if="${#lists.isEmpty(exam.questions)}">
+            등록된 문항이 없습니다.
+        </div>
+
 
         <article class="question-card question-edit-card"
                  th:each="question : ${exam.questions}"
                  th:attr="data-question-id=${question.questionId}">
+
+
+            <!-- 문항 헤더 -->
             <div class="question-card-header">
+
                 <div>
-                    <span class="question-number" th:text="|${question.questionNumber}번|">1번</span>
-                    <span class="type-badge" th:text="${question.questionType}">MULTIPLE_CHOICE</span>
+
+                    <span class="question-number"
+                          th:text="|${question.questionNumber}번|">
+                        1번
+                    </span>
+
+                    <span class="type-badge"
+                          th:text="${question.questionType}">
+                        MULTIPLE_CHOICE
+                    </span>
+
                 </div>
-                <span class="locked-label">구조 변경 불가</span>
+
+                <span class="locked-label">
+                    구조 변경 불가
+                </span>
+
             </div>
 
+
+            <!-- 문항 메타 정보 -->
             <div class="edit-grid question-meta-grid">
+
+
+                <!-- 배점 -->
                 <div class="form-group">
-                    <label>배점</label>
-                    <input type="number" class="question-score" min="0" step="0.5" th:value="${question.score}">
+
+                    <label>
+                        배점
+                    </label>
+
+                    <input type="number"
+                           class="question-score"
+                           min="0"
+                           step="0.5"
+                           th:value="${question.score}">
+
                 </div>
-                <div class="form-group wide-field">
-                    <label>문제 유형 태그</label>
-                    <input type="text" class="question-type-tag" th:value="${question.questionTypeTag}">
+
+
+                <!-- 대분류 -->
+                <div class="form-group">
+
+                    <label>
+                        대분류
+                    </label>
+
+                    <select class="question-large-category"
+                            required
+                            th:attr="data-current-value=${question.largeCategory}">
+
+                        <option value="">
+                            대분류를 선택하세요
+                        </option>
+
+                    </select>
+
                 </div>
+
+
+                <!-- 소분류 -->
+                <div class="form-group">
+
+                    <label>
+                        소분류
+                    </label>
+
+                    <select class="question-small-category"
+                            required
+                            th:attr="data-current-value=${question.smallCategory}">
+
+                        <option value="">
+                            소분류를 선택하세요
+                        </option>
+
+                    </select>
+
+                </div>
+
             </div>
 
+
+            <!-- 문제 -->
             <div class="form-group">
-                <label>문제</label>
-                <textarea class="question-text-input" rows="3" required th:text="${question.questionText}"></textarea>
+
+                <label>
+                    문제
+                </label>
+
+                <textarea class="question-text-input"
+                          rows="3"
+                          required
+                          th:text="${question.questionText}">
+                </textarea>
+
             </div>
 
+
+            <!-- 지문 -->
             <div class="form-group">
-                <label>지문</label>
-                <textarea class="question-passage-input" rows="6" th:text="${question.passage}"></textarea>
+
+                <label>
+                    지문
+                </label>
+
+                <textarea class="question-passage-input"
+                          rows="6"
+                          th:text="${question.passage}">
+                </textarea>
+
             </div>
 
-            <div class="fixed-choice-list" th:if="${!#lists.isEmpty(question.choices)}">
-                <label>보기</label>
-                <div class="choice-edit-row" th:each="choice : ${question.choices}">
-                    <span class="choice-number" th:text="${choice.choiceNumber}">1</span>
-                    <input type="text" class="choice-input" required
+
+            <!-- 객관식 보기 -->
+            <div class="fixed-choice-list"
+                 th:if="${!#lists.isEmpty(question.choices)}">
+
+                <label>
+                    보기
+                </label>
+
+                <div class="choice-edit-row"
+                     th:each="choice : ${question.choices}">
+
+                    <span class="choice-number"
+                          th:text="${choice.choiceNumber}">
+                        1
+                    </span>
+
+                    <input type="text"
+                           class="choice-input"
+                           required
                            th:value="${choice.choiceText}"
                            th:attr="data-choice-id=${choice.choiceId}">
+
                 </div>
+
             </div>
 
+
+            <!-- 정답 -->
             <div class="form-group answer-field">
-                <label>정답</label>
-                <input type="text" class="correct-answer-input" th:value="${question.correctAnswer}">
+
+                <label>
+                    정답
+                </label>
+
+                <input type="text"
+                       class="correct-answer-input"
+                       th:value="${question.correctAnswer}">
+
             </div>
+
         </article>
+
     </section>
 
+
+    <!-- ========================================= -->
+    <!-- 하단 버튼 -->
+    <!-- ========================================= -->
+
     <div class="bottom-actions">
-        <a class="secondary-button" th:href="@{/teacher/exams/{examId}(examId=${exam.examId})}">취소</a>
-        <button type="button" id="saveExamBottomButton" class="primary-button">변경사항 저장</button>
+
+        <a class="secondary-button"
+           th:href="@{/teacher/exams/{examId}(examId=${exam.examId})}">
+            취소
+        </a>
+
+        <button type="button"
+                id="saveExamBottomButton"
+                class="primary-button">
+            변경사항 저장
+        </button>
+
     </div>
+
 </main>
 
+
 <script th:src="@{/js/exam-edit.js}"></script>
+
 </body>
 </html>

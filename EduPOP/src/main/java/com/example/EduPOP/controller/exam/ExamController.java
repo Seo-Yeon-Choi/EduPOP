@@ -1,5 +1,6 @@
 package com.example.EduPOP.controller.exam;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.domain.exam.Exam;
 import com.example.EduPOP.domain.exam.ExamQuestion;
 import com.example.EduPOP.domain.user.User;
@@ -131,7 +132,7 @@ public class ExamController {
     }
 
     private Long getLoginTeacherId(HttpSession session) {
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null || loginUser.getRole() != UserRole.TEACHER) {
             return null;

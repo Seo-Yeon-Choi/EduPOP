@@ -1,158 +1,215 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>학원 등록하기</title>
 
-    <style>
-        body {
-            font-family: 'Malgun Gothic', sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+    <title>EduPOP - 학원 등록</title>
 
-        .register-container {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            width: 400px;
-        }
-
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-            font-weight: bold;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        .submit-btn:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/academy-register.css}">
 </head>
 
 <body>
 
-<div class="register-container">
+<div th:replace="~{layout/header :: header}"></div>
 
-    <h2>🏫 우리 학원 등록하기</h2>
+<main class="academy-register-page">
 
-    <form action="/academy/register"
-          method="POST"
-          id="academyForm"
-          onsubmit="return checkForm()">
+    <div class="register-container">
 
-        <div class="form-group">
-            <label for="name">학원 이름</label>
-            <input type="text"
-                   id="name"
-                   name="name"
-                   placeholder="예: 한국정보교육원">
+        <div class="register-header">
+            <div class="register-icon">🏫</div>
+
+            <h1>학원 등록</h1>
+
+            <p>
+                EduPOP을 시작하기 위해<br>
+                운영하시는 학원 정보를 등록해 주세요.
+            </p>
         </div>
 
-        <div class="form-group">
-            <label for="address">학원 주소</label>
-            <input type="text"
-                   id="address"
-                   name="address"
-                   placeholder="예: 서울시 관악구 봉천로">
-        </div>
+        <form th:action="@{/academy/register}"
+              method="POST"
+              id="academyForm"
+              class="register-form"
+              onsubmit="return checkForm()">
 
-        <div class="form-group">
-            <label for="phone">연락처</label>
-            <input type="text"
-                   id="phone"
-                   name="phone"
-                   placeholder="예: 02-1234-5678">
-        </div>
+            <div class="form-group">
+                <label for="name">
+                    학원 이름
+                    <span class="required">*</span>
+                </label>
 
-        <div class="form-group">
-            <label for="businessCer">사업자 등록번호</label>
-            <input type="text"
-                   id="businessCer"
-                   name="businessCer"
-                   placeholder="예: 123-45-67890">
-        </div>
+                <input type="text"
+                       id="name"
+                       name="name"
+                       placeholder="예: 한국정보교육원"
+                       autocomplete="organization">
+            </div>
 
-        <button type="submit" class="submit-btn">
-            등록하기
-        </button>
+            <div class="form-group">
+                <label for="address">
+                    학원 주소
+                    <span class="required">*</span>
+                </label>
 
-    </form>
+                <input type="text"
+                       id="address"
+                       name="address"
+                       placeholder="예: 서울시 관악구 봉천로"
+                       autocomplete="street-address">
+            </div>
 
-</div>
+            <div class="form-group">
+                <label for="phone">
+                    학원 연락처
+                    <span class="required">*</span>
+                </label>
+
+                <input type="text"
+                       id="phone"
+                       name="phone"
+                       placeholder="예: 02-1234-5678"
+                       autocomplete="tel">
+            </div>
+            <div class="form-group">
+
+                <label for="representativeName">
+                    대표자명
+                    <span class="required">*</span>
+                </label>
+
+                <input type="text"
+                       id="representativeName"
+                       name="representativeName"
+                       placeholder="예: 홍길동">
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="businessStartDate">
+                    개업일자
+                    <span class="required">*</span>
+                </label>
+
+                <input type="date"
+                       id="businessStartDate"
+                       name="businessStartDate">
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="businessNumber">
+                    사업자등록번호
+                    <span class="required">*</span>
+                </label>
+
+                <input type="text"
+                       id="businessNumber"
+                       name="businessNumber"
+                       placeholder="예: 123-45-67890"
+                       maxlength="12">
+
+            </div>
+
+            <div th:if="${error}"
+                 class="error-message"
+                 th:text="${error}">
+            </div>
+
+            <div class="form-notice">
+                <span class="notice-icon">ⓘ</span>
+
+                <p>
+                    등록된 학원 정보는 관리자 승인 및
+                    교사·학생 회원의 소속 학원 확인에 사용됩니다.
+                </p>
+            </div>
+
+            <button type="submit"
+                    class="submit-btn">
+                학원 등록하기
+            </button>
+
+        </form>
+
+    </div>
+
+</main>
 
 <script>
-
-    // 빈칸이 있는지 검사
     function checkForm() {
 
-        const name = document.getElementById('name').value;
-        const address = document.getElementById('address').value;
-        const phone = document.getElementById('phone').value;
-        const businessCer =
-            document.getElementById('businessCer').value;
+        const name =
+            document.getElementById('name').value.trim();
 
-        if (name.trim() === '') {
-            alert('학원 이름을 입력해 주세요!');
+        const address =
+            document.getElementById('address').value.trim();
+
+        const phone =
+            document.getElementById('phone').value.trim();
+
+        const businessNumber =
+            document.getElementById('businessNumber').value.trim();
+
+        if (name === '') {
+            alert('학원 이름을 입력해 주세요.');
+            document.getElementById('name').focus();
             return false;
         }
 
-        if (address.trim() === '') {
-            alert('학원 주소를 입력해 주세요!');
+        if (address === '') {
+            alert('학원 주소를 입력해 주세요.');
+            document.getElementById('address').focus();
             return false;
         }
 
-        if (phone.trim() === '') {
-            alert('전화번호를 입력해 주세요!');
+        if (phone === '') {
+            alert('전화번호를 입력해 주세요.');
+            document.getElementById('phone').focus();
             return false;
         }
 
-        if (businessCer.trim() === '') {
-            alert('사업자 등록번호를 입력해 주세요!');
+        if (businessNumber === '') {
+            alert('사업자 등록번호를 입력해 주세요.');
+            document.getElementById('businessNumber').focus();
             return false;
         }
 
         return true;
     }
 
+    document
+        .getElementById('businessNumber')
+        .addEventListener('input', function () {
+
+            let value = this.value.replace(/[^0-9]/g, '');
+
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+
+            if (value.length > 5) {
+                value =
+                    value.substring(0, 3)
+                    + '-'
+                    + value.substring(3, 5)
+                    + '-'
+                    + value.substring(5);
+            } else if (value.length > 3) {
+                value =
+                    value.substring(0, 3)
+                    + '-'
+                    + value.substring(3);
+            }
+
+            this.value = value;
+        });
 </script>
 
 </body>

@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>EduPOP - 회원가입</title>
 
-    <link rel="stylesheet" th:href="@{/css/common.css}">
-    <link rel="stylesheet" th:href="@{/css/signup.css}">
+    <link rel="stylesheet"
+          th:href="@{/css/common.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/signup.css}">
 </head>
 
 <body>
 
 <div th:replace="~{layout/header :: header}"></div>
+
 
 <main class="signup-container">
 
@@ -23,109 +29,564 @@
             <p>EduPOP 이용을 위한 정보를 입력해주세요.</p>
         </div>
 
+
         <form th:action="@{/signUp}"
               method="post"
-              class="signup-form">
+              class="signup-form"
+              id="signupForm">
 
+            <!-- 아이디 -->
             <div class="form-group">
-                <label for="loginId">아이디</label>
-                <input
-                        type="text"
-                        id="loginId"
-                        name="loginId"
-                        placeholder="아이디를 입력해주세요."
-                        required>
+
+                <label for="loginId">
+                    아이디
+                </label>
+
+                <input type="text"
+                       id="loginId"
+                       name="loginId"
+                       placeholder="아이디를 입력해주세요."
+                       required>
+
             </div>
 
+
+            <!-- 비밀번호 -->
             <div class="form-group">
-                <label for="passwordHash">비밀번호</label>
-                <input
-                        type="password"
-                        id="passwordHash"
-                        name="passwordHash"
-                        placeholder="비밀번호를 입력해주세요."
-                        required>
+
+                <label for="passwordHash">
+                    비밀번호
+                </label>
+
+                <input type="password"
+                       id="passwordHash"
+                       name="passwordHash"
+                       placeholder="비밀번호를 입력해주세요."
+                       required>
+
             </div>
 
+
+            <!-- 이름 -->
             <div class="form-group">
-                <label for="name">이름</label>
-                <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="이름을 입력해주세요."
-                        required>
+
+                <label for="name">
+                    이름
+                </label>
+
+                <input type="text"
+                       id="name"
+                       name="name"
+                       placeholder="이름을 입력해주세요."
+                       required>
+
             </div>
 
+
+            <!-- 이메일 -->
             <div class="form-group">
-                <label for="email">이메일</label>
-                <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="example@email.com">
+
+                <label for="email">
+                    이메일
+                </label>
+
+                <input type="email"
+                       id="email"
+                       name="email"
+                       placeholder="example@email.com">
+
             </div>
 
+
+            <!-- 전화번호 -->
             <div class="form-group">
-                <label for="phone">전화번호</label>
-                <input
-                        type="text"
-                        id="phone"
-                        name="phone"
-                        placeholder="010-0000-0000">
+
+                <label for="phone">
+                    전화번호
+                </label>
+
+                <input type="text"
+                       id="phone"
+                       name="phone"
+                       placeholder="010-0000-0000">
+
             </div>
 
-            <div class="form-group">
-                <label for="schoolGrade">학년</label>
-                <input
-                        type="text"
-                        id="schoolGrade"
-                        name="schoolGrade"
-                        placeholder="예: 중학교 2학년">
-            </div>
 
-            <!-- 관리자 회원가입에서는 표시하지 않음 -->
+            <!-- 학년 -->
             <div class="form-group"
-                 th:if="${requestedRole != 'ADMIN'}">
+                    th:if="${requestedRole=='STUDENT'}">
 
-                <label for="academyId">학원 선택</label>
+                <label for="schoolGrade">
+                    학년
+                </label>
 
-                <select
-                        id="academyId"
-                        name="academyId"
-                        required>
+                <select id="schoolGrade"
+                        name="schoolGrade">
 
-                    <option value="">학원을 선택하세요</option>
-
-                    <option
-                            th:each="academy : ${academies}"
-                            th:value="${academy.academyId}"
-                            th:text="${academy.name}">
+                    <option value="">
+                        학년을 선택해주세요
                     </option>
 
+                    <optgroup label="초등학교">
+
+                        <option value="초등학교 1학년">
+                            초등학교 1학년
+                        </option>
+
+                        <option value="초등학교 2학년">
+                            초등학교 2학년
+                        </option>
+
+                        <option value="초등학교 3학년">
+                            초등학교 3학년
+                        </option>
+
+                        <option value="초등학교 4학년">
+                            초등학교 4학년
+                        </option>
+
+                        <option value="초등학교 5학년">
+                            초등학교 5학년
+                        </option>
+
+                        <option value="초등학교 6학년">
+                            초등학교 6학년
+                        </option>
+
+                    </optgroup>
+
+                    <optgroup label="중학교">
+
+                        <option value="중학교 1학년">
+                            중학교 1학년
+                        </option>
+
+                        <option value="중학교 2학년">
+                            중학교 2학년
+                        </option>
+
+                        <option value="중학교 3학년">
+                            중학교 3학년
+                        </option>
+
+                    </optgroup>
+
                 </select>
+
             </div>
 
-            <button type="submit" class="signup-button">
+
+            <!-- =====================================
+                 학원 검색
+                 관리자 회원가입에서는 표시하지 않음
+            ====================================== -->
+
+            <div class="form-group academy-search-group"
+                 th:if="${requestedRole != 'ADMIN'}">
+
+                <label for="academySearch">
+                    학원 선택
+                </label>
+
+                <p class="academy-search-guide">
+                    학원 이름을 검색한 후 소속 학원을 선택해주세요.
+                </p>
+
+
+                <!-- 검색창 -->
+                <div class="academy-search-box">
+
+                    <input type="text"
+                           id="academySearch"
+                           class="academy-search-input"
+                           placeholder="학원 이름을 입력해주세요."
+                           autocomplete="off">
+
+                    <span class="academy-search-icon">
+                        🔍
+                    </span>
+
+                </div>
+
+
+                <!-- 실제 서버로 전달되는 academyId -->
+                <input type="hidden"
+                       id="academyId"
+                       name="academyId">
+
+
+                <!-- 검색 결과 -->
+                <div id="academySearchResults"
+                     class="academy-search-results"
+                     hidden>
+
+                    <!-- 학원 목록을 Thymeleaf로 미리 생성 -->
+                    <button type="button"
+                            class="academy-search-item"
+                            th:each="academy : ${academies}"
+                            th:data-id="${academy.academyId}"
+                            th:data-name="${academy.name}"
+                            th:data-address="${academy.address}"
+                            hidden>
+
+                        <strong class="academy-result-name"
+                                th:text="${academy.name}">
+                            EduPOP 학원
+                        </strong>
+
+                        <span class="academy-result-address"
+                              th:text="${academy.address != null
+                                  and !#strings.isEmpty(academy.address)
+                                  ? academy.address
+                                  : '주소 정보 없음'}">
+                            서울특별시 강남구
+                        </span>
+
+                    </button>
+
+
+                    <!-- 검색 결과 없음 -->
+                    <div id="academyEmptyResult"
+                         class="academy-empty-result"
+                         hidden>
+
+                        검색 결과가 없습니다.
+
+                    </div>
+
+                </div>
+
+
+                <!-- 선택 완료된 학원 -->
+                <div id="selectedAcademy"
+                     class="selected-academy"
+                     hidden>
+
+                    <div class="selected-academy-info">
+
+                        <span class="selected-academy-label">
+                            선택한 학원
+                        </span>
+
+                        <strong id="selectedAcademyName">
+                        </strong>
+
+                        <span id="selectedAcademyAddress"
+                              class="selected-academy-address">
+                        </span>
+
+                    </div>
+
+                    <button type="button"
+                            id="academyChangeButton"
+                            class="academy-change-button">
+
+                        변경
+
+                    </button>
+
+                </div>
+
+
+                <p id="academyError"
+                   class="academy-error"
+                   hidden>
+
+                    소속 학원을 선택해주세요.
+
+                </p>
+
+            </div>
+
+
+            <button type="submit"
+                    class="signup-button">
+
                 가입하기
+
             </button>
 
         </form>
 
-        <div class="login-area">
-            <span>이미 계정이 있으신가요?</span>
 
-            <a th:href="@{/}" class="login-link">
+        <div class="login-area">
+
+            <span>
+                이미 계정이 있으신가요?
+            </span>
+
+            <a th:href="@{/}"
+               class="login-link">
+
                 로그인하기
+
             </a>
+
         </div>
 
     </section>
 
 </main>
 
+
 <script th:if="${error != null}">
     alert("[[${error}]]");
+</script>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const form =
+            document.getElementById('signupForm');
+
+        const searchInput =
+            document.getElementById('academySearch');
+
+        const academyIdInput =
+            document.getElementById('academyId');
+
+        const resultsBox =
+            document.getElementById('academySearchResults');
+
+        const academyItems =
+            document.querySelectorAll('.academy-search-item');
+
+        const emptyResult =
+            document.getElementById('academyEmptyResult');
+
+        const selectedAcademy =
+            document.getElementById('selectedAcademy');
+
+        const selectedAcademyName =
+            document.getElementById('selectedAcademyName');
+
+        const selectedAcademyAddress =
+            document.getElementById('selectedAcademyAddress');
+
+        const changeButton =
+            document.getElementById('academyChangeButton');
+
+        const academyError =
+            document.getElementById('academyError');
+
+
+        /*
+         * ADMIN 회원가입이면 학원 검색 영역 자체가 없으므로
+         * 아래 로직을 실행하지 않는다.
+         */
+        if (!searchInput) {
+            return;
+        }
+
+
+        /*
+         * 학원명 검색
+         */
+        searchInput.addEventListener('input', function () {
+
+            const keyword =
+                searchInput.value.trim().toLowerCase();
+
+            /*
+             * 검색어가 변경되었으면
+             * 기존 선택값 초기화
+             */
+            academyIdInput.value = '';
+
+            selectedAcademy.hidden = true;
+
+            academyError.hidden = true;
+
+
+            if (keyword.length === 0) {
+
+                resultsBox.hidden = true;
+
+                academyItems.forEach(function (item) {
+                    item.hidden = true;
+                });
+
+                return;
+            }
+
+
+            resultsBox.hidden = false;
+
+            let resultCount = 0;
+
+
+            academyItems.forEach(function (item) {
+
+                const academyName =
+                    (item.dataset.name || '').toLowerCase();
+
+
+                /*
+                 * 학원 이름으로 검색
+                 */
+                if (academyName.includes(keyword)) {
+
+                    item.hidden = false;
+
+                    resultCount++;
+
+                } else {
+
+                    item.hidden = true;
+
+                }
+
+            });
+
+
+            /*
+             * 검색 결과 없음
+             */
+            emptyResult.hidden =
+                resultCount !== 0;
+
+        });
+
+
+        /*
+         * 검색 결과에서 학원 선택
+         */
+        academyItems.forEach(function (item) {
+
+            item.addEventListener('click', function () {
+
+                const academyId =
+                    item.dataset.id;
+
+                const academyName =
+                    item.dataset.name;
+
+                const academyAddress =
+                    item.dataset.address || '주소 정보 없음';
+
+
+                /*
+                 * 실제 전송할 academyId 저장
+                 */
+                academyIdInput.value =
+                    academyId;
+
+
+                /*
+                 * 검색창에도 선택한 학원명 표시
+                 */
+                searchInput.value =
+                    academyName;
+
+
+                /*
+                 * 선택 결과 표시
+                 */
+                selectedAcademyName.textContent =
+                    academyName;
+
+                selectedAcademyAddress.textContent =
+                    academyAddress;
+
+                selectedAcademy.hidden =
+                    false;
+
+
+                /*
+                 * 검색 결과 닫기
+                 */
+                resultsBox.hidden =
+                    true;
+
+                academyError.hidden =
+                    true;
+
+            });
+
+        });
+
+
+        /*
+         * 선택한 학원 변경
+         */
+        changeButton.addEventListener('click', function () {
+
+            academyIdInput.value = '';
+
+            searchInput.value = '';
+
+            selectedAcademy.hidden = true;
+
+            academyError.hidden = true;
+
+            searchInput.focus();
+
+        });
+
+
+        /*
+         * 검색 영역 밖을 클릭하면 결과창 닫기
+         */
+        document.addEventListener('click', function (event) {
+
+            const searchGroup =
+                document.querySelector('.academy-search-group');
+
+
+            if (searchGroup &&
+                !searchGroup.contains(event.target)) {
+
+                resultsBox.hidden = true;
+
+            }
+
+        });
+
+
+        /*
+         * 검색창을 다시 클릭하면
+         * 입력값이 있을 경우 검색 결과 다시 표시
+         */
+        searchInput.addEventListener('focus', function () {
+
+            if (searchInput.value.trim() !== '' &&
+                academyIdInput.value === '') {
+
+                searchInput.dispatchEvent(
+                    new Event('input')
+                );
+
+            }
+
+        });
+
+
+        /*
+         * 회원가입 제출 전 학원 선택 여부 확인
+         *
+         * hidden input에는 required가 제대로 동작하지 않기 때문에
+         * JavaScript로 확인한다.
+         */
+        form.addEventListener('submit', function (event) {
+
+            if (academyIdInput &&
+                !academyIdInput.value) {
+
+                event.preventDefault();
+
+                academyError.hidden = false;
+
+                searchInput.focus();
+
+            }
+
+        });
+
+    });
+
 </script>
 
 </body>

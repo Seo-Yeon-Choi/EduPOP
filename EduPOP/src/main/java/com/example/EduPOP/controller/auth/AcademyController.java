@@ -1,5 +1,6 @@
 package com.example.EduPOP.controller.auth;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.domain.user.Academy;
 import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.domain.user.UserRole;
@@ -7,12 +8,17 @@ import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.repository.user.AcademyMapper;
 import com.example.EduPOP.repository.user.UserMapper;
 import com.example.EduPOP.service.auth.AcademyService;
+import com.example.EduPOP.service.business.BusinessVerificationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.LocalDate;
 
 //학원 등록
 @Controller
@@ -20,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AcademyController {
 
     private final AcademyService academyService;
+    private final BusinessVerificationService businessVerificationService;
 
     @GetMapping("/register-page")
     public String registerPage() {
@@ -27,37 +34,141 @@ public class AcademyController {
     }
 
     //학원 등록 처리
+// 학원 등록 처리
     @PostMapping("/academy/register")
     public String registerAcademy(
             @RequestParam String name,
             @RequestParam String address,
             @RequestParam String phone,
-            @RequestParam String businessCer,
-            HttpSession session
+            @RequestParam String businessNumber,
+            @RequestParam String representativeName,
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate businessStartDate,
+            HttpSession session,
+            RedirectAttributes redirectAttributes
     ) {
-        //학원 등록 성공한 user의 role을 관리자로 업데이트
-        //세션에서 로그인한 user정보 가져와서 role Admin, 상태 Active로 변경
-        User loginUser = (User) session.getAttribute("loginUser");
+
+        // 로그인 사용자 확인
+        User loginUser =
+                (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
-            return "redirect:/login"; // 로그인이 풀려있다면 로그인 페이지로
+            return "redirect:/LocalLogin";
         }
 
-        //DB저장
+        // 사업자등록번호에서 하이픈 제거
+        String normalizedBusinessNumber =
+                businessNumber.replaceAll("[^0-9]", "");
+
+        // 사업자등록번호 형식 확인
+        if (normalizedBusinessNumber.length() != 10) {
+
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "사업자등록번호는 10자리 숫자로 입력해주세요."
+            );
+
+            return "redirect:/register-page";
+        }
+
+        // 대표자명 확인
+        if (representativeName == null
+                || representativeName.trim().isEmpty()) {
+
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "대표자명을 입력해주세요."
+            );
+
+            return "redirect:/register-page";
+        }
+
+        // 개업일자 확인
+        if (businessStartDate == null) {
+
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "개업일자를 입력해주세요."
+            );
+
+            return "redirect:/register-page";
+        }
+
+        try {
+
+            // 국세청 API
+            // 1. 사업자 정보 진위확인
+            // 2. 현재 계속사업자인지 확인
+            boolean verified =
+                    businessVerificationService.verify(
+                            normalizedBusinessNumber,
+                            representativeName.trim(),
+                            businessStartDate
+                    );
+
+            if (!verified) {
+
+                redirectAttributes.addFlashAttribute(
+                        "error",
+                        "사업자등록정보가 일치하지 않거나 현재 운영 중인 사업자가 아닙니다."
+                );
+
+                return "redirect:/register-page";
+            }
+
+        } catch (Exception e) {
+
+            // API 장애와 '정보 불일치'를 구분
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "사업자등록정보 확인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+            );
+
+            return "redirect:/register-page";
+        }
+
+        // 검증 성공 후 학원 생성
         Academy academy = new Academy();
-        academy.setName(name);
-        academy.setAddress(address);
-        academy.setPhone(phone);
-        academy.setBusinessCer(businessCer);
 
-        // 학원 저장 + 관리자 상태를 ACTIVE로 변경
-        academyService.registerAcademy(academy, loginUser.getUserId());
+        academy.setName(name.trim());
+        academy.setAddress(address.trim());
+        academy.setPhone(phone.trim());
 
-        // DB에서 상태가 ACTIVE로 바뀐 최신 유저 정보를 다시 가져옴
-        User updatedUser = academyService.findById(loginUser.getUserId());
+        academy.setBusinessNumber(
+                normalizedBusinessNumber
+        );
 
-        // 세션에 들어있던 user 정보를 최신 정보로 갱신
-        session.setAttribute("loginUser", updatedUser);
+        academy.setRepresentativeName(
+                representativeName.trim()
+        );
+
+        academy.setBusinessStartDate(
+                businessStartDate
+        );
+
+        // 학원 저장 + 관리자 상태 ACTIVE 변경
+        academyService.registerAcademy(
+                academy,
+                loginUser.getUserId()
+        );
+
+        // DB에서 최신 사용자 정보 다시 조회
+        User updatedUser =
+                academyService.findById(
+                        loginUser.getUserId()
+                );
+
+        // 세션 갱신
+        session.setAttribute(
+                "loginUser",
+                updatedUser
+        );
+
+        redirectAttributes.addFlashAttribute(
+                "message",
+                "사업자등록정보 확인이 완료되었습니다. 학원이 등록되었습니다."
+        );
 
         return "redirect:/main/adminMain";
     }
@@ -67,4 +178,6 @@ public class AcademyController {
     public String adminPage() {
         return "main/adminMain";
     }
+
+
 }

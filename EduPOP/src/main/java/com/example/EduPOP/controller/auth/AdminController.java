@@ -1,5 +1,6 @@
  package com.example.EduPOP.controller.auth;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.domain.user.*;
 import com.example.EduPOP.service.auth.AcademyService;
 import com.example.EduPOP.service.auth.ClassauthService;
@@ -39,7 +40,7 @@ public class AdminController {
     @GetMapping("/admin/users")
     public String adminPage(HttpSession session,
                             Model model) {
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
        //로그인이 안되어있거나 academyId가 없다면 돌려보냄
         if (loginUser == null || loginUser.getAcademyId() == null){
             return "redirect:/";
@@ -79,7 +80,7 @@ public class AdminController {
     @GetMapping("/admin/academies")
     public String findAllAcademies(HttpSession session, Model model) {
 
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
         if (loginUser == null) {
             return "redirect:/";
         }
@@ -100,7 +101,7 @@ public class AdminController {
             @ModelAttribute Academy academy,
             HttpSession session
     ) {
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
         if (loginUser == null || loginUser.getAcademyId() == null) {
             return "redirect:/";
         }
@@ -113,7 +114,7 @@ public class AdminController {
     //학원 삭제
     @PostMapping("/admin/deleteAcademy")
     public String deleteAcademy(HttpSession session) {
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
         if (loginUser == null || loginUser.getAcademyId() == null) {
             return "redirect:/";
         }
@@ -127,7 +128,7 @@ public class AdminController {
     @GetMapping("/admin/classes")
     public String classes(HttpSession session,
                           Model model){
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         System.out.println("로그인 유저 = " + loginUser);
 
@@ -158,7 +159,7 @@ public class AdminController {
             @PathVariable Long classId,
             HttpSession session,
             Model model){
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
         if(loginUser == null || loginUser.getAcademyId() == null){
             return "redirect:/";
         }
@@ -176,7 +177,7 @@ public class AdminController {
     public String updateClass(@ModelAttribute AcademyClass classInfo,
                               HttpSession session){
         User loginUser =
-                (User) session.getAttribute("loginUser");
+                (User) session.getAttribute(SessionConst.LOGIN_USER);
         if (loginUser == null ||
                 loginUser.getAcademyId() == null) {
             return "redirect:/";
@@ -197,7 +198,7 @@ public class AdminController {
             HttpSession session
     ) {
         User loginUser =
-                (User) session.getAttribute("loginUser");
+                (User) session.getAttribute(SessionConst.LOGIN_USER);
         if (loginUser == null ||
                 loginUser.getAcademyId() == null) {
             return "redirect:/";

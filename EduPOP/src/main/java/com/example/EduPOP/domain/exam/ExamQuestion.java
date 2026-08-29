@@ -1,29 +1,27 @@
 package com.example.EduPOP.domain.exam;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class ExamQuestion {
-
     private Long questionId;
-
     private Long examId;
 
     private Long sectionId;
 
     private Integer questionNumber;
 
-    private QuestionType questionType;
+    private String questionType;
 
-    private String questionTypeTag;
+    private String largeCategory;
+
+    private String smallCategory;
 
     private BigDecimal score;
 

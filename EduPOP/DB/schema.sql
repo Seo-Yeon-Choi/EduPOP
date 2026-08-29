@@ -3,6 +3,16 @@
 -- =========================================================================================
 CREATE DATABASE edupop;
 
+-- 학원별/시스템별 시험 분류 및 대·소분류 마스터 테이블
+CREATE TABLE IF NOT EXISTS exam_categories (
+                                               category_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                               academy_id BIGINT NOT NULL DEFAULT 1,       -- 학원 ID (멀티 테넌트 대비)
+                                               category_type VARCHAR(30) NOT NULL,         -- 구분 ('EXAM_TYPE': 시험분류, 'LARGE': 대분류, 'SMALL': 소분류)
+                                               category_name VARCHAR(100) NOT NULL,        -- 명칭 (예: 월말평가, VOCAB, 관계대명사 등)
+                                               sort_order INT DEFAULT 0,                   -- 정렬 순서
+                                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE academies (
                            academy_id BIGINT AUTO_INCREMENT PRIMARY KEY,
                            name VARCHAR(100) NOT NULL,                 -- 학원 명칭
@@ -492,3 +502,18 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD CONSTRAINT uk_users_naver_id UNIQUE (naverId);
+
+ALTER TABLE exam_questions
+    ADD COLUMN large_category VARCHAR(100) NULL,
+    ADD COLUMN small_category VARCHAR(100) NULL;
+
+ALTER TABLE exam_questions
+DROP COLUMN question_type_tag;
+
+ALTER TABLE academies
+    ADD COLUMN business_number VARCHAR(10) NULL COMMENT '사업자등록번호',
+ADD COLUMN representative_name VARCHAR(100) NULL COMMENT '대표자명',
+ADD COLUMN business_start_date DATE NULL COMMENT '개업일자';
+
+ALTER TABLE academies
+    MODIFY COLUMN business_cer VARCHAR(100) NULL;

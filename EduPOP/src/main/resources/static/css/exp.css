@@ -386,6 +386,7 @@
 
 .exp-card[data-stage="4"] .exp-character-foreground {
     background-image: url("../images/exp/stage4-foreground.png");
+    opacity: 1;
     /* 4단계 책상을 캐릭터보다 앞에 표시 */
 }
 

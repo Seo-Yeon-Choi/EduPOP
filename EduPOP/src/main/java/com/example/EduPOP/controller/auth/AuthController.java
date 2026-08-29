@@ -1,12 +1,15 @@
 package com.example.EduPOP.controller.auth;
 
+import com.example.EduPOP.config.SessionConst;
 import com.example.EduPOP.domain.user.Academy;
 import com.example.EduPOP.domain.user.User;
 import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.service.auth.AcademyService;
+import com.example.EduPOP.service.auth.SecurityLoginService;
 import com.example.EduPOP.service.auth.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,6 +25,7 @@ public class AuthController {
 
     private  final AcademyService academyService;
     private final UserService userService;
+    private final SecurityLoginService securityLoginService;
 
     // 기본 도메인 요청 시 로그인 페이지로 이동
     @GetMapping("/")
@@ -34,7 +38,7 @@ public class AuthController {
     public String signUpPage(Model model,
                              HttpSession session) {
         //요청받은 역할을 세션에 저장, null일시 기본값 NONE
-       String requestedRole = (String) session.getAttribute("requestedRole");
+       String requestedRole = (String) session.getAttribute(SessionConst.REQUESTED_ROLE);
        if (requestedRole == null) {
            requestedRole = "NONE";
        }
@@ -56,7 +60,7 @@ public class AuthController {
             HttpSession session,
             RedirectAttributes redirectAttributes
     ) {//세션에 요청받은 역할 넣음
-        String requestedRole = (String) session.getAttribute("requestedRole");
+        String requestedRole = (String) session.getAttribute(SessionConst.REQUESTED_ROLE);
         // 요청이 없다면 역할 기본값 none
         if (requestedRole == null) {
             requestedRole = "NONE";
@@ -117,6 +121,8 @@ public class AuthController {
     public String loginProcess(
             @RequestParam("loginId") String loginId,
             @RequestParam("passwordHash") String passwordHash,
+            HttpServletRequest request,
+            HttpServletResponse response,
             HttpSession session,
             RedirectAttributes redirectAttributes
     ) {
@@ -125,15 +131,18 @@ public class AuthController {
         if (loginUser == null) {
             redirectAttributes.addFlashAttribute(
                     "error",
-                    "존재하지않는 회원입니다. 회원가입 후 로그인해주세요."
+                    "아이디 또는 비밀번호가 올바르지 않습니다."
             );
-            return "redirect:/signUp";
+            return "redirect:/LocalLogin";
         } else if (loginUser.getStatus() == UserStatus.WITHDRAWN) {
             return "redirect:/";
         }
-
+        // request.changeSessionId();
         User latestUser = userService.findByUserId(loginUser.getUserId());
-        session.setAttribute("loginUser", latestUser);
+        // session.setAttribute(SessionConst.LOGIN_USER, latestUser);
+
+        // Spring Security 로그인
+        securityLoginService.login(latestUser, request, response);
 
         if (latestUser.getStatus() == UserStatus.PENDING) {
             if (latestUser.getRole() == UserRole.ADMIN) {
@@ -158,7 +167,7 @@ public class AuthController {
     // 학생, 교사 승인 대기 페이지
     @GetMapping("/blankPage")
     public String blankPage(HttpSession session) {
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
             return "redirect:/";
@@ -178,6 +187,7 @@ public class AuthController {
     }
 //--------------------------------------------------------------------------------
     // 로그아웃
+    /*
     @GetMapping("/logout")
     public String logout(
             HttpServletRequest request,
@@ -196,6 +206,8 @@ public class AuthController {
 
         return "redirect:/";
     }
+    */
+
 
     // 회원 탈퇴
     @PostMapping("/user/withdraw")
@@ -203,7 +215,7 @@ public class AuthController {
             HttpSession session,
             RedirectAttributes redirectAttributes
     ) {
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
             return "redirect:/login";
@@ -224,14 +236,17 @@ public class AuthController {
     @GetMapping("/selectAcademy")
     public String selectAcademy(HttpSession session,
                                 Model model){
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
         if (loginUser == null){
             return "redirect:/";
         }
+
         //모든 학원을 가져와서 model에 담음
         List<Academy> academies = academyService.getAllAcademies();
         model.addAttribute("academies", academies);
         model.addAttribute("loginUser", loginUser);
+        model.addAttribute("requestedRole",loginUser.getRole().name());
+
         return "/selectAcademy";
     }
 
@@ -240,9 +255,9 @@ public class AuthController {
     public String selectAcademy(@RequestParam Long academyId,
                                 @RequestParam String email,
                                 @RequestParam String phone,
-                                @RequestParam Integer schoolGrade,
+                                @RequestParam(required = false) String schoolGrade,
                                 HttpSession session){
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
         if (loginUser == null){
             return "redirect:/";
         }
@@ -260,7 +275,7 @@ public class AuthController {
         loginUser.setEmail(email);
         loginUser.setPhone(phone);
         loginUser.setSchoolGrade(String.valueOf(schoolGrade));
-        session.setAttribute("loginUser", loginUser);
+        session.setAttribute(SessionConst.LOGIN_USER, loginUser);
 
         // PENDING 상태
         if (loginUser.getStatus() == UserStatus.PENDING) {
@@ -298,4 +313,3 @@ public class AuthController {
     }
 
 }
-
