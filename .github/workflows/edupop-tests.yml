@@ -1,0 +1,54 @@
+name: EduPOP tests
+
+on:
+  push:
+    branches:
+      - main
+      - merge-main-seoyoung-auth
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        working-directory: EduPOP
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: EduPOP/pom.xml
+
+      - name: Run tests and build coverage report
+        run: mvn --batch-mode --no-transfer-progress clean verify
+
+      - name: Upload JaCoCo report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: EduPOP/target/site/jacoco
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: EduPOP/target/surefire-reports
+          if-no-files-found: ignore
+          retention-days: 14
