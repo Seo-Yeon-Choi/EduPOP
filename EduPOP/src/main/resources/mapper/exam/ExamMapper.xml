@@ -69,10 +69,10 @@
         updated_at
         ) VALUES (
         #{classId},
-        1,
+        #{teacherId},
         #{templateExamId},
         #{title},
-        'MONTH',
+        #{examType},
         'PAPER',
         #{examRound},
         'ACTIVE',
@@ -89,6 +89,8 @@
         question_number,
         question_text,
         question_type,
+        large_category,
+        small_category,
         question_type_tag,
         score,
         correct_answer,
@@ -100,6 +102,8 @@
         question_number,
         COALESCE(question_text, CONCAT(question_number, '번 문항')),
         question_type,
+        large_category,
+        small_category,
         COALESCE(question_type_tag, question_type, 'VOCAB'),
         score,
         correct_answer,
@@ -171,7 +175,12 @@
         SELECT
         eq.question_id AS questionId,
         eq.question_number AS questionNumber,
-        COALESCE(eq.question_type, '공통') AS questionType,
+        COALESCE(
+            NULLIF(eq.small_category, ''),
+            NULLIF(eq.large_category, ''),
+            NULLIF(eq.question_type_tag, ''),
+            '기타'
+        ) AS questionType,
         eq.score AS score,
         eq.correct_answer AS correctAnswer
         FROM exam_questions eq
@@ -209,6 +218,7 @@
             exam_id,
             student_id,
             attempt_no,
+            attempt_type,
             entry_method,
             status,
             total_score,
@@ -221,6 +231,7 @@
                      #{examId},
                      #{studentId},
                      1,
+                     'EXAM',
                      'MANUAL',
                      'GRADED',
                      #{totalScore},
@@ -231,6 +242,26 @@
                      NOW()
                  )
     </insert>
+
+    <!--
+        기존 최초 응시의 attempt_id는 유지하고 채점 결과만 수정한다.
+        복습 응시의 source_attempt_id 연결이 끊기지 않도록 원장 행을 삭제하지 않는다.
+    -->
+    <update id="updateExamAttemptScore"
+            parameterType="com.example.EduPOP.domain.exam.ExamAttempt">
+        UPDATE exam_attempts
+        SET entry_method = 'MANUAL',
+            status = 'GRADED',
+            total_score = #{totalScore},
+            max_score = #{maxScore},
+            correct_count = #{correctCount},
+            total_question_count = #{totalQuestionCount},
+            primary_weak_tag = #{primaryWeakTag},
+            graded_at = NOW()
+        WHERE attempt_id = #{attemptId}
+          AND attempt_no = 1
+          AND attempt_type = 'EXAM'
+    </update>
 
     <!-- 문항별 답안 상세 저장 -->
     <insert id="batchInsertExamAnswers">
@@ -263,11 +294,26 @@
                 FROM exam_answers eans
                          JOIN exam_questions eq ON eans.question_id = eq.question_id
                 WHERE eans.attempt_id = ea.attempt_id
-            ) AS savedAnswers
+            ) AS savedAnswers,
+            (
+                SELECT pr.teacher_comment
+                FROM parent_reports pr
+                JOIN exams comment_exam
+                  ON comment_exam.exam_id = #{examId}
+                WHERE pr.student_id = u.user_id
+                  AND YEAR(pr.period_start) = YEAR(comment_exam.exam_date)
+                  AND MONTH(pr.period_start) = MONTH(comment_exam.exam_date)
+                ORDER BY pr.created_at DESC, pr.report_id DESC
+                LIMIT 1
+            ) AS teacherComment
         FROM class_students cs
                  JOIN users u ON cs.student_id = u.user_id
                  JOIN classes c ON cs.class_id = c.class_id
-                 LEFT JOIN exam_attempts ea ON ea.exam_id = #{examId} AND ea.student_id = u.user_id
+                 LEFT JOIN exam_attempts ea
+                    ON ea.exam_id = #{examId}
+                   AND ea.student_id = u.user_id
+                   AND ea.attempt_no = 1
+                   AND ea.attempt_type = 'EXAM'
         WHERE cs.class_id = #{classId} AND cs.status = 'ACTIVE'
         ORDER BY u.name ASC
     </select>
@@ -279,38 +325,85 @@
 
     <!-- 기존 학생 응시 원장 조회 및 삭제를 위한 ID 확인 또는 직접 삭제 -->
     <delete id="deleteExamAttemptByExamAndStudent">
-        DELETE FROM exam_attempts WHERE exam_id = #{examId} AND student_id = #{studentId}
+        DELETE FROM exam_attempts
+        WHERE exam_id = #{examId}
+          AND student_id = #{studentId}
+          AND attempt_no = 1
+          AND attempt_type = 'EXAM'
     </delete>
 
     <!-- 기존 응시 원장 단건 조회 쿼리 -->
     <select id="findExamAttempt" resultType="com.example.EduPOP.domain.exam.ExamAttempt">
         SELECT * FROM exam_attempts
-        WHERE exam_id = #{examId} AND student_id = #{studentId}
+        WHERE exam_id = #{examId}
+          AND student_id = #{studentId}
+          AND attempt_no = 1
+          AND attempt_type = 'EXAM'
         LIMIT 1
     </select>
 
-    <!-- 학부모 리포트 코멘트 업데이트 (이미 데이터가 있을 때) -->
+    <!-- 해당 시험이 시행된 월의 최신 학부모 리포트 코멘트 수정 -->
     <update id="updateTeacherComment">
         UPDATE parent_reports
-        SET teacher_comment = #{comment}
-        WHERE student_id = #{studentId}
-          AND period_start = DATE_FORMAT(NOW(), '%Y-%m-01')
+        SET teacher_comment = #{comment},
+            created_by = #{teacherId}
+        WHERE report_id = (
+            SELECT report_id
+            FROM (
+                SELECT pr.report_id
+                FROM parent_reports pr
+                JOIN exams e
+                  ON e.exam_id = #{examId}
+                WHERE pr.student_id = #{studentId}
+                  AND YEAR(pr.period_start) = YEAR(e.exam_date)
+                  AND MONTH(pr.period_start) = MONTH(e.exam_date)
+                ORDER BY pr.created_at DESC, pr.report_id DESC
+                LIMIT 1
+            ) latest_report
+        )
     </update>
 
-    <!-- 학부모 리포트 신규 생성 및 코멘트 인서트 (DB 에러 방어 로직 포함) -->
+    <!-- 같은 시험 월의 리포트가 없을 때 기본값과 코멘트를 함께 신규 저장 -->
     <insert id="insertTeacherComment">
         INSERT INTO parent_reports (
-        student_id, created_by, period_start, period_end, access_token, teacher_comment, status, created_at
-        ) VALUES (
-        #{studentId},
-        (SELECT COALESCE(MAX(user_id), 1) FROM users WHERE role = 'TEACHER'),
-        DATE_FORMAT(NOW(), '%Y-%m-01'),
-        LAST_DAY(NOW()),
-        UUID(),
-        #{comment},
-        'DRAFT',
-        NOW()
+            student_id,
+            created_by,
+            period_start,
+            period_end,
+            access_token,
+            monthly_exam_score,
+            class_average_score,
+            comprehension_level,
+            word_exam_completion_rate,
+            monthly_exam_completion_rate,
+            books_read_count,
+            overcome_wrong_count,
+            top_weak_type_tag,
+            radar_chart_data,
+            teacher_comment,
+            status,
+            created_at
         )
+        SELECT
+            #{studentId},
+            #{teacherId},
+            DATE_FORMAT(e.exam_date, '%Y-%m-01'),
+            LAST_DAY(e.exam_date),
+            UUID(),
+            0.0,
+            0.0,
+            'F',
+            0.0,
+            0.0,
+            0,
+            0,
+            '분석 중',
+            '{}',
+            #{comment},
+            'DRAFT',
+            NOW()
+        FROM exams e
+        WHERE e.exam_id = #{examId}
     </insert>
 
 
@@ -326,10 +419,30 @@
 
     <!-- 문항별 커스텀 정답 및 영역 일괄 등록 쿼리 -->
     <insert id="batchInsertCustomQuestions">
-        INSERT INTO exam_questions (exam_id, question_number, question_type, question_type_tag, score, correct_answer, question_text)
+        INSERT INTO exam_questions (
+            exam_id,
+            question_number,
+            question_type,
+            large_category,
+            small_category,
+            question_type_tag,
+            score,
+            correct_answer,
+            question_text
+        )
         VALUES
         <foreach collection="questions" item="q" separator=",">
-            (#{examId}, #{q.questionNumber}, #{q.questionType}, #{q.questionTypeTag}, #{q.score}, #{q.correctAnswer}, CONCAT(#{q.questionNumber}, '번 문항'))
+            (
+                #{examId},
+                #{q.questionNumber},
+                'MULTIPLE_CHOICE',
+                #{q.questionType},
+                #{q.questionTypeTag},
+                #{q.questionTypeTag},
+                #{q.score},
+                #{q.correctAnswer},
+                CONCAT(#{q.questionNumber}, '번 문항')
+            )
         </foreach>
     </insert>
 </mapper>

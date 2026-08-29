@@ -1,59 +1,613 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.EduPOP.repository.report.ReportMapper">
 
-    <select id="getMonthlyReportMetrics" resultType="com.example.EduPOP.dto.ReportMetricsDTO">
+
+    <!-- =========================================================
+         학부모 리포트 기본 통계
+         ========================================================= -->
+
+    <select id="getMonthlyReportMetrics"
+            resultType="com.example.EduPOP.dto.ReportMetricsDTO">
+
         SELECT
-            -- [1. 기본 정보]
-            u.name AS studentName,
-            a.name AS academyName,
-            c.name AS className,
-            (SELECT name FROM users WHERE user_id = #{teacherId}) AS teacherName,
 
-            -- [2. 성과 지표] : 해당 월의 월말평가 본인 점수
-            (SELECT ea.total_score
-             FROM exam_attempts ea
-                      JOIN exams e ON ea.exam_id = e.exam_id
-             WHERE ea.student_id = #{studentId} AND e.exam_type = 'MONTHLY'
-               AND e.exam_date BETWEEN #{periodStart} AND #{periodEnd} LIMIT 1) AS monthlyExamScore,
+        u.name AS studentName,
 
-            -- [2. 성과 지표] : 해당 월말평가를 치른 같은 반 학생들의 평균 점수
-            (SELECT AVG(ea2.total_score)
-             FROM exam_attempts ea2
-             WHERE ea2.exam_id = (
-                 SELECT e.exam_id FROM exam_attempts ea
-                                           JOIN exams e ON ea.exam_id = e.exam_id
-                 WHERE ea.student_id = #{studentId} AND e.exam_type = 'MONTHLY'
-                   AND e.exam_date BETWEEN #{periodStart} AND #{periodEnd} LIMIT 1
-             )) AS classAverageScore,
+        a.name AS academyName,
 
-            -- [3. 학습 태도 지표] : 기간 내 독서 이력 수 및 오답 극복 활동 수
-            (SELECT COUNT(*) FROM reading_reports
-             WHERE student_id = #{studentId} AND created_at BETWEEN #{periodStart} AND #{periodEnd}) AS booksReadCount,
+        c.name AS className,
 
-            (SELECT COUNT(*) FROM activity_logs
-             WHERE student_id = #{studentId} AND activity_type = 'OVERCOME_WRONG'
-               AND created_at BETWEEN #{periodStart} AND #{periodEnd}) AS overcomeWrongCount,
+        (
+        SELECT name
+        FROM users
+        WHERE user_id = #{teacherId}
+        ) AS teacherName,
 
-            -- [3. 취약 유형] : 기간 내 오답이 가장 많은 문제 유형 태그 추출
-            (SELECT eq.question_type_tag
-             FROM exam_answers ans
-                      JOIN exam_questions eq ON ans.question_id = eq.question_id
-                      JOIN exam_attempts ea ON ans.attempt_id = ea.attempt_id
-                      JOIN exams e ON ea.exam_id = e.exam_id
-             WHERE ea.student_id = #{studentId} AND ans.is_correct = false
-               AND e.exam_date BETWEEN #{periodStart} AND #{periodEnd}
-             GROUP BY eq.question_type_tag
-             ORDER BY COUNT(*) DESC LIMIT 1) AS topWeakTypeTag
+
+        <!-- =================================================
+             1. 월말평가 점수
+
+             해당 기간의 MONTHLY 시험 중
+             가장 최근 시험의 최초 응시 결과를 가져온다.
+
+             attempt_no = 1
+             status = GRADED
+             ================================================= -->
+
+        (
+        SELECT ea.total_score
+
+        FROM exam_attempts ea
+
+        JOIN exams e
+        ON e.exam_id = ea.exam_id
+
+        WHERE ea.student_id = #{studentId}
+
+        AND ea.attempt_no = 1
+
+        AND ea.attempt_type = 'EXAM'
+
+        AND ea.status = 'GRADED'
+
+        AND e.exam_type IN ('MONTHLY', 'MONTH')
+
+        AND e.exam_date
+        BETWEEN #{periodStart}
+        AND #{periodEnd}
+
+        ORDER BY
+        e.exam_date DESC,
+        ea.graded_at DESC
+
+        LIMIT 1
+
+        ) AS monthlyExamScore,
+
+
+        <!-- =================================================
+             2. 반 평균
+
+             위에서 찾은 동일 월말평가 시험의
+             최초 응시자들의 평균 점수를 계산한다.
+             ================================================= -->
+
+        (
+        SELECT
+        ROUND(
+        AVG(ea2.total_score),
+        1
+        )
+
+        FROM exam_attempts ea2
+
+        WHERE ea2.exam_id = (
+
+        SELECT ea.exam_id
+
+        FROM exam_attempts ea
+
+        JOIN exams e
+        ON e.exam_id = ea.exam_id
+
+        WHERE ea.student_id = #{studentId}
+
+        AND ea.attempt_no = 1
+
+        AND ea.attempt_type = 'EXAM'
+
+        AND ea.status = 'GRADED'
+
+        AND e.exam_type IN ('MONTHLY', 'MONTH')
+
+        AND e.exam_date
+        BETWEEN #{periodStart}
+        AND #{periodEnd}
+
+        ORDER BY
+        e.exam_date DESC,
+        ea.graded_at DESC
+
+        LIMIT 1
+        )
+
+        AND ea2.attempt_no = 1
+
+        AND ea2.attempt_type = 'EXAM'
+
+        AND ea2.status = 'GRADED'
+
+        ) AS classAverageScore,
+
+
+        <!-- =================================================
+             3. 단어 시험 응시율
+
+             해당 기간의 WORD 시험 중
+             학생이 EXAM으로 응시하고 GRADED된 시험 비율
+
+             응시 시험 수 / 전체 시험 수 × 100
+
+             최대값 = 100%
+             ================================================= -->
+
+        (
+        SELECT
+        COALESCE(
+        ROUND(
+        COUNT(
+        DISTINCT CASE
+        WHEN ea.attempt_id IS NOT NULL
+        THEN e.exam_id
+        END
+        )
+        * 100.0
+        /
+        NULLIF(
+        COUNT(
+        DISTINCT e.exam_id
+        ),
+        0
+        ),
+        1
+        ),
+        0
+        )
+
+        FROM exams e
+
+        JOIN class_students cs
+        ON cs.class_id = e.class_id
+        AND cs.student_id = #{studentId}
+        AND cs.status = 'ACTIVE'
+
+        LEFT JOIN exam_attempts ea
+        ON ea.exam_id = e.exam_id
+        AND ea.student_id = #{studentId}
+        AND ea.status = 'GRADED'
+        AND ea.attempt_type = 'EXAM'
+
+        WHERE e.exam_type = 'WORD'
+
+        AND e.exam_date
+        BETWEEN #{periodStart}
+        AND #{periodEnd}
+
+        ) AS wordExamCompletionRate,
+
+
+        <!-- =================================================
+             4. 완독 도서 권수
+
+             reading_reports의 실제 제출 개수
+
+             최신 DB 기준:
+             submitted_at 사용
+             ================================================= -->
+
+        (
+        SELECT COUNT(*)
+
+        FROM reading_reports rr
+
+        WHERE rr.student_id = #{studentId}
+
+        AND rr.submitted_at >= #{periodStart}
+
+        AND rr.submitted_at &lt; DATE_ADD(
+        #{periodEnd},
+        INTERVAL 1 DAY
+        )
+
+        ) AS booksReadCount,
+
+
+        <!-- 원래 틀린 문항을 복습에서 맞힌 고유 문항 수 -->
+        (
+        SELECT COUNT(*)
+        FROM (
+            SELECT DISTINCT review_answer.question_id
+            FROM exam_attempts review_attempt
+            JOIN exam_answers review_answer
+              ON review_answer.attempt_id = review_attempt.attempt_id
+            WHERE review_attempt.student_id = #{studentId}
+              AND review_attempt.attempt_type = 'REVIEW'
+              AND review_attempt.status = 'GRADED'
+              AND review_answer.is_correct = TRUE
+              AND DATE(review_attempt.graded_at)
+                    BETWEEN #{periodStart} AND #{periodEnd}
+              AND EXISTS (
+                    SELECT 1
+                    FROM exam_answers original_answer
+                    WHERE original_answer.attempt_id = review_attempt.source_attempt_id
+                      AND original_answer.question_id = review_answer.question_id
+                      AND original_answer.is_correct = FALSE
+              )
+
+            UNION
+
+            SELECT DISTINCT daily_answer.question_id
+            FROM daily_review_attempts daily_attempt
+            JOIN daily_review_answers daily_answer
+              ON daily_answer.daily_review_attempt_id =
+                 daily_attempt.daily_review_attempt_id
+            WHERE daily_attempt.student_id = #{studentId}
+              AND daily_attempt.status = 'GRADED'
+              AND daily_answer.is_correct = TRUE
+              AND DATE(daily_attempt.graded_at)
+                    BETWEEN #{periodStart} AND #{periodEnd}
+              AND EXISTS (
+                    SELECT 1
+                    FROM exam_attempts original_attempt
+                    JOIN exam_answers original_answer
+                      ON original_answer.attempt_id = original_attempt.attempt_id
+                    WHERE original_attempt.student_id = #{studentId}
+                      AND original_attempt.attempt_type = 'EXAM'
+                      AND original_attempt.status = 'GRADED'
+                      AND original_answer.question_id = daily_answer.question_id
+                      AND original_answer.is_correct = FALSE
+              )
+        ) overcome_questions
+        ) AS overcomeWrongCount,
+
+
+        <!-- =================================================
+             6. 월간 최저 정답률 취약 유형
+
+             중요:
+
+             최신 DB에서는 question_type_tag를 사용하지 않는다.
+
+             대신:
+             small_category
+             large_category
+
+             를 사용한다.
+
+             small_category가 있으면 우선 사용하고
+             없으면 large_category를 사용한다.
+             ================================================= -->
+
+        (
+        SELECT
+
+        COALESCE(
+
+        NULLIF(
+        eq.small_category,
+        ''
+        ),
+
+        NULLIF(
+        eq.large_category,
+        ''
+        ),
+
+        '분석 중'
+
+        )
+
+        FROM exam_answers ans
+
+        JOIN exam_questions eq
+        ON eq.question_id =
+        ans.question_id
+
+        JOIN exam_attempts ea
+        ON ea.attempt_id =
+        ans.attempt_id
+
+        JOIN exams e
+        ON e.exam_id =
+        ea.exam_id
+
+        WHERE ea.student_id = #{studentId}
+
+        AND ea.attempt_no = 1
+
+        AND ea.attempt_type = 'EXAM'
+
+        AND ea.status = 'GRADED'
+
+        AND (
+            NULLIF(TRIM(eq.small_category), '') IS NOT NULL
+            OR NULLIF(TRIM(eq.large_category), '') IS NOT NULL
+        )
+
+        AND e.exam_date
+        BETWEEN #{periodStart}
+        AND #{periodEnd}
+
+        GROUP BY
+
+        COALESCE(
+
+        NULLIF(
+        eq.small_category,
+        ''
+        ),
+
+        NULLIF(
+        eq.large_category,
+        ''
+        ),
+
+        '분석 중'
+
+        )
+
+        ORDER BY
+        ROUND(
+        SUM(CASE WHEN ans.is_correct = TRUE THEN 1 ELSE 0 END)
+        * 100.0 / NULLIF(COUNT(ans.answer_id), 0),
+        1
+        ) ASC,
+        COUNT(ans.answer_id) DESC
+
+        LIMIT 1
+
+        ) AS topWeakTypeTag
+
 
         FROM users u
-                 JOIN academies a ON u.academy_id = a.academy_id
-                 JOIN class_students cs ON u.user_id = cs.student_id
-                 JOIN classes c ON cs.class_id = c.class_id
-        WHERE u.user_id = #{studentId}
+
+        JOIN academies a
+        ON a.academy_id =
+        u.academy_id
+
+        LEFT JOIN class_students cs
+        ON cs.student_id =
+        u.user_id
+
+        AND cs.status =
+        'ACTIVE'
+
+        LEFT JOIN classes c
+        ON c.class_id =
+        cs.class_id
+
+        WHERE u.user_id =
+        #{studentId}
+
         LIMIT 1
+
+    </select>
+
+
+    <!-- =========================================================
+         ⭐ 동적 영역별 성취도
+
+         영역 이름과 개수를 하드코딩하지 않는다.
+
+         실제 시험에서 선생님이 입력한
+         exam_sections.section_name을 사용한다.
+
+         최신 DB 구조:
+
+         exam_sections
+              ↓
+         section_name
+              ↓
+         exam_questions.section_id
+              ↓
+         exam_answers
+
+         따라서 선생님이
+
+         듣기 / 쓰기 / 독해
+
+         3개를 만들면 3개가 나오고,
+
+         어휘 / 문법 / 독해 / 듣기 / 쓰기
+
+         5개를 만들면 5개가 나온다.
+         ========================================================= -->
+
+    <select id="findSectionAchievementScores"
+            resultType="map">
+
+        SELECT
+
+        es.section_name AS category,
+
+
+        ROUND(
+
+        COALESCE(
+        SUM(ans.earned_score),
+        0
+        )
+
+        * 100.0
+
+        /
+
+        NULLIF(
+        SUM(eq.score),
+        0
+        ),
+
+        1
+
+        ) AS score
+
+
+        FROM exam_sections es
+
+
+        JOIN exam_questions eq
+        ON eq.section_id =
+        es.section_id
+
+
+        LEFT JOIN exam_attempts ea
+        ON ea.exam_id =
+        es.exam_id
+
+        AND ea.student_id =
+        #{studentId}
+
+        AND ea.attempt_no =
+        1
+
+        AND ea.status =
+        'GRADED'
+
+        AND ea.attempt_id = (
+
+        SELECT MAX(ea2.attempt_id)
+
+        FROM exam_attempts ea2
+
+        WHERE ea2.exam_id =
+        es.exam_id
+
+        AND ea2.student_id =
+        #{studentId}
+
+        AND ea2.attempt_no =
+        1
+
+        AND ea2.status =
+        'GRADED'
+        )
+
+
+        LEFT JOIN exam_answers ans
+        ON ans.attempt_id =
+        ea.attempt_id
+
+        AND ans.question_id =
+        eq.question_id
+
+
+        WHERE es.exam_id = (
+
+        SELECT e.exam_id
+
+        FROM exams e
+
+        WHERE e.exam_type IN (
+        'MONTHLY',
+        'MONTH'
+        )
+
+        AND e.exam_date
+        BETWEEN #{periodStart}
+        AND #{periodEnd}
+
+        AND e.class_id = (
+
+        SELECT cs.class_id
+
+        FROM class_students cs
+
+        WHERE cs.student_id =
+        #{studentId}
+
+        AND cs.status =
+        'ACTIVE'
+
+        ORDER BY
+        cs.class_student_id DESC
+
+        LIMIT 1
+        )
+
+        ORDER BY
+        e.exam_date DESC,
+        e.exam_id DESC
+
+        LIMIT 1
+        )
+
+
+        <!--
+            exam_sections.section_name은
+            DB에서 NOT NULL이므로
+            IS NOT NULL 조건은 작성하지 않는다.
+        -->
+
+        AND TRIM(
+        es.section_name
+        ) &lt;&gt; ''
+
+
+        GROUP BY
+
+        es.section_id,
+
+        es.section_name,
+
+        es.sort_order
+
+
+        ORDER BY
+
+        es.sort_order,
+
+        es.section_id
+
+    </select>
+
+
+    <!-- =========================================================
+         ⭐ 월말평가 점수 추이
+
+         parent_reports에 저장된 이전 스냅샷이 아니라
+         실제 exams + exam_attempts를 조회한다.
+
+         최근 기간에서 월별 최신 월말평가만 표시한다.
+         ========================================================= -->
+
+    <select id="findMonthlyScoreTrend"
+            resultType="map">
+
+        <!--
+            ExamBulkGradeRequest로 받은 답안을 채점한 뒤 저장된
+            exam_attempts.total_score를 최초 월부터 전부 조회한다.
+            같은 달에 여러 월말평가가 있으면 학생이 실제 채점 완료한
+            가장 최신 시험 한 건만 남긴다.
+        -->
+        WITH ranked_monthly_scores AS (
+            SELECT
+                e.exam_id,
+                e.exam_date,
+                DATE_FORMAT(e.exam_date, '%Y-%m') AS monthLabel,
+                ea.total_score AS studentScore,
+                ROW_NUMBER() OVER (
+                    PARTITION BY DATE_FORMAT(e.exam_date, '%Y-%m')
+                    ORDER BY e.exam_date DESC, e.exam_id DESC, ea.graded_at DESC
+                ) AS monthRank
+            FROM exams e
+            JOIN exam_attempts ea
+              ON ea.exam_id = e.exam_id
+            WHERE e.exam_type IN ('MONTHLY', 'MONTH')
+              AND ea.student_id = #{studentId}
+              AND ea.attempt_no = 1
+              AND ea.attempt_type = 'EXAM'
+              AND ea.status = 'GRADED'
+        )
+        SELECT
+            ranked.monthLabel,
+            ROUND(ranked.studentScore, 1) AS studentScore,
+            (
+                SELECT ROUND(AVG(class_attempt.total_score), 1)
+                FROM exam_attempts class_attempt
+                WHERE class_attempt.exam_id = ranked.exam_id
+                  AND class_attempt.attempt_no = 1
+                  AND class_attempt.attempt_type = 'EXAM'
+                  AND class_attempt.status = 'GRADED'
+            ) AS classScore
+        FROM ranked_monthly_scores ranked
+        WHERE ranked.monthRank = 1
+        ORDER BY ranked.exam_date ASC, ranked.exam_id ASC
+
     </select>
 
 </mapper>

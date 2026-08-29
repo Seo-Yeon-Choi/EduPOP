@@ -63,7 +63,6 @@
         <div class="info-dropdown">
             📅 <span th:text="${#temporals.format(report.periodStart, 'yyyy년 M월 d일')} + ' ~ ' + ${#temporals.format(report.periodEnd, 'yyyy년 M월 d일')}">날짜</span> ∨
         </div>
-        <button class="btn-compare">지난 달 비교</button>
     </div>
 
     <!-- 4개 지표 카드 그리드 -->
@@ -87,10 +86,23 @@
 
         <!-- 2. 영역별 성취도 (동적 다각형 차트) -->
         <div class="card">
-            <div class="card-title">2. 영역별 성취도</div>
-            <div class="chart-container" style="position: relative; height: 230px; width: 100%; display: flex; justify-content: center;">
-                <canvas id="radarChart"></canvas>
+
+            <div class="card-title">
+                영역별 성취도
             </div>
+
+            <div
+                    style="
+            position: relative;
+            width: 100%;
+            height: 280px;
+            "
+            >
+
+                <canvas id="parentRadarChart"></canvas>
+
+            </div>
+
         </div>
 
         <!-- 3. 학습 태도 및 달성 지표 -->
@@ -143,55 +155,214 @@
     </div>
 </main>
 
+<!-- =========================================================
+     영역별 성취도 레이더 차트
+     ========================================================= -->
+
 <script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function() {
 
-        // ==========================================
-        // 1. 영역별 성취도 차트 (Radar Chart) 초기화
-        // ==========================================
-        const radarJsonString = /*[[${report.radarChartData != null ? report.radarChartData : '{}'}]]*/ '{}';
-        let radarData = {};
+    // =========================================================
+    // Controller에서 전달받은
+    // StudentTrendResponse.radarStats
+    // =========================================================
 
-        try {
-            // DB에 텍스트로 저장된 JSON 데이터를 자바스크립트 객체로 파싱
-            radarData = JSON.parse(radarJsonString);
-        } catch (error) {
-            console.error("차트 데이터 파싱 에러:", error);
-            radarData = {"데이터 없음": 0};
-        }
+    const radarStats =
+        /*[[${radarStats}]]*/ [];
 
-        // 객체의 Key(과목명)와 Value(점수)를 분리하여 차트 라벨 및 데이터 배열 생성
-        const radarLabels = Object.keys(radarData);
-        const radarValues = Object.values(radarData);
 
-        const ctxRadar = document.getElementById('radarChart').getContext('2d');
-        new Chart(ctxRadar, {
-            type: 'radar',
-            data: {
-                labels: radarLabels,
-                datasets: [{
-                    label: '영역별 성취도',
-                    data: radarValues,
-                    backgroundColor: 'rgba(74, 144, 226, 0.2)',
-                    borderColor: 'rgba(74, 144, 226, 1)',
-                    pointBackgroundColor: 'rgba(74, 144, 226, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    r: {
-                        angleLines: { display: true },
-                        min: 0, max: 100,
-                        ticks: { stepSize: 20, display: false }
-                    }
+    console.log(
+        "학부모 리포트 영역별 성취도:",
+        radarStats
+    );
+
+
+    // =========================================================
+    // 영역명
+    //
+    // student-trend.html과 동일하게
+    // radarStats.tag를 사용한다.
+    // =========================================================
+
+    const radarLabels =
+        radarStats.map(
+            stat => stat.tag || "기타"
+        );
+
+
+    // =========================================================
+    // 학생의 영역별 성취도
+    //
+    // student-trend.html과 동일하게
+    // studentScoreRate를 사용한다.
+    // =========================================================
+
+    const studentRadarScores =
+        radarStats.map(
+            stat =>
+                stat.studentScoreRate != null
+                    ? stat.studentScoreRate
+                    : 0
+        );
+
+
+    // =========================================================
+    // 반 평균 영역별 성취도
+    //
+    // 필요하면 같이 표시할 수 있도록
+    // classAvgScoreRate도 동일한 데이터에서 가져온다.
+    // =========================================================
+
+    const classRadarScores =
+        radarStats.map(
+            stat =>
+                stat.classAvgScoreRate != null
+                    ? stat.classAvgScoreRate
+                    : 0
+        );
+
+
+    // =========================================================
+    // Canvas 존재 여부 확인
+    // =========================================================
+
+    const radarCanvas =
+        document.getElementById(
+            "parentRadarChart"
+        );
+
+
+    // =========================================================
+    // 데이터가 있을 때만 차트 생성
+    // =========================================================
+
+    if (
+        radarCanvas &&
+        radarLabels.length > 0
+    ) {
+
+        new Chart(
+            radarCanvas.getContext("2d"),
+            {
+
+                type: "radar",
+
+                data: {
+
+                    labels: radarLabels,
+
+                    datasets: [
+
+                        // -------------------------------------
+                        // 학생 성취도
+                        // -------------------------------------
+
+                        {
+                            label: "학생 성취도",
+
+                            data: studentRadarScores,
+
+                            backgroundColor:
+                                "rgba(236, 72, 153, 0.20)",
+
+                            borderColor:
+                                "#ec4899",
+
+                            pointBackgroundColor:
+                                "#ec4899",
+
+                            borderWidth: 2,
+
+                            pointRadius: 4,
+
+                            fill: true
+                        },
+
+                        // -------------------------------------
+                        // 반 평균
+                        //
+                        // student-trend의 RadarStatDto에
+                        // classAvgScoreRate가 있으므로
+                        // 필요하면 같이 표시할 수 있다.
+                        // -------------------------------------
+
+                        {
+                            label: "반 평균",
+
+                            data: classRadarScores,
+
+                            backgroundColor:
+                                "rgba(148, 163, 184, 0.10)",
+
+                            borderColor:
+                                "#94a3b8",
+
+                            pointBackgroundColor:
+                                "#94a3b8",
+
+                            borderWidth: 2,
+
+                            pointRadius: 3,
+
+                            fill: false
+                        }
+
+                    ]
                 },
-                plugins: { legend: { display: false } }
-            }
-        });
 
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    scales: {
+
+                        r: {
+
+                            min: 0,
+
+                            max: 100,
+
+                            ticks: {
+
+                                stepSize: 20,
+
+                                display: false
+
+                            }
+
+                        }
+
+                    },
+
+
+                    plugins: {
+
+                        legend: {
+
+                            position: "bottom"
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    } else {
+
+        console.log(
+            "영역별 성취도 데이터가 없습니다."
+        );
+
+    }
+
+</script>
+
+<script th:inline="javascript">
         // ==========================================
         // 2. 월말평가 점수 추이 차트 (Line Chart) 페이징 로직
         // ==========================================
@@ -267,7 +438,6 @@
                 renderLineChart();
             }
         });
-    });
 </script>
 </body>
 </html>

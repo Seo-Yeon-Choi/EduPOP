@@ -281,6 +281,10 @@
     }
 
     function saveComments() {
+        var examId = parseInt(
+            document.getElementById('omrTable').getAttribute('data-exam-id')
+        ) || 0;
+
         var comments = [];
         document.querySelectorAll('.comment-textarea').forEach(function(ta) {
             var sid = parseInt(ta.getAttribute('data-student-id'));
@@ -296,7 +300,10 @@
         fetch('/exam/api/save-comments', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ comments: comments })
+            body: JSON.stringify({
+                examId: examId,
+                comments: comments
+            })
         })
             .then(res => {
                 if(!res.ok) throw new Error();

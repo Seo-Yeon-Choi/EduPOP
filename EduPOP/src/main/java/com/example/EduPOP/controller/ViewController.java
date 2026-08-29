@@ -1,61 +1,311 @@
 package com.example.EduPOP.controller;
 
 import com.example.EduPOP.domain.report.StudentReport;
+import com.example.EduPOP.domain.user.User;
+import com.example.EduPOP.domain.user.UserRole;
 import com.example.EduPOP.service.report.StudentReportService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+
 @Controller
 public class ViewController {
 
-    // 1. 화면 띄울 때도 주방장(Service)의 도움이 필요합니다.
     private final StudentReportService studentReportService;
 
-    public ViewController(StudentReportService studentReportService) {
+    public ViewController(
+            StudentReportService studentReportService
+    ) {
         this.studentReportService = studentReportService;
     }
 
+    // =========================================================
+    // 학생 "나의 리포트" 화면
+    //
+    // 학생이 로그인한 후 "나의 리포트"를 클릭하면
+    // 현재 로그인한 학생의 userId를 이용하여
+    // 해당 학생의 리포트를 자동으로 조회한다.
+    //
+    // reportId를 1L, 2L처럼 하드코딩하지 않는다.
+    // =========================================================
+
     @GetMapping("/student/report")
-    public String showTestPage(Model model) {
-        // 1. 이번 달 리포트 가져오기 (DB에 밀어넣은 2번)
-        StudentReport currentReport = studentReportService.getReport(2L);
+    public String showStudentReport(
+            HttpSession session,
+            Model model
+    ) {
 
-        // 2. 지난 달 리포트 가져오기 (DB에 밀어넣은 1번)
-        StudentReport lastMonthReport = studentReportService.getReport(1L);
+        // -----------------------------------------------------
+        // 현재 로그인한 사용자 가져오기
+        // -----------------------------------------------------
 
-        // 3. 🚀 두 리포트의 행동 지표를 비교해서 화면(Model)에 넘겨주기!
-        if (lastMonthReport != null && currentReport != null) {
+        User loginUser =
+                (User) session.getAttribute("loginUser");
 
-            // Null 방어 로직: DB에 값이 비어있으면 0으로 계산합니다.
-            int currBooks = currentReport.getBooksReadCount() != null ? currentReport.getBooksReadCount() : 0;
-            int lastBooks = lastMonthReport.getBooksReadCount() != null ? lastMonthReport.getBooksReadCount() : 0;
-            model.addAttribute("lastMonthBooks", lastBooks);
-            model.addAttribute("booksDiff", currBooks - lastBooks);
-
-            int currExam = currentReport.getExamCompletionRate() != null ? currentReport.getExamCompletionRate().intValue() : 0;
-            int lastExam = lastMonthReport.getExamCompletionRate() != null ? lastMonthReport.getExamCompletionRate().intValue() : 0;
-            model.addAttribute("lastMonthExam", lastExam);
-            model.addAttribute("examDiff", currExam - lastExam);
-
-            int currRetest = currentReport.getRetestCompletionRate() != null ? currentReport.getRetestCompletionRate().intValue() : 0;
-            int lastRetest = lastMonthReport.getRetestCompletionRate() != null ? lastMonthReport.getRetestCompletionRate().intValue() : 0;
-            model.addAttribute("lastMonthRetest", lastRetest);
-            model.addAttribute("retestDiff", currRetest - lastRetest);
-
-            int currAtt = currentReport.getStudyAttendanceDays() != null ? currentReport.getStudyAttendanceDays() : 0;
-            int lastAtt = lastMonthReport.getStudyAttendanceDays() != null ? lastMonthReport.getStudyAttendanceDays() : 0;
-            model.addAttribute("lastMonthAtt", lastAtt);
-            model.addAttribute("attDiff", currAtt - lastAtt);
-
-            int currOvercome = currentReport.getOvercomeWrongCount() != null ? currentReport.getOvercomeWrongCount() : 0;
-            int lastOvercome = lastMonthReport.getOvercomeWrongCount() != null ? lastMonthReport.getOvercomeWrongCount() : 0;
-            model.addAttribute("lastMonthOvercome", lastOvercome);
-            model.addAttribute("overcomeDiff", currOvercome - lastOvercome);
+        // 로그인하지 않았다면 로그인 페이지로 이동
+        if (loginUser == null) {
+            return "redirect:/LocalLogin";
         }
 
-        // 4. ★ currentReport 라는 이름으로 꺼냈으니, 넘길 때도 currentReport 를 넘깁니다!
-        model.addAttribute("report", currentReport);
+        // 학생만 접근 가능
+        if (loginUser.getRole() != UserRole.STUDENT) {
+            return "redirect:/";
+        }
+
+        // 현재 로그인한 학생의 user_id
+        Long studentId = loginUser.getUserId();
+
+
+        // =====================================================
+        // 1. 이번 달 학생 리포트 생성 또는 최신화
+        //
+        // 기존 리포트가 있어도 다시 집계해야 시험 응시율과
+        // 극복 문제 수가 학부모 리포트와 같은 최신 값이 된다.
+        // =====================================================
+
+        LocalDate today = LocalDate.now();
+
+        LocalDate periodStart =
+                today.withDayOfMonth(1); // 이번 달 첫날
+
+        LocalDate periodEnd =
+                today.with(TemporalAdjusters.lastDayOfMonth()); // 이번 달 마지막 날
+
+        StudentReport currentReport =
+                studentReportService.createMonthlyReport(
+                        studentId,
+                        periodStart,
+                        periodEnd
+                );
+
+
+        // =====================================================
+        // 3. 현재 리포트를 화면에 전달
+        // =====================================================
+
+        model.addAttribute(
+                "report",
+                currentReport
+        );
+
+
+        // =====================================================
+        // 4. 이전 리포트 조회
+        // =====================================================
+
+        StudentReport lastMonthReport =
+                studentReportService
+                        .getPreviousReport(
+                                studentId,
+                                currentReport.getPeriodStart()
+                        );
+
+
+        // =====================================================
+        // 5. 지난 달과 비교할 데이터
+        // =====================================================
+
+        if (lastMonthReport != null) {
+
+            // -------------------------------------------------
+            // 읽은 책
+            // -------------------------------------------------
+
+            int currentBooks =
+                    currentReport.getBooksReadCount() != null
+                            ? currentReport.getBooksReadCount()
+                            : 0;
+
+            int previousBooks =
+                    lastMonthReport.getBooksReadCount() != null
+                            ? lastMonthReport.getBooksReadCount()
+                            : 0;
+
+            model.addAttribute(
+                    "lastMonthBooks",
+                    previousBooks
+            );
+
+            model.addAttribute(
+                    "booksDiff",
+                    currentBooks - previousBooks
+            );
+
+
+            // -------------------------------------------------
+            // 시험 응시율
+            // -------------------------------------------------
+
+            int currentExam =
+                    currentReport.getExamCompletionRate() != null
+                            ? currentReport
+                            .getExamCompletionRate()
+                            .intValue()
+                            : 0;
+
+            int previousExam =
+                    lastMonthReport.getExamCompletionRate() != null
+                            ? lastMonthReport
+                            .getExamCompletionRate()
+                            .intValue()
+                            : 0;
+
+            model.addAttribute(
+                    "lastMonthExam",
+                    previousExam
+            );
+
+            model.addAttribute(
+                    "examDiff",
+                    currentExam - previousExam
+            );
+
+
+            // -------------------------------------------------
+            // 재시험 응시율
+            // -------------------------------------------------
+
+            int currentRetest =
+                    currentReport.getRetestCompletionRate() != null
+                            ? currentReport
+                            .getRetestCompletionRate()
+                            .intValue()
+                            : 0;
+
+            int previousRetest =
+                    lastMonthReport
+                            .getRetestCompletionRate() != null
+                            ? lastMonthReport
+                            .getRetestCompletionRate()
+                            .intValue()
+                            : 0;
+
+            model.addAttribute(
+                    "lastMonthRetest",
+                    previousRetest
+            );
+
+            model.addAttribute(
+                    "retestDiff",
+                    currentRetest - previousRetest
+            );
+
+
+            // -------------------------------------------------
+            // 학습 출석 일수
+            // -------------------------------------------------
+
+            int currentAttendance =
+                    currentReport.getStudyAttendanceDays() != null
+                            ? currentReport
+                            .getStudyAttendanceDays()
+                            : 0;
+
+            int previousAttendance =
+                    lastMonthReport
+                            .getStudyAttendanceDays() != null
+                            ? lastMonthReport
+                            .getStudyAttendanceDays()
+                            : 0;
+
+            model.addAttribute(
+                    "lastMonthAtt",
+                    previousAttendance
+            );
+
+            model.addAttribute(
+                    "attDiff",
+                    currentAttendance - previousAttendance
+            );
+
+
+            // -------------------------------------------------
+            // 극복한 문제 수
+            // -------------------------------------------------
+
+            int currentOvercome =
+                    currentReport.getOvercomeWrongCount() != null
+                            ? currentReport
+                            .getOvercomeWrongCount()
+                            : 0;
+
+            int previousOvercome =
+                    lastMonthReport
+                            .getOvercomeWrongCount() != null
+                            ? lastMonthReport
+                            .getOvercomeWrongCount()
+                            : 0;
+
+            model.addAttribute(
+                    "lastMonthOvercome",
+                    previousOvercome
+            );
+
+            model.addAttribute(
+                    "overcomeDiff",
+                    currentOvercome - previousOvercome
+            );
+
+        } else {
+
+            // -------------------------------------------------
+            // 이전 달 리포트가 없는 첫 리포트
+            // -------------------------------------------------
+
+            model.addAttribute(
+                    "lastMonthBooks",
+                    0
+            );
+
+            model.addAttribute(
+                    "booksDiff",
+                    0
+            );
+
+            model.addAttribute(
+                    "lastMonthExam",
+                    0
+            );
+
+            model.addAttribute(
+                    "examDiff",
+                    0
+            );
+
+            model.addAttribute(
+                    "lastMonthRetest",
+                    0
+            );
+
+            model.addAttribute(
+                    "retestDiff",
+                    0
+            );
+
+            model.addAttribute(
+                    "lastMonthAtt",
+                    0
+            );
+
+            model.addAttribute(
+                    "attDiff",
+                    0
+            );
+
+            model.addAttribute(
+                    "lastMonthOvercome",
+                    0
+            );
+
+            model.addAttribute(
+                    "overcomeDiff",
+                    0
+            );
+        }
 
         return "test";
     }
