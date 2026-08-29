@@ -6,6 +6,8 @@ public enum ExpActivityType { // 경험치 지금 기록 , 경험치 지급 룰
 
     REVIEW_LOG, // : 시험 복습 경험치 지급 로그
 
+    DAILY_REVIEW_LOG, // : 오늘의 복습 경험치 지급 로그
+
     READING_LOG, // : 독서감상문 경험치 지급 로그
 
 
