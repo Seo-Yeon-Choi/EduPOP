@@ -43,5 +43,7 @@ public class ClassWarningResponse {
         private Double errorRate;
         private List<String> topWeakWords;
         private List<String> topWeakTypes;
+        // 추가: 윤서영이 만든 학부모 리포트의 ID를 담을 그릇
+        private Long reportId;
     }
 }

@@ -17,6 +17,7 @@ public class ExamBulkGradeRequest {
         private Long studentId;
         private String studentName;
         private List<AnswerPayload> answers;
+        private String teacherComment; // OMR에서 작성한 학부모 리포트용 코멘트
     }
 
     @Data

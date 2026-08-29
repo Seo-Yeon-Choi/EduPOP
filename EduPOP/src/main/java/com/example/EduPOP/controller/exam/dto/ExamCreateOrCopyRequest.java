@@ -10,10 +10,12 @@ import java.util.List;
 @NoArgsConstructor
 public class ExamCreateOrCopyRequest {
     private Long academyId;
+    private Long teacherId;            // 로그인한 교사 ID를 서버에서 넣는다.
 
     private Long classId;              // 배정 대상 반 PK
     private Long templateExamId;       // 복제할 서식 ID (선택)
     private String title;              // 시험명
+    private String examType;           // WORD, MONTHLY, REVIEW, OTHER
     private Integer examRound;         // 회차 (예: 1회차)
     private String examDate;           // 시행일 (예: 2026-08-25)
 

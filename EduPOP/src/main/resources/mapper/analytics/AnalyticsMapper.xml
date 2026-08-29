@@ -55,46 +55,73 @@
     </select>
 
 
-    <!-- 대분류별 영역 취약점 통계 조회 -->
+    <!--
+        학생 성적 분석 화면의 영역별 성취도 조회.
+        학생 점수는 현재 학생의 최초 채점 결과로 계산하고,
+        반 평균은 같은 시험을 본 반 학생 전체의 최초 채점 결과로 계산한다.
+    -->
     <select id="findRadarStatsByStudentId"
             resultType="com.example.EduPOP.controller.analytics.dto.StudentTrendResponse$RadarStatDto">
+        WITH student_exam_ids AS (
+            SELECT DISTINCT ea.exam_id
+            FROM exam_attempts ea
+            WHERE ea.student_id = #{studentId}
+              AND ea.attempt_no = 1
+              AND ea.attempt_type = 'EXAM'
+              AND ea.status = 'GRADED'
+        ),
+        student_scores AS (
+            SELECT
+                COALESCE(NULLIF(TRIM(eq.large_category), ''), '기타') AS tag,
+                ROUND(
+                    SUM(CASE WHEN ans.is_correct = 1 THEN eq.score ELSE 0 END)
+                    * 100.0 / NULLIF(SUM(eq.score), 0),
+                    1
+                ) AS studentScoreRate
+            FROM exam_attempts ea
+            JOIN exam_answers ans
+              ON ans.attempt_id = ea.attempt_id
+            JOIN exam_questions eq
+              ON eq.question_id = ans.question_id
+            WHERE ea.student_id = #{studentId}
+              AND ea.attempt_no = 1
+              AND ea.attempt_type = 'EXAM'
+              AND ea.status = 'GRADED'
+            GROUP BY COALESCE(NULLIF(TRIM(eq.large_category), ''), '기타')
+        ),
+        class_scores AS (
+            SELECT
+                COALESCE(NULLIF(TRIM(eq.large_category), ''), '기타') AS tag,
+                ROUND(
+                    SUM(CASE WHEN ans.is_correct = 1 THEN eq.score ELSE 0 END)
+                    * 100.0 / NULLIF(SUM(eq.score), 0),
+                    1
+                ) AS classAvgScoreRate
+            FROM exam_attempts ea
+            JOIN exam_answers ans
+              ON ans.attempt_id = ea.attempt_id
+            JOIN exam_questions eq
+              ON eq.question_id = ans.question_id
+            JOIN exams e
+              ON e.exam_id = ea.exam_id
+            JOIN class_students cs
+              ON cs.class_id = e.class_id
+             AND cs.student_id = ea.student_id
+             AND cs.status = 'ACTIVE'
+            WHERE ea.exam_id IN (SELECT exam_id FROM student_exam_ids)
+              AND ea.attempt_no = 1
+              AND ea.attempt_type = 'EXAM'
+              AND ea.status = 'GRADED'
+            GROUP BY COALESCE(NULLIF(TRIM(eq.large_category), ''), '기타')
+        )
         SELECT
-            COALESCE(eq.large_category, '기타') AS tag,
-
-            ROUND(
-                    SUM(
-                            CASE
-                                WHEN eans.is_correct = 1
-                                    THEN eq.score
-                                ELSE 0
-                                END
-                    ) * 100.0
-                        / NULLIF(SUM(eq.score), 0),
-                    1
-            ) AS studentScoreRate,
-
-            ROUND(
-                    SUM(
-                            CASE
-                                WHEN eans.is_correct = 1
-                                    THEN eq.score
-                                ELSE 0
-                                END
-                    ) * 100.0
-                        / NULLIF(SUM(eq.score), 0),
-                    1
-            ) AS classAvgScoreRate
-
-        FROM exam_answers eans
-                 JOIN exam_questions eq
-                      ON eans.question_id = eq.question_id
-                 JOIN exam_attempts ea
-                      ON eans.attempt_id = ea.attempt_id
-
-        WHERE ea.student_id = #{studentId}
-
-        GROUP BY
-            COALESCE(eq.large_category, '기타')
+            student_scores.tag,
+            student_scores.studentScoreRate,
+            COALESCE(class_scores.classAvgScoreRate, 0.0) AS classAvgScoreRate
+        FROM student_scores
+        LEFT JOIN class_scores
+          ON class_scores.tag = student_scores.tag
+        ORDER BY student_scores.tag
     </select>
 
 
@@ -138,11 +165,54 @@
                       ON ea.exam_id = e.exam_id
 
         WHERE ea.student_id = #{studentId}
+          AND ea.attempt_no = 1
+          AND ea.attempt_type = 'EXAM'
+          AND ea.status = 'GRADED'
 
         GROUP BY
             e.title,
             COALESCE(eq.large_category, '일반'),
             COALESCE(eq.small_category, '기본')
+    </select>
+
+
+    <!--
+        집중 학습이 필요한 취약 영역 WORST 3.
+        같은 소분류가 여러 시험에 나와도 한 유형으로 합산한 뒤
+        누적 정답률이 낮은 순서로 정확히 3개만 반환한다.
+    -->
+    <select id="findWorst3SubCategoriesByStudentId"
+            resultType="com.example.EduPOP.controller.analytics.dto.StudentTrendResponse$SubCategoryStatDto">
+        SELECT
+            '전체 시험' AS examTitle,
+            COALESCE(NULLIF(TRIM(eq.large_category), ''), '일반') AS largeCategory,
+            COALESCE(NULLIF(TRIM(eq.small_category), ''), '기본') AS smallCategory,
+            ROUND(
+                SUM(CASE WHEN ans.is_correct = 1 THEN eq.score ELSE 0 END)
+                * 100.0 / NULLIF(SUM(eq.score), 0),
+                1
+            ) AS studentScoreRate
+        FROM exam_attempts ea
+        JOIN exam_answers ans
+          ON ans.attempt_id = ea.attempt_id
+        JOIN exam_questions eq
+          ON eq.question_id = ans.question_id
+        WHERE ea.student_id = #{studentId}
+          AND ea.attempt_no = 1
+          AND ea.attempt_type = 'EXAM'
+          AND ea.status = 'GRADED'
+          AND (
+                NULLIF(TRIM(eq.large_category), '') IS NOT NULL
+                OR NULLIF(TRIM(eq.small_category), '') IS NOT NULL
+          )
+        GROUP BY
+            COALESCE(NULLIF(TRIM(eq.large_category), ''), '일반'),
+            COALESCE(NULLIF(TRIM(eq.small_category), ''), '기본')
+        ORDER BY
+            studentScoreRate ASC,
+            largeCategory ASC,
+            smallCategory ASC
+        LIMIT 3
     </select>
 
 
@@ -223,43 +293,55 @@
     <select id="findVulnerableStudentsByClassId"
             resultType="com.example.EduPOP.controller.analytics.dto.ClassWarningResponse$StudentVulnerableDto">
         SELECT
-            u.user_id AS studentId,
-            u.name AS studentName,
+        u.user_id AS studentId,
+        u.name AS studentName,
 
-            ROUND(
-                    SUM(
-                            CASE
-                                WHEN eans.is_correct = 0
-                                    THEN 1
-                                ELSE 0
-                                END
-                    ) * 100.0
-                        / NULLIF(COUNT(eans.answer_id), 0),
-                    1
-            ) AS errorRate
+        <!--
+            🚀 [추가된 코드 설명]
+            학부모 리포트(parent_reports) 테이블에서 현재 학생(u.user_id)과 매칭되는 리포트 중
+            가장 최근에 생성된(ORDER BY created_at DESC) 리포트의 고유번호(report_id) 1개를 가져옵니다.
+            이 값이 프론트엔드로 넘어가서 "학부모 리포트 링크 복사" 버튼의 링크 생성 API 파라미터로 쓰입니다!
+        -->
+        (SELECT report_id
+        FROM parent_reports
+        WHERE student_id = u.user_id
+        ORDER BY created_at DESC LIMIT 1) AS reportId,
+
+        ROUND(
+        SUM(
+        CASE
+        WHEN eans.is_correct = 0
+        THEN 1
+        ELSE 0
+        END
+        ) * 100.0
+        / NULLIF(COUNT(eans.answer_id), 0),
+        1
+        ) AS errorRate
 
         FROM class_students cs
 
-                 JOIN users u
-                      ON cs.student_id = u.user_id
+        JOIN users u
+        ON cs.student_id = u.user_id
 
-                 LEFT JOIN exam_attempts ea
-                           ON u.user_id = ea.student_id
+        LEFT JOIN exam_attempts ea
+        ON u.user_id = ea.student_id
 
-                 LEFT JOIN exam_answers eans
-                           ON ea.attempt_id = eans.attempt_id
+        LEFT JOIN exam_answers eans
+        ON ea.attempt_id = eans.attempt_id
 
         WHERE
-            cs.class_id = #{classId}
-          AND cs.status = 'ACTIVE'
+        cs.class_id = #{classId}
+        AND cs.status = 'ACTIVE'
 
         GROUP BY
-            u.user_id,
-            u.name
+        u.user_id,
+        u.name
 
         HAVING COUNT(eans.answer_id) > 0
 
         ORDER BY errorRate DESC
+
     </select>
 
 
@@ -373,4 +455,81 @@
         LIMIT 3
     </select>
 
+    <!-- =========================================================
+     ⭐ [추가]
+     기간별 영역별 성취도
+     목적: 학부모 리포트의 "월간 영역별 성취도" 계산용
+     기존 student-trend.html의 findRadarStatsByStudentId와 동일한 계산식을 사용한다.
+
+     차이:
+     e.exam_date가 periodStart ~ periodEnd에 포함되는 시험만 계산한다.
+     ========================================================= -->
+
+    <select id="findRadarStatsByStudentIdAndPeriod"
+            resultType="com.example.EduPOP.controller.analytics.dto.StudentTrendResponse$RadarStatDto">
+        WITH student_exam_ids AS (
+            SELECT DISTINCT ea.exam_id
+            FROM exam_attempts ea
+            JOIN exams e
+              ON e.exam_id = ea.exam_id
+            WHERE ea.student_id = #{studentId}
+              AND ea.attempt_no = 1
+              AND ea.attempt_type = 'EXAM'
+              AND ea.status = 'GRADED'
+              AND e.exam_date BETWEEN #{periodStart} AND #{periodEnd}
+        ),
+        student_scores AS (
+            SELECT
+                COALESCE(NULLIF(TRIM(eq.large_category), ''), '기타') AS tag,
+                ROUND(
+                    SUM(CASE WHEN ans.is_correct = 1 THEN eq.score ELSE 0 END)
+                    * 100.0 / NULLIF(SUM(eq.score), 0),
+                    1
+                ) AS studentScoreRate
+            FROM exam_attempts ea
+            JOIN exam_answers ans
+              ON ans.attempt_id = ea.attempt_id
+            JOIN exam_questions eq
+              ON eq.question_id = ans.question_id
+            WHERE ea.student_id = #{studentId}
+              AND ea.exam_id IN (SELECT exam_id FROM student_exam_ids)
+              AND ea.attempt_no = 1
+              AND ea.attempt_type = 'EXAM'
+              AND ea.status = 'GRADED'
+            GROUP BY COALESCE(NULLIF(TRIM(eq.large_category), ''), '기타')
+        ),
+        class_scores AS (
+            SELECT
+                COALESCE(NULLIF(TRIM(eq.large_category), ''), '기타') AS tag,
+                ROUND(
+                    SUM(CASE WHEN ans.is_correct = 1 THEN eq.score ELSE 0 END)
+                    * 100.0 / NULLIF(SUM(eq.score), 0),
+                    1
+                ) AS classAvgScoreRate
+            FROM exam_attempts ea
+            JOIN exam_answers ans
+              ON ans.attempt_id = ea.attempt_id
+            JOIN exam_questions eq
+              ON eq.question_id = ans.question_id
+            JOIN exams e
+              ON e.exam_id = ea.exam_id
+            JOIN class_students cs
+              ON cs.class_id = e.class_id
+             AND cs.student_id = ea.student_id
+             AND cs.status = 'ACTIVE'
+            WHERE ea.exam_id IN (SELECT exam_id FROM student_exam_ids)
+              AND ea.attempt_no = 1
+              AND ea.attempt_type = 'EXAM'
+              AND ea.status = 'GRADED'
+            GROUP BY COALESCE(NULLIF(TRIM(eq.large_category), ''), '기타')
+        )
+        SELECT
+            student_scores.tag,
+            student_scores.studentScoreRate,
+            COALESCE(class_scores.classAvgScoreRate, 0.0) AS classAvgScoreRate
+        FROM student_scores
+        LEFT JOIN class_scores
+          ON class_scores.tag = student_scores.tag
+        ORDER BY student_scores.tag
+    </select>
 </mapper>

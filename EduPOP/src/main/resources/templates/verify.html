@@ -23,10 +23,29 @@
     <div th:if="${error}" style="color: #ff6b6b; margin-bottom: 15px; font-size: 14px; font-weight: bold;" th:text="${error}"></div>
 
     <!-- 인증 정보 전송 폼 -->
-    <form th:action="@{/share/reports/{token}/verify(token=${token})}" method="post">
-        <input type="text" name="studentName" class="input-field" placeholder="학생 이름 (예: 김민수)" required>
-        <input type="password" name="phoneLast4" class="input-field" placeholder="학부모 전화번호 뒷자리 4개 (예: 1234)" maxlength="4" required>
-        <button type="submit" class="btn-submit">인증하고 리포트 보기</button>
+    <form th:action="@{'/share/reports/' + ${token} + '/verify'}"
+          method="post">
+
+        <div>
+            <label>학생 이름</label>
+            <input type="text"
+                   name="studentName"
+                   required>
+        </div>
+
+        <div>
+            <label>전화번호 뒤 4자리</label>
+            <input type="text"
+                   name="phoneLast4"
+                   maxlength="4"
+                   inputmode="numeric"
+                   required>
+        </div>
+
+        <button type="submit">
+            리포트 확인
+        </button>
+
     </form>
 </div>
 

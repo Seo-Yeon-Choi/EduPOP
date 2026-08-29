@@ -4,145 +4,375 @@ import com.example.EduPOP.domain.report.StudentReport;
 import com.example.EduPOP.service.report.StudentReportService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/student-reports")
 public class StudentReportController {
 
-    // TODO: 나중에 주방장(StudentReportService)을 연결할 자리
-    // 1. 웨이터가 일할 때 필요한 주방장(Service)을 final 변수로 선언
     private final StudentReportService studentReportService;
 
-    // 2. [생성자 주입] 스프링이 알아서 만들어둔 StudentReportService 주방장을 이곳에 꽂아줍니다!
-    public StudentReportController(StudentReportService studentReportService) {
-        this.studentReportService = studentReportService;
+    public StudentReportController(
+            StudentReportService studentReportService
+    ) {
+        this.studentReportService =
+                studentReportService;
     }
 
-    // ==========================================
-    // 1. 이번 달 나의 회고 (4가지 항목) 자동 저장 API
-    // ==========================================
+    // =========================================================
+    // 월간 리포트 자동 생성
+    //
+    // 다른 팀원의 데이터를 모아
+    // student_reports에 자동 저장한다.
+    // =========================================================
+
+    @PostMapping("/generate")
+    public StudentReport generateReport(
+            @RequestBody GenerateReportRequest request
+    ) {
+
+        return studentReportService.createMonthlyReport(
+                request.getStudentId(),
+                request.getPeriodStart(),
+                request.getPeriodEnd()
+        );
+    }
+
+
+    // =========================================================
+    // 특정 리포트 조회
+    // =========================================================
+
+    @GetMapping("/{reportId}")
+    public StudentReport getReport(
+            @PathVariable Long reportId
+    ) {
+
+        return studentReportService.getReport(
+                reportId
+        );
+    }
+
+
+    // =========================================================
+    // Keep
+    // =========================================================
 
     @PatchMapping("/{reportId}/proudest-moment")
-    public String updateProudestMoment(@PathVariable Long reportId, @RequestBody ProudestRequest request) {
-        // 1. 주방장에게 저장을 시킵니다 (이때 *** 필터링 작동!)
-        studentReportService.updateProudestMoment(reportId, request.getProudestMoment());
+    public String updateProudestMoment(
+            @PathVariable Long reportId,
+            @RequestBody ProudestRequest request
+    ) {
 
-        // 2. 필터링된 깨끗한 데이터를 DB에서 다시 꺼내서 화면(JS)으로 던져줍니다!
-        StudentReport report = studentReportService.getReport(reportId);
-        return report.getProudestMoment();
+        studentReportService.updateProudestMoment(
+                reportId,
+                request.getProudestMoment()
+        );
+
+        return studentReportService
+                .getReport(reportId)
+                .getProudestMoment();
     }
+
+
+    // =========================================================
+    // Problem
+    // =========================================================
 
     @PatchMapping("/{reportId}/habit-to-improve")
-    public String updateHabitToImprove(@PathVariable Long reportId, @RequestBody HabitRequest request) {
-        studentReportService.updateHabitToImprove(reportId, request.getHabitToImprove());
+    public String updateHabitToImprove(
+            @PathVariable Long reportId,
+            @RequestBody HabitRequest request
+    ) {
 
-        StudentReport report = studentReportService.getReport(reportId);
-        return report.getHabitToImprove();
+        studentReportService.updateHabitToImprove(
+                reportId,
+                request.getHabitToImprove()
+        );
+
+        return studentReportService
+                .getReport(reportId)
+                .getHabitToImprove();
     }
+
+
+    // =========================================================
+    // Self Feedback
+    // =========================================================
 
     @PatchMapping("/{reportId}/self-feedback")
-    public String updateSelfFeedback(@PathVariable Long reportId, @RequestBody FeedbackRequest request) {
-        studentReportService.updateSelfFeedback(reportId, request.getSelfFeedback());
+    public String updateSelfFeedback(
+            @PathVariable Long reportId,
+            @RequestBody FeedbackRequest request
+    ) {
 
-        StudentReport report = studentReportService.getReport(reportId);
-        return report.getSelfFeedback();
+        studentReportService.updateSelfFeedback(
+                reportId,
+                request.getSelfFeedback()
+        );
+
+        return studentReportService
+                .getReport(reportId)
+                .getSelfFeedback();
     }
+
+
+    // =========================================================
+    // Try
+    // =========================================================
 
     @PatchMapping("/{reportId}/next-resolution")
-    public String updateNextResolution(@PathVariable Long reportId, @RequestBody ResolutionRequest request) {
-        studentReportService.updateNextResolution(reportId, request.getNextResolution());
+    public String updateNextResolution(
+            @PathVariable Long reportId,
+            @RequestBody ResolutionRequest request
+    ) {
 
-        StudentReport report = studentReportService.getReport(reportId);
-        return report.getNextResolution();
+        studentReportService.updateNextResolution(
+                reportId,
+                request.getNextResolution()
+        );
+
+        return studentReportService
+                .getReport(reportId)
+                .getNextResolution();
     }
 
-    // ==========================================
-    // 2. 만족도 별점 & 기분 저장 API (비속어 필터링 적용 반환)
-    // ==========================================
+
+    // =========================================================
+    // 기분 / 만족도
+    // =========================================================
+
     @PatchMapping("/{reportId}/mood-and-score")
-    public MoodScoreRequest updateMoodAndScore(@PathVariable Long reportId, @RequestBody MoodScoreRequest request) {
-        // 1. 주방장에게 저장을 시킵니다 (이때 기분에 비속어가 있으면 *** 처리됨)
-        studentReportService.updateMoodAndScore(reportId, request.getMonthlyMood(), request.getSelfEffortScore());
+    public MoodScoreRequest updateMoodAndScore(
+            @PathVariable Long reportId,
+            @RequestBody MoodScoreRequest request
+    ) {
 
-        // 2. DB에서 필터링이 끝난 최신 리포트를 다시 꺼내옵니다.
-        StudentReport report = studentReportService.getReport(reportId);
+        studentReportService.updateMoodAndScore(
+                reportId,
+                request.getMonthlyMood(),
+                request.getSelfEffortScore()
+        );
 
-        // 3. 화면(JS)이 알아먹기 쉽게 다시 DTO 상자에 담아서(JSON) 던져줍니다!
-        MoodScoreRequest response = new MoodScoreRequest();
-        response.setMonthlyMood(report.getMonthlyMood());
-        response.setSelfEffortScore(report.getSelfEffortScore());
+        StudentReport report =
+                studentReportService.getReport(
+                        reportId
+                );
 
-        return response; // 스프링이 알아서 JSON 형태로 변환해 줍니다!
-    }
+        MoodScoreRequest response =
+                new MoodScoreRequest();
 
-    // ==========================================
-    // 3. 아는 개념 & 모르는 개념 저장 API (비속어 필터링 적용 반환)
-    // ==========================================
-    @PatchMapping("/{reportId}/learning-concepts")
-    public ConceptRequest updateLearningConcepts(@PathVariable Long reportId, @RequestBody ConceptRequest request) {
-        // 1. 주방장에게 저장을 시킵니다 (이때 비속어가 있으면 *** 처리됨)
-        studentReportService.updateLearningConcepts(reportId, request.getKnownConcepts(), request.getUnknownConcepts());
+        response.setMonthlyMood(
+                report.getMonthlyMood()
+        );
 
-        // 2. DB에서 최신 리포트 꺼내오기
-        StudentReport report = studentReportService.getReport(reportId);
-
-        // 3. 화면에 돌려줄 DTO 상자에 안전한(***) 데이터 담기
-        ConceptRequest response = new ConceptRequest();
-        response.setKnownConcepts(report.getKnownConcepts());
-        response.setUnknownConcepts(report.getUnknownConcepts());
+        response.setSelfEffortScore(
+                report.getSelfEffortScore()
+        );
 
         return response;
     }
 
 
-    // ==========================================
-    // 📦 프론트엔드에서 날아오는 JSON 데이터를 담을 빈 상자들 (DTO 클래스)
-    // ==========================================
+    // =========================================================
+    // 아는 개념 / 모르는 개념
+    // =========================================================
 
-    static class ProudestRequest {
+    @PatchMapping("/{reportId}/learning-concepts")
+    public ConceptRequest updateLearningConcepts(
+            @PathVariable Long reportId,
+            @RequestBody ConceptRequest request
+    ) {
+
+        studentReportService.updateLearningConcepts(
+                reportId,
+                request.getKnownConcepts(),
+                request.getUnknownConcepts()
+        );
+
+        StudentReport report =
+                studentReportService.getReport(
+                        reportId
+                );
+
+        ConceptRequest response =
+                new ConceptRequest();
+
+        response.setKnownConcepts(
+                report.getKnownConcepts()
+        );
+
+        response.setUnknownConcepts(
+                report.getUnknownConcepts()
+        );
+
+        return response;
+    }
+
+
+    // =========================================================
+    // DTO
+    // =========================================================
+
+    public static class GenerateReportRequest {
+
+        private Long studentId;
+        private LocalDate periodStart;
+        private LocalDate periodEnd;
+
+        public Long getStudentId() {
+            return studentId;
+        }
+
+        public void setStudentId(
+                Long studentId
+        ) {
+            this.studentId = studentId;
+        }
+
+        public LocalDate getPeriodStart() {
+            return periodStart;
+        }
+
+        public void setPeriodStart(
+                LocalDate periodStart
+        ) {
+            this.periodStart = periodStart;
+        }
+
+        public LocalDate getPeriodEnd() {
+            return periodEnd;
+        }
+
+        public void setPeriodEnd(
+                LocalDate periodEnd
+        ) {
+            this.periodEnd = periodEnd;
+        }
+    }
+
+
+    public static class ProudestRequest {
+
         private String proudestMoment;
-        public String getProudestMoment() { return proudestMoment; }
-        public void setProudestMoment(String proudestMoment) { this.proudestMoment = proudestMoment; }
+
+        public String getProudestMoment() {
+            return proudestMoment;
+        }
+
+        public void setProudestMoment(
+                String proudestMoment
+        ) {
+            this.proudestMoment = proudestMoment;
+        }
     }
 
-    static class HabitRequest {
+
+    public static class HabitRequest {
+
         private String habitToImprove;
-        public String getHabitToImprove() { return habitToImprove; }
-        public void setHabitToImprove(String habitToImprove) { this.habitToImprove = habitToImprove; }
+
+        public String getHabitToImprove() {
+            return habitToImprove;
+        }
+
+        public void setHabitToImprove(
+                String habitToImprove
+        ) {
+            this.habitToImprove =
+                    habitToImprove;
+        }
     }
 
-    static class FeedbackRequest {
+
+    public static class FeedbackRequest {
+
         private String selfFeedback;
-        public String getSelfFeedback() { return selfFeedback; }
-        public void setSelfFeedback(String selfFeedback) { this.selfFeedback = selfFeedback; }
+
+        public String getSelfFeedback() {
+            return selfFeedback;
+        }
+
+        public void setSelfFeedback(
+                String selfFeedback
+        ) {
+            this.selfFeedback =
+                    selfFeedback;
+        }
     }
 
-    static class ResolutionRequest {
+
+    public static class ResolutionRequest {
+
         private String nextResolution;
-        public String getNextResolution() { return nextResolution; }
-        public void setNextResolution(String nextResolution) { this.nextResolution = nextResolution; }
+
+        public String getNextResolution() {
+            return nextResolution;
+        }
+
+        public void setNextResolution(
+                String nextResolution
+        ) {
+            this.nextResolution =
+                    nextResolution;
+        }
     }
 
-    static class MoodScoreRequest {
+
+    public static class MoodScoreRequest {
+
         private String monthlyMood;
-        private Integer selfEffortScore; // 빈칸(null) 허용
+        private Integer selfEffortScore;
 
-        public String getMonthlyMood() { return monthlyMood; }
-        public void setMonthlyMood(String monthlyMood) { this.monthlyMood = monthlyMood; }
+        public String getMonthlyMood() {
+            return monthlyMood;
+        }
 
-        // ⭐️ 리턴 타입도 똑같이 Integer로 변경완료!
-        public Integer getSelfEffortScore() { return selfEffortScore; }
-        // ⭐️ Setter(수정 버튼) 추가완료!
-        public void setSelfEffortScore(Integer selfEffortScore) { this.selfEffortScore = selfEffortScore; }
+        public void setMonthlyMood(
+                String monthlyMood
+        ) {
+            this.monthlyMood =
+                    monthlyMood;
+        }
+
+        public Integer getSelfEffortScore() {
+            return selfEffortScore;
+        }
+
+        public void setSelfEffortScore(
+                Integer selfEffortScore
+        ) {
+            this.selfEffortScore =
+                    selfEffortScore;
+        }
     }
 
-    static class ConceptRequest {
+
+    public static class ConceptRequest {
+
         private String knownConcepts;
         private String unknownConcepts;
 
-        public String getKnownConcepts() { return knownConcepts; }
-        public void setKnownConcepts(String knownConcepts) { this.knownConcepts = knownConcepts; } // ⭐️ 추가!
+        public String getKnownConcepts() {
+            return knownConcepts;
+        }
 
-        public String getUnknownConcepts() { return unknownConcepts; }
-        public void setUnknownConcepts(String unknownConcepts) { this.unknownConcepts = unknownConcepts; } // ⭐️ 추가!
+        public void setKnownConcepts(
+                String knownConcepts
+        ) {
+            this.knownConcepts =
+                    knownConcepts;
+        }
+
+        public String getUnknownConcepts() {
+            return unknownConcepts;
+        }
+
+        public void setUnknownConcepts(
+                String unknownConcepts
+        ) {
+            this.unknownConcepts =
+                    unknownConcepts;
+        }
     }
 }

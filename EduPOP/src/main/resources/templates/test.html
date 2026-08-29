@@ -273,9 +273,12 @@
 <!-- ========================================================================= -->
 <!-- 💡 자바스크립트 영역: 프론트엔드와 백엔드 API 간의 통신(Fetch)을 담당합니다 -->
 <!-- ========================================================================= -->
-<script>
+<script th:inline="javascript">
     const csrfToken = document.querySelector('meta[name="_csrf"]').content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+    // 현재 로그인한 학생에게 생성된 리포트 ID
+    const REPORT_ID = /*[[${report.reportId}]]*/ 0;
 
     /**
      * KPT 4가지 항목(Keep, Problem, Feedback, Try)의 자동 저장을 처리하는 공용 함수
@@ -305,7 +308,7 @@
 
         // JS 비동기 통신(Fetch API)을 통해 서버(자바 컨트롤러)로 데이터를 쏩니다.
         // async 키워드: 서버의 응답을 기다렸다가(await) 처리하기 위해 사용합니다.
-        fetch('/api/student-reports/2/' + apiPath, {
+        fetch('/api/student-reports/' + REPORT_ID + '/' + apiPath, {
             method: 'PATCH', // 데이터의 일부만 수정하므로 PATCH 메서드 사용
             headers: {
                 'Content-Type': 'application/json',
@@ -353,7 +356,7 @@
         statusDiv.innerText = "저장 중... ⏳";
         statusDiv.style.color = "#0d6efd";
 
-        fetch('/api/student-reports/2/mood-and-score', {
+        fetch('/api/student-reports/' + REPORT_ID + '/mood-and-score', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -401,7 +404,7 @@
         statusDiv.innerText = "저장 중... ⏳";
         statusDiv.style.color = "#0d6efd";
 
-        fetch('/api/student-reports/2/learning-concepts', {
+        fetch('/api/student-reports/' + REPORT_ID + '/learning-concepts', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

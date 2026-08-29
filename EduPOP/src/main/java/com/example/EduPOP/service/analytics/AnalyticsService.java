@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,16 +74,17 @@ public class AnalyticsService {
                     .collect(Collectors.toList());
             response.setTop3SubCategories(top3);
 
-            // 정답률 낮은 순으로 정렬 후 하위 3개 (Worst 3 - 취약 영역) 추출
-            List<SubCategoryStatDto> worst3 = subCategoryStats.stream()
-                    .sorted((a, b) -> Double.compare(a.getStudentScoreRate(), b.getStudentScoreRate()))
-                    .limit(3)
-                    .collect(Collectors.toList());
-            response.setWorst3SubCategories(worst3);
         } else {
             response.setTop3SubCategories(new ArrayList<>());
-            response.setWorst3SubCategories(new ArrayList<>());
         }
+
+        // 시험별 행을 Java에서 단순 정렬하지 않고, 같은 유형을 DB에서 합산한 WORST 3를 조회
+        List<SubCategoryStatDto> worst3 =
+                analyticsMapper.findWorst3SubCategoriesByStudentId(studentId);
+
+        response.setWorst3SubCategories(
+                worst3 != null ? worst3 : new ArrayList<>()
+        );
 
         response.setSubCategoryStats(subCategoryStats != null ? subCategoryStats : new ArrayList<>());
 
@@ -90,5 +92,94 @@ public class AnalyticsService {
                 response.getStudentName(), response.getExamHistories().size(), response.getRadarStats().size());
 
         return response;
+    }
+    // =========================================================
+    // ⭐ [추가]
+    // 기간 제한 영역별 성취도
+    // 사용 목적:학부모 리포트의 "월간 영역별 성취도"
+    // ---------------------------------------------------------
+    // 기존 student-trend의 영역별 성취도와 동일한 SQL 계산식 사용
+    // 단, periodStart <= 시험일 <= periodEnd 조건을 추가해서 해당 월의 시험만 계산한다.
+    // =========================================================
+
+    @Transactional(readOnly = true)
+    public List<RadarStatDto> getRadarStatsByPeriod(
+            Long studentId,
+            LocalDate periodStart,
+            LocalDate periodEnd
+    ) {
+
+        // -----------------------------------------------------
+        // 기본 파라미터 검증
+        // -----------------------------------------------------
+
+        if (studentId == null) {
+
+            throw new IllegalArgumentException(
+                    "학생 ID가 없습니다."
+            );
+        }
+
+
+        if (
+                periodStart == null
+                        || periodEnd == null
+        ) {
+
+            throw new IllegalArgumentException(
+                    "조회 기간이 없습니다."
+            );
+        }
+
+
+        if (
+                periodStart.isAfter(
+                        periodEnd
+                )
+        ) {
+
+            throw new IllegalArgumentException(
+                    "조회 시작일이 종료일보다 늦을 수 없습니다."
+            );
+        }
+
+
+        log.info(
+                "학생 [{}]의 기간별 영역 성취도 조회: {} ~ {}",
+                studentId,
+                periodStart,
+                periodEnd
+        );
+
+
+        // -----------------------------------------------------
+        // ⭐ 실제 DB 조회
+        // 기존 radarStats와 동일한 계산식이지만 기간을 함께 전달한다.
+        // -----------------------------------------------------
+
+        List<RadarStatDto> radarStats =
+                analyticsMapper
+                        .findRadarStatsByStudentIdAndPeriod(
+                                studentId,
+                                periodStart,
+                                periodEnd
+                        );
+
+
+        // -----------------------------------------------------
+        // 데이터가 없으면 빈 리스트 반환
+        // 학부모 리포트에서는 존재하지 않는 영역을 임의로 만들어내지 않는다.
+        // =====================================================
+
+        if (
+                radarStats == null
+                        || radarStats.isEmpty()
+        ) {
+
+            return new ArrayList<>();
+        }
+
+
+        return radarStats;
     }
 }

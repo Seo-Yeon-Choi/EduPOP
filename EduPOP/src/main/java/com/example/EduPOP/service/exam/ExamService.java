@@ -195,6 +195,26 @@ public class ExamService {
             request.setExamRound(1);
         }
 
+        // 기존 MONTH 값은 표준 월말평가 코드인 MONTHLY로 통일
+        String examType = request.getExamType();
+
+        if (examType == null || examType.isBlank()) {
+            request.setExamType("OTHER");
+        } else {
+            String normalizedExamType = examType.trim().toUpperCase();
+
+            if ("MONTH".equals(normalizedExamType)
+                    || "MONTHLY".equals(normalizedExamType)
+                    || normalizedExamType.contains("월말")) {
+                request.setExamType("MONTHLY");
+            } else if ("WORD".equals(normalizedExamType)
+                    || normalizedExamType.contains("단어")) {
+                request.setExamType("WORD");
+            } else {
+                request.setExamType(normalizedExamType);
+            }
+        }
+
         examMapper.insertExam(request);
 
         Long newExamId = request.getGeneratedExamId();
@@ -245,7 +265,10 @@ public class ExamService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveBulkGrades(ExamBulkGradeRequest request) {
+    public void saveBulkGrades(
+            ExamBulkGradeRequest request,
+            Long teacherId
+    ) {
         Long examId = request.getExamId();
 
         log.info("시험 ID [{}] 일괄/개별 채점 저장 로직 실행", examId);
@@ -327,10 +350,6 @@ public class ExamService {
                 examMapper.deleteExamAnswersByAttemptId(
                         existingAttempt.getAttemptId()
                 );
-                examMapper.deleteExamAttemptByExamAndStudent(
-                        examId,
-                        student.getStudentId()
-                );
             }
 
             ExamAttempt attempt = new ExamAttempt();
@@ -347,12 +366,35 @@ public class ExamService {
             );
             attempt.setPrimaryWeakTag(primaryWeakTag);
 
-            examMapper.insertExamAttempt(attempt);
+            if (existingAttempt == null) {
+                examMapper.insertExamAttempt(attempt);
+            } else {
+                attempt.setAttemptId(existingAttempt.getAttemptId());
+
+                int updatedRows =
+                        examMapper.updateExamAttemptScore(attempt);
+
+                if (updatedRows != 1) {
+                    throw new IllegalStateException(
+                            "기존 시험 채점 결과 수정에 실패했습니다."
+                    );
+                }
+            }
 
             if (!answerList.isEmpty()) {
                 examMapper.batchInsertExamAnswers(
                         attempt.getAttemptId(),
                         answerList
+                );
+            }
+
+            // 점수 저장 요청에 코멘트가 함께 왔다면 같은 시험 월의 학부모 리포트에 저장
+            if (student.getTeacherComment() != null) {
+                saveTeacherComment(
+                        examId,
+                        student.getStudentId(),
+                        teacherId,
+                        student.getTeacherComment()
                 );
             }
         }
@@ -364,20 +406,57 @@ public class ExamService {
     }
 
     @Transactional
-    public void saveTeacherComments(List<Map<String, Object>> comments) {
-        for (Map<String, Object> commentData : comments) {
-            Long studentId = Long.valueOf(
-                    commentData.get("studentId").toString()
-            );
-            String comment = commentData.get("comment").toString();
+    public void saveTeacherComments(
+            Long examId,
+            Long teacherId,
+            List<ExamCommentSaveRequest.StudentCommentPayload> comments
+    ) {
 
-            int updatedRows = examMapper.updateTeacherComment(
+        if (examId == null || teacherId == null || comments == null) {
+            throw new IllegalArgumentException("시험·교사·코멘트 정보가 필요합니다.");
+        }
+
+        for (ExamCommentSaveRequest.StudentCommentPayload commentData : comments) {
+            if (commentData == null || commentData.getStudentId() == null) {
+                continue;
+            }
+
+            saveTeacherComment(
+                    examId,
+                    commentData.getStudentId(),
+                    teacherId,
+                    commentData.getComment()
+            );
+        }
+    }
+
+    // 해당 시험이 시행된 월의 parent_reports 한 건에 코멘트를 저장
+    private void saveTeacherComment(
+            Long examId,
+            Long studentId,
+            Long teacherId,
+            String comment
+    ) {
+
+        String safeComment = comment != null ? comment.trim() : "";
+
+        int updatedRows = examMapper.updateTeacherComment(
+                examId,
+                studentId,
+                teacherId,
+                safeComment
+        );
+
+        if (updatedRows == 0) {
+            int insertedRows = examMapper.insertTeacherComment(
+                    examId,
                     studentId,
-                    comment
+                    teacherId,
+                    safeComment
             );
 
-            if (updatedRows == 0) {
-                examMapper.insertTeacherComment(studentId, comment);
+            if (insertedRows != 1) {
+                throw new IllegalStateException("학부모 리포트 코멘트 저장에 실패했습니다.");
             }
         }
     }

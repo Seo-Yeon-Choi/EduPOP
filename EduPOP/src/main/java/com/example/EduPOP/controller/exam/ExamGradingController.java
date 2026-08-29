@@ -156,6 +156,11 @@ public class ExamGradingController {
                 loginUser.getAcademyId()
         );
 
+        // 프론트에서 받은 값 대신 로그인 세션의 교사 번호를 사용
+        request.setTeacherId(
+                loginUser.getUserId()
+        );
+
         log.info(
                 "새 시험 배정 요청 - teacherId: {}, academyId: {}, classId: {}",
                 loginUser.getUserId(),
@@ -191,7 +196,10 @@ public class ExamGradingController {
                 loginUser.getUserId()
         );
 
-        examService.saveBulkGrades(request);
+        examService.saveBulkGrades(
+                request,
+                loginUser.getUserId()
+        );
 
         Map<String, Object> response =
                 new HashMap<>();
@@ -240,8 +248,7 @@ public class ExamGradingController {
     @PostMapping("/api/save-comments")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> saveTeacherComments(
-            @RequestBody
-            Map<String, List<Map<String, Object>>> payload,
+            @RequestBody ExamCommentSaveRequest request,
 
             HttpSession session
     ) {
@@ -255,13 +262,17 @@ public class ExamGradingController {
                     .build();
         }
 
-        List<Map<String, Object>> comments =
-                payload.get("comments");
+        List<ExamCommentSaveRequest.StudentCommentPayload> comments =
+                request.getComments();
 
         if (comments != null &&
                 !comments.isEmpty()) {
 
-            examService.saveTeacherComments(comments);
+            examService.saveTeacherComments(
+                    request.getExamId(),
+                    loginUser.getUserId(),
+                    comments
+            );
         }
 
         Map<String, Object> response =
@@ -272,3 +283,4 @@ public class ExamGradingController {
         return ResponseEntity.ok(response);
     }
 }
+

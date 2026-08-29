@@ -44,6 +44,7 @@ public interface ExamMapper {
 
     // 학생 응시 원장 저장
     int insertExamAttempt(ExamAttempt attempt);
+    int updateExamAttemptScore(ExamAttempt attempt);
     Exam findById(Long examId);
 
     // 문항별 세부 답안 일괄 저장
@@ -59,8 +60,19 @@ public interface ExamMapper {
     void deleteExamAttemptByExamAndStudent(@Param("examId") Long examId, @Param("studentId") Long studentId);
     List<Exam> findAll();
 
-    int updateTeacherComment(@Param("studentId") Long studentId, @Param("comment") String comment);
-    void insertTeacherComment(@Param("studentId") Long studentId, @Param("comment") String comment);
+    int updateTeacherComment(
+            @Param("examId") Long examId,
+            @Param("studentId") Long studentId,
+            @Param("teacherId") Long teacherId,
+            @Param("comment") String comment
+    );
+
+    int insertTeacherComment(
+            @Param("examId") Long examId,
+            @Param("studentId") Long studentId,
+            @Param("teacherId") Long teacherId,
+            @Param("comment") String comment
+    );
     List<Exam> findByTeacherId(Long teacherId);
 
 
