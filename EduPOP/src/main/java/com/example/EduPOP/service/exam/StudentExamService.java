@@ -3,6 +3,8 @@ package com.example.EduPOP.service.exam;
 import com.example.EduPOP.domain.common.Paging;
 import com.example.EduPOP.domain.exam.*;
 import com.example.EduPOP.repository.exam.StudentExamMapper;
+import com.example.EduPOP.service.exp.ExpService;
+// ExpService(이엑스피 서비스): 완료된 시험 결과를 경험치 기능에 전달
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,8 @@ import java.util.List;
 public class StudentExamService {
 
     private final StudentExamMapper studentExamMapper;
+    private final ExpService expService; // 시험과 복습 완료 결과를 경험치 처리 객체에 전달
+
 
     private static final int PAGE_SIZE=10;
 
@@ -356,6 +360,15 @@ public class StudentExamService {
 
         studentExamMapper.completeAttempt(attempt);
 
+        expService.giveAttemptExp(
+                studentId,
+                attempt.getExamId(),
+                attempt.getAttemptType(),
+                attempt.getTotalScore(),
+                attempt.getMaxScore()
+        );
+        // 일반 시험 또는 시험별 복습 결과를 경험치 기능에 전달
+
         return attempt.getAttemptId();
     }
 
@@ -498,9 +511,9 @@ public class StudentExamService {
         int retrySuccessRate = reviewQuestionCount == 0
                 ? 0
                 : (int) Math.round(
-                        reviewCorrectCount * 100.0
-                                / reviewQuestionCount
-                );
+                reviewCorrectCount * 100.0
+                        / reviewQuestionCount
+        );
 
         summary.setRetrySuccessRate(retrySuccessRate);
 
@@ -722,6 +735,15 @@ public class StudentExamService {
                 .completeDailyReviewAttempt(
                         attempt
                 );
+
+        expService.giveDailyReviewExp(
+                studentId,
+                LocalDate.now(),
+                correctCount,
+                submission.getAnswers().size(),
+                reviewQuestions.size()
+        );
+        // 전체 문제 완료·정답률 80% 이상·오늘 최초 1회이면 20점 지급
 
         return submission
                 .getDailyReviewAttemptId();

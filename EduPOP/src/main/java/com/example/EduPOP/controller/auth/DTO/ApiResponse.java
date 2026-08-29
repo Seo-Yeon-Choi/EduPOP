@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor // 생성자 생성
 public class ApiResponse<T> {
     private String status;   // SUCCESS 또는 ERROR
     private String message;  // 결과 메시지

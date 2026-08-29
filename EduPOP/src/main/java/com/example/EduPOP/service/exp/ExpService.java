@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal; // BigDecimal(빅 데시멀): 소수점 계산용 숫자 타입
 import java.math.RoundingMode; // RoundingMode(라운딩 모드): 소수점 처리 방법
+import java.time.LocalDate; // LocalDate(로컬 데이트): 오늘의 복습 날짜
+import java.time.format.DateTimeFormatter; // DateTimeFormatter(데이트 타임 포매터): 날짜 형식 변환
 import java.util.List; // List(리스트): 여러 경험치 로그를 저장하는 자료형
 
 @Service // 경험치 지급과 캐릭터 성장 판단을 담당하는 객체로 등록
@@ -193,7 +195,67 @@ public class ExpService {
                 30
         ); // 같은 시험 복습은 최초 1회에만 경험치 30점 지급
     }
+    @Transactional // 오늘의 복습 경험치 지급 작업을 하나의 작업 단위로 처리
+    public int giveDailyReviewExp(
+            Long studentId,
+            LocalDate reviewDate,
+            int correctCount,
+            int submittedAnswerCount,
+            int totalQuestionCount
+    ) { // giveDailyReviewExp(기브 데일리 리뷰 이엑스피): 오늘의 복습 경험치 지급
 
+        validateId(
+                studentId,
+                "학생 번호"
+        ); // 올바른 학생 번호인지 확인
+
+        if (reviewDate == null) {
+            throw new IllegalArgumentException(
+                    "오늘의 복습 날짜가 필요합니다."
+            );
+        }
+
+        if (totalQuestionCount <= 0) {
+            return 0;
+            // 오늘 복습할 문제가 없으면 경험치를 지급하지 않음
+        }
+
+        if (submittedAnswerCount != totalQuestionCount) {
+            return 0;
+            // 제출 답안 수가 전체 문제 수와 다르면 완료로 인정하지 않음
+        }
+
+        if (correctCount < 0
+                || correctCount > totalQuestionCount) {
+
+            throw new IllegalArgumentException(
+                    "오늘의 복습 정답 개수가 올바르지 않습니다."
+            );
+        }
+
+        if ((long) correctCount * 100
+                < (long) totalQuestionCount * 80) {
+
+            return 0;
+            // 정답률이 80% 미만이면 경험치를 지급하지 않음
+        }
+
+        Long reviewDateReferenceId =
+                Long.valueOf(
+                        reviewDate.format(
+                                DateTimeFormatter.BASIC_ISO_DATE
+                        )
+                );
+        // 오늘 날짜를 20260829 형태의 중복 확인 번호로 변환
+
+        return giveExp(
+                studentId,
+                ExpActivityType.DAILY_REVIEW_LOG,
+                reviewDateReferenceId,
+                20
+        );
+        // 같은 날짜의 오늘의 복습 경험치는 최초 한 번만 20점 지급
+    }
 
     @Transactional // 독서 경험치 지급 작업을 하나의 작업 단위로 처리
     public int giveReadingExp(
