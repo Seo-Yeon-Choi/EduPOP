@@ -57,10 +57,17 @@
 <th:block th:replace="~{layout/header :: header}"></th:block>
 <th:block th:replace="~{layout/sidebar-teacher :: sidebar}"></th:block>
 
+<!-- 💡 [핵심 수정] 전체 레이아웃을 감싸는 wrapper를 올바른 위치에 배치합니다. -->
 <div class="page-content-wrapper">
+
+    <!-- 1. 좌측 반 목록 카드 -->
     <div class="class-list-card">
         <h3>📚 나의 클래스 룸</h3>
         <div id="classListContainer">
+            <div th:if="${teacherClasses == null or teacherClasses.isEmpty()}" style="padding: 15px 10px; font-size: 12px; color: #94a3b8; text-align: center;">
+                등록된 반이 없습니다.
+            </div>
+
             <div th:each="cls, iter : ${teacherClasses}"
                  class="class-item"
                  th:classappend="${iter.first} ? 'active'"
@@ -73,11 +80,11 @@
         </div>
     </div>
 
+    <!-- 2. 우측 메인 콘텐츠 영역 -->
     <div class="analytics-main">
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <div>
-                    <!-- OMR 화면(반 관리)으로 돌아가는 뒤로가기 버튼 -->
                     <div style="margin-bottom: 8px;">
                         <button onclick="location.href='/exam/list'" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: background 0.2s;">
                             <span>⬅️ 반 관리(OMR)로 이동</span>
@@ -87,16 +94,12 @@
                     <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 13px;">[수업 전 3분 보완 브리핑 뷰]</p>
                 </div>
 
-                <!-- 두 버튼을 나란히 배치한 flex 컨테이너 (학부모 리포트 배포 버튼 + 신호등 서랍 버튼) -->
                 <div id="signalBadgeContainer" style="display: flex; gap: 12px; align-items: center;">
-
-                    <!-- 학부모 리포트 배포용 공통 링크 복사 버튼 -->
                     <button class="signal-action-btn" style="background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe;" onclick="copyClassReportLink()">
                         <span>🔗 학부모 리포트 배포</span>
                         <span style="background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 6px; font-size: 11px;">단톡방 공유용</span>
                     </button>
 
-                    <!-- 신호등 서랍(Drawer) 버튼 -->
                     <button id="classSignalBtn" class="signal-action-btn signal-green" onclick="openDrawer()">
                         <span>🟢 안정권</span>
                         <span style="background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 6px; font-size: 11px;">👉 학생별 리포트 보기</span>
@@ -115,7 +118,8 @@
             </div>
         </div>
     </div>
-</div>
+
+</div> <!-- /.page-content-wrapper 닫기 -->
 
 <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
 <div id="drawerPanel" class="drawer-panel">
@@ -230,12 +234,12 @@
                             <div style="font-weight: 800; font-size: 16px; margin-bottom: 8px; color: #0f172a;">${st.studentName}</div>
                             <div style="font-size: 13px; color: #475569; line-height: 1.6; margin-bottom: 14px; background: #f8fafc; padding: 10px 12px; border-radius: 8px;">
                                 • 취약 유형 태그: <b style="color: #4f46e5;">${weakTypes}</b><br>
-                                • 오답 집중 단어: <b style="color: #334155;">${weakWords}</b>
                             </div>
-
+                            <!--
                             <button onclick="alert('${st.studentName.replace(' 학생', '')} 학생에게 맞춤형 무료 강좌 과제가 원클릭 전송되었습니다! 🎁')" style="width: 100%; padding: 10px; background: var(--brand-primary); color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px;">
                                 🎁 맞춤형 강좌 원클릭 과제 배정
                             </button>
+                            -->
                         </div>`;
                     });
                 } else {
@@ -256,7 +260,6 @@
         document.getElementById('drawerPanel').classList.remove('open');
     }
 
-    // 학부모 단톡방 공유용 공통 링크 복사 함수
     function copyClassReportLink() {
         const activeClassItem = document.querySelector('.class-item.active');
         if (!activeClassItem) {

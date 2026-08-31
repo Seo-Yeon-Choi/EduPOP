@@ -44,13 +44,6 @@ public class ExamGradingController {
         Long academyId = loginUser.getAcademyId();
         Long teacherId = loginUser.getUserId();
 
-        log.info(
-                "반 중심 시험 관리 대시보드 요청 - teacherId: {}, academyId: {}, classId: {}",
-                teacherId,
-                academyId,
-                classId
-        );
-
         // 로그인한 사용자의 학원에 속한 반 목록
         List<ClassroomListResponse> classList =
                 classroomService.findAllByAcademyId(
@@ -60,15 +53,19 @@ public class ExamGradingController {
 
         model.addAttribute("classList", classList);
 
+        if (classId == null && classList != null && !classList.isEmpty()) {
+        }
+
         // 시험 목록
         List<ExamListResponse> examList =
                 examService.getAllExamList();
 
-        // 특정 반 클릭 시 해당 반 시험만 필터링
+        // 특정 반이 선택된 경우 해당 반 시험만 필터링
         if (classId != null) {
+            final Long targetClassId = classId;
             examList = examList.stream()
                     .filter(exam ->
-                            classId.equals(exam.getClassId()))
+                            targetClassId.equals(exam.getClassId()))
                     .toList();
         }
 

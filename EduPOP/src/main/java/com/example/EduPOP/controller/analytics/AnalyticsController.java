@@ -60,12 +60,22 @@ public class AnalyticsController {
     }
 
     @GetMapping("/class-trend")
-    public String viewClassTrend(@RequestParam(name = "examId", required = false) Long examId,
-                                 @RequestParam(name = "classId", required = false) Long classId,
-                                 @RequestParam(name = "academyId", required = false) Long academyId,
-                                 Model model) {
+    public String viewClassTrend(
+            @RequestParam(name = "examId", required = false) Long examId,
+            @RequestParam(name = "classId", required = false) Long classId,
+            HttpSession session,
+            Model model
+    ) {
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
 
-        Long targetAcademyId = (academyId != null) ? academyId : 1L;
+        // 로그인이 안 되어있거나 선생님이 아니면 로그인 페이지로 리다이렉트
+        if (loginUser == null || loginUser.getRole() != UserRole.TEACHER) {
+            return "redirect:/LocalLogin";
+        }
+
+        Long targetAcademyId = loginUser.getAcademyId();
+
+        // 로그인한 선생님의 학원에 속한 활성화된 반 목록 조회
         List<ClassroomListResponse> teacherClasses = classroomService.findAllByAcademyId(targetAcademyId, "ACTIVE");
 
         model.addAttribute("teacherClasses", teacherClasses);

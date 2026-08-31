@@ -178,7 +178,7 @@
         <div style="max-height: 400px; overflow-y: auto;">
             <div th:each="stu : ${exam.students}" style="margin-bottom: 16px;">
                 <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;" th:text="${stu.studentName} + ' 학생'"></label>
-                <!-- 💡 [에러 해결] teacherComment 바인딩 시 안전하게 출력 -->
+                <!-- teacherComment 바인딩 시 안전하게 출력 -->
                 <textarea class="form-input comment-textarea"
                           th:data-student-id="${stu.studentId}"
                           th:text="${stu.teacherComment != null ? stu.teacherComment : ''}"
