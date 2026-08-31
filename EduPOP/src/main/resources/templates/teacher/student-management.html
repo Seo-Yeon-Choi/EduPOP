@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPOP - 전체 학생 및 반별 마스터 관리</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --brand-primary: #4f46e5;
+            --brand-light: #eef2ff;
+            --border-light: #e2e8f0;
+            --shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+        }
+
+        body { margin: 0; background-color: var(--bg-page); font-family: 'Pretendard', sans-serif; color: var(--text-main); }
+        .page-content-wrapper { margin-left: 240px; margin-top: 70px; padding: 36px 40px; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 20px; padding: 28px; box-shadow: var(--shadow-subtle); margin-bottom: 24px; }
+
+        .class-toggle-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+        .class-chip { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-light); background: #ffffff; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); }
+        .class-chip:hover { background: #f1f5f9; color: var(--text-main); }
+        .class-chip.active { background: var(--brand-primary); color: #ffffff; border-color: var(--brand-primary); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+        th { background: #f8fafc; font-weight: 700; color: var(--text-muted); }
+
+        .btn-action { padding: 6px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+        .btn-action:hover { filter: brightness(0.95); transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<th:block th:replace="~{layout/header :: header}"></th:block>
+<th:block th:replace="~{layout/sidebar-teacher :: sidebar}"></th:block>
+
+<div class="page-content-wrapper">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 style="margin: 0; font-size: 24px; font-weight: 800;">👥 전체 학생 및 반별 마스터 관리</h2>
+                <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 13px;">탭 진입 시 전체 학생이 즉시 조회되며, 상단 반 토글을 클릭해 특정 반 학생만 모아볼 수 있습니다.</p>
+            </div>
+        </div>
+
+        <div class="class-toggle-container" id="classToggleGroup">
+            <button class="class-chip active" onclick="filterStudents('ALL', this)">🔥 전체 학생 보기</button>
+            <button th:each="cls : ${teacherClasses}"
+                    class="class-chip"
+                    th:data-class-id="${cls.classId}"
+                    th:data-class-name="${cls.name}"
+                    th:text="${cls.name}"
+                    onclick="filterStudents(this.getAttribute('data-class-id'), this)">
+                반 이름
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 id="currentViewTitle" style="margin-top: 0; font-size: 18px; font-weight: 700;">📂 전체 학생 명단</h3>
+        <div id="studentTableContainer">
+            <p style="color: var(--text-muted); text-align: center; padding: 30px;">학생 데이터를 불러오는 중입니다...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allStudentsCache = [];
+    let classMap = {};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.class-chip[data-class-id]').forEach(btn => {
+            classMap[btn.getAttribute('data-class-id')] = btn.getAttribute('data-class-name');
+        });
+        loadAllAcademyStudents();
+    });
+
+    function loadAllAcademyStudents() {
+        const classIds = Object.keys(classMap);
+        if (classIds.length === 0) {
+            document.getElementById('studentTableContainer').innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 30px;">등록된 반이 없습니다.</p>';
+            return;
+        }
+
+        let promises = classIds.map(cId =>
+            fetch(`/analytics/teacher/api/class/${cId}/students`)
+                .then(res => res.json())
+                .then(students => {
+                    return (students || []).map(st => ({
+                        ...st,
+                        classId: cId,
+                        className: st.className || classMap[cId]
+                    }));
+                })
+                .catch(err => [])
+        );
+
+        Promise.all(promises).then(results => {
+            let uniqueMap = new Map();
+            results.flat().forEach(st => {
+                let sId = st.studentId || st.userId;
+                if (sId && !uniqueMap.has(sId)) {
+                    uniqueMap.set(sId, st);
+                }
+            });
+
+            allStudentsCache = Array.from(uniqueMap.values());
+            renderStudentTable(allStudentsCache);
+        });
+    }
+
+    function filterStudents(classId, element) {
+        document.querySelectorAll('.class-chip').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+
+        if (classId === 'ALL') {
+            document.getElementById('currentViewTitle').innerText = "📂 전체 학생 명단";
+            renderStudentTable(allStudentsCache);
+        } else {
+            let targetName = classMap[classId] || '선택된 반';
+            document.getElementById('currentViewTitle').innerText = `📂 [${targetName}] 소속 학생 명단`;
+
+            let filtered = allStudentsCache.filter(st => String(st.classId) === String(classId));
+            renderStudentTable(filtered);
+        }
+    }
+
+    // 💡 학부모 성적 리포트 접속 링크 복사 및 팝업 알림 함수
+    function copyParentLink(studentName, studentId) {
+        const parentLinkUrl = window.location.origin + `/report-auth?studentId=${studentId}`;
+
+        navigator.clipboard.writeText(parentLinkUrl).then(() => {
+            alert(`✅ [${studentName} 학생] 학부모 성적 리포트 링크가 복사되었습니다!\n\n복사된 주소: ${parentLinkUrl}\n\n학부모님께 메신저나 문자로 전달해 주세요.`);
+        }).catch(err => {
+            console.error('링크 복사 실패:', err);
+            alert("❌ 링크 복사에 실패했습니다. 브라우저의 클립보드 권한을 확인해주세요.");
+        });
+    }
+
+    function renderStudentTable(students) {
+        let html = `<table>
+            <thead>
+                <tr>
+                    <th>학생 이름</th>
+                    <th>소속 반</th>
+                    <th>이메일</th>
+                    <th>연락처</th>
+                    <th style="text-align: center;">📊 성적 결과</th>
+                    <th style="text-align: center;">🎯 퀘스트(시험) 결과</th>
+                    <th style="text-align: center;">🔗 학부모 성적 링크</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        if (students && students.length > 0) {
+            students.forEach(st => {
+                let sId = st.studentId || st.userId;
+                let assignedClassName = st.className || '소속 반';
+
+                let trendUrl = `/analytics/student-trend?studentId=${sId}`;
+                let questUrl = `/analytics/teacher/student/results?studentId=${sId}`;
+
+                html += `
+                <tr>
+                    <td style="font-weight: 700;">${st.name}</td>
+                    <td><span style="background: #eef2ff; color: #4f46e5; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">${assignedClassName}</span></td>
+                    <td style="color: var(--text-muted);">${st.email || '등록된 이메일 없음'}</td>
+                    <td style="color: var(--text-muted);">${st.phone || '연락처 없음'}</td>
+
+                    <td style="text-align: center;">
+                        <button onclick="location.href='${trendUrl}'" class="btn-action" style="background: #eef2ff; color: #4f46e5;">성적 보기</button>
+                    </td>
+                    <td style="text-align: center;">
+                        <button onclick="location.href='${questUrl}'" class="btn-action" style="background: #fef3c7; color: #d97706;">퀘스트 결과</button>
+                    </td>
+                    <td style="text-align: center;">
+                        <button onclick="copyParentLink('${st.name}', '${sId}')" class="btn-action" style="background: #dcfce7; color: #16a34a;">학부모 링크</button>
+                    </td>
+                </tr>`;
+            });
+        } else {
+            html += `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">해당 조건에 일치하는 학생이 없습니다.</td></tr>`;
+        }
+
+        html += `</tbody></table>`;
+        document.getElementById('studentTableContainer').innerHTML = html;
+    }
+</script>
+</body>
+</html>

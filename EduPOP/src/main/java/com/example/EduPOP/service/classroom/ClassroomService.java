@@ -226,6 +226,27 @@ public class ClassroomService {
         }
     }
 
+    /**
+     * 특정 반(classId)에 소속된 학생 목록 조회 (선생님 학생 관리 페이지용)
+     */
+    @Transactional(readOnly = true)
+    public List<ClassroomDetailResponse.StudentInfo> findStudentsByClassId(Long classId) {
+        if (classId == null) {
+            return Collections.emptyList();
+        }
+        return classroomMapper.findStudentsByClassId(classId);
+    }
+
+    /**
+     * 학생 기본 정보 수정 (선생님 권한: 이름, 이메일, 연락처)
+     * - (※ 학생 삭제는 운영진 권한이므로 제외)
+     */
+    @Transactional
+    public void updateStudentInfo(Long studentId, String name, String email, String phone) {
+        // 실제 존재하는 사용자(학생)인지 검증 로직 추가 가능
+        classroomMapper.updateStudentInfo(studentId, name, email, phone);
+    }
+
 }
 
 

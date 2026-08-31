@@ -588,4 +588,9 @@ public class ExamService {
     private String trimToNull(String value) {
         return isBlank(value) ? null : value.trim();
     }
+
+    // 시험 리스트 화면 전용 서비스 메서드
+    public List<ExamListResponse> getExamListResponseByTeacher(Long teacherId, Long classId) {
+        return examMapper.findExamListByTeacherId(teacherId, classId);
+    }
 }

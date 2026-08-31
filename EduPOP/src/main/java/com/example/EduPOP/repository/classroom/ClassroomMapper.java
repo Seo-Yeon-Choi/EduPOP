@@ -77,4 +77,12 @@ public interface ClassroomMapper {
 
     // 전반 처리를 위한 타 반 배정 기록 삭제
     void deleteOtherClassMapping(@Param("studentIds") List<Long> studentIds);
+
+    /**
+     * 학생 기본 정보 수정 (선생님 권한)
+     */
+    void updateStudentInfo(@Param("studentId") Long studentId,
+                           @Param("name") String name,
+                           @Param("email") String email,
+                           @Param("phone") String phone);
 }

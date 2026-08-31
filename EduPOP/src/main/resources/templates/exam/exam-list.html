@@ -69,21 +69,29 @@
         <div class="class-sidebar">
             <div class="sidebar-title">
                 <span>🏫 내 담당 반 목록</span>
-                <span style="font-size: 11px; background: #eff6ff; color: #2563eb; padding: 2px 6px; border-radius: 4px;" th:text="${classList.size() + '개 반'}">2개 반</span>
+                <span style="font-size: 11px; background: #eff6ff; color: #2563eb; padding: 2px 6px; border-radius: 4px;" th:text="${classList != null ? classList.size() + '개 반' : '0개 반'}">0개 반</span>
             </div>
             <div>
-                <a th:href="@{/exam/list}"
+                <!-- 전체 반 보기 버튼은 항상 유지 -->
+                <a th:href="@{/teacher/exams}"
                    th:classappend="${currentClassId == null} ? 'active' : ''"
                    class="class-item">
                     <span>전체 반 보기</span>
                     <span>→</span>
                 </a>
+
+                <!-- 💡 담당 반이 없을 때 안내 문구 출력 -->
+                <div th:if="${classList == null or classList.isEmpty()}" style="padding: 15px 10px; font-size: 12px; color: #94a3b8; text-align: center; background: #f8fafc; border-radius: 6px; margin-top: 6px;">
+                    등록된 반이 없습니다.
+                </div>
+
+                <!-- 담당 반이 있을 때만 리스트 반복 출력 -->
                 <a th:each="cls : ${classList}"
-                   th:href="@{/exam/list(classId=${cls.classId})}"
+                   th:href="@{/teacher/exams(classId=${cls.classId})}"
                    th:classappend="${currentClassId != null and currentClassId == cls.classId} ? 'active' : ''"
                    class="class-item">
-                    <span th:text="${cls.name}">중2 심화A반</span>
-                    <span style="font-size: 11px; color: #64748b;" th:text="${cls.targetGrade}">중2</span>
+                    <span th:text="${cls.name}"></span>
+                    <span style="font-size: 11px; color: #64748b;" th:text="${cls.targetGrade}"></span>
                 </a>
             </div>
         </div>
