@@ -30,7 +30,9 @@ public class ExamCreateOrCopyRequest {
     public static class CustomQuestionDto {
         private Integer questionNumber;
         private String questionType;
-        private String questionTypeTag;
+        // 현재 시험 문항 분류 구조
+        private String largeCategory;
+        private String smallCategory;
         private Integer score;
         private String correctAnswer;
     }

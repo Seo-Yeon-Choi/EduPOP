@@ -69,10 +69,10 @@
         updated_at
         ) VALUES (
         #{classId},
-        1,
+        #{teacherId},
         #{templateExamId},
         #{title},
-        'MONTH',
+        #{examType},
         'PAPER',
         #{examRound},
         'ACTIVE',
