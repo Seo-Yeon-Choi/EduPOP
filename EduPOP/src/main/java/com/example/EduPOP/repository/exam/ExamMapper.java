@@ -79,4 +79,9 @@ public interface ExamMapper {
     // 평균 통계
     Map<String, Object> getExamStats(@Param("examId") Long examId, @Param("classId") Long classId);
     List<StudentExamResult> findDailyReviewResults(Long studentId);
+
+    List<ExamListResponse> findExamListByTeacherId(
+            @Param("teacherId") Long teacherId,
+            @Param("classId") Long classId
+    );
 }

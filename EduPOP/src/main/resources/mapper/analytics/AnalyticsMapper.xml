@@ -216,25 +216,29 @@
     </select>
 
 
-    <!-- 현재 등록되어 있는 모든 대분류 / 소분류 조회 -->
+    <!-- 현재 등록되어 있는 모든 대분류 / 소분류 조회 (학원별 격리 적용) -->
     <select id="findAllCategories"
             resultType="com.example.EduPOP.controller.analytics.dto.StudentTrendResponse$SubCategoryStatDto">
         SELECT DISTINCT
             COALESCE(
-                    large_category,
+                    eq.large_category,
                     '기타'
             ) AS largeCategory,
 
             COALESCE(
-                    small_category,
+                    eq.small_category,
                     '기본'
             ) AS smallCategory
 
-        FROM exam_questions
+        FROM exam_questions eq
+                 JOIN exams e ON eq.exam_id = e.exam_id
+                 JOIN classes c ON e.class_id = c.class_id
 
-        WHERE
-            large_category IS NOT NULL
-           OR small_category IS NOT NULL
+        WHERE c.academy_id = #{academyId}
+          AND (
+            eq.large_category IS NOT NULL
+                OR eq.small_category IS NOT NULL
+            )
     </select>
 
 
@@ -297,7 +301,6 @@
         u.name AS studentName,
 
         <!--
-            🚀 [추가된 코드 설명]
             학부모 리포트(parent_reports) 테이블에서 현재 학생(u.user_id)과 매칭되는 리포트 중
             가장 최근에 생성된(ORDER BY created_at DESC) 리포트의 고유번호(report_id) 1개를 가져옵니다.
             이 값이 프론트엔드로 넘어가서 "학부모 리포트 링크 복사" 버튼의 링크 생성 API 파라미터로 쓰입니다!

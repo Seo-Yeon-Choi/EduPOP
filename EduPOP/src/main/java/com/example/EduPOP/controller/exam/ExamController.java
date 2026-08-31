@@ -1,6 +1,7 @@
 package com.example.EduPOP.controller.exam;
 
 import com.example.EduPOP.config.SessionConst;
+import com.example.EduPOP.controller.exam.dto.ExamListResponse;
 import com.example.EduPOP.domain.exam.Exam;
 import com.example.EduPOP.domain.exam.ExamQuestion;
 import com.example.EduPOP.domain.user.User;
@@ -28,16 +29,31 @@ public class ExamController {
     private final PdfTextExtractService pdfTextExtractService;
     private final ExamQuestionParseService examQuestionParseService;
 
+    /**
+     * 시험 리스트 및 OMR 관리 메인 화면 (좌측 사이드바 반별 필터링 지원)
+     */
     @GetMapping
-    public String examList(HttpSession session, Model model) {
+    public String examList(
+            @RequestParam(name = "classId", required = false) Long classId,
+            HttpSession session,
+            Model model
+    ) {
         Long teacherId = getLoginTeacherId(session);
 
         if (teacherId == null) {
             return "redirect:/LocalLogin";
         }
 
-        model.addAttribute("exams", examService.getExamListByTeacher(teacherId));
-        return "layout/exam/list";
+        // 1. 좌측 사이드바에 띄울 "내 담당 반 목록" 조회
+        var teacherClasses = classService.getClassesByTeacher(teacherId);
+        model.addAttribute("classList", teacherClasses);
+        model.addAttribute("currentClassId", classId);
+
+        // 해당 반(또는 전체 반)의 시험지
+        List<ExamListResponse> exams = examService.getExamListResponseByTeacher(teacherId, classId);
+
+        model.addAttribute("exams", exams);
+        return "exam/exam-list";
     }
 
     @GetMapping("/create")

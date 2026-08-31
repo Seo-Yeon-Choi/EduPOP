@@ -195,6 +195,27 @@
         WHERE teacher_id = #{teacherId}
         ORDER BY exam_id DESC
     </select>
+
+    <!-- 시험 리스트 화면 전용 쿼리 (반 이름과 문항수가 포함된 DTO 반환) -->
+    <select id="findExamListByTeacherId" resultType="com.example.EduPOP.controller.exam.dto.ExamListResponse">
+        SELECT
+        e.exam_id AS examId,
+        e.class_id AS classId,
+        COALESCE(e.exam_round, 1) AS examRound,
+        e.title AS title,
+        COALESCE(c.name, '미배정') AS className,
+        DATE_FORMAT(e.exam_date, '%Y-%m-%d') AS examDate,
+        (SELECT COUNT(*) FROM exam_questions eq WHERE eq.exam_id = e.exam_id) AS totalQuestions,
+        (SELECT COUNT(DISTINCT ea.student_id) FROM exam_attempts ea WHERE ea.exam_id = e.exam_id) AS gradedStudentCount
+        FROM exams e
+        LEFT JOIN classes c ON c.class_id = e.class_id
+        WHERE e.teacher_id = #{teacherId}
+        <if test="classId != null">
+            AND e.class_id = #{classId}
+        </if>
+        ORDER BY e.exam_date DESC, e.exam_id DESC
+    </select>
+
     <!-- 7. 반 소속 학생 명단 조회 -->
     <select id="findStudentsByClassId" resultType="com.example.EduPOP.controller.exam.dto.ExamDetailResponse$StudentRosterDto">
         SELECT

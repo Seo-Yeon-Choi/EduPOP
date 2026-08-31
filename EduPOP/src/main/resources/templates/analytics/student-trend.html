@@ -36,7 +36,6 @@
             min-height: calc(100vh - 70px);
         }
 
-        /* 요즘 학습 플랫폼 스타일의 둥글고 부드러운 카드 */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-light);
@@ -66,7 +65,6 @@
             justify-content: space-between;
         }
 
-        /* 깔끔하고 정돈된 테이블 레이아웃 */
         .common-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
         .common-table th {
             background-color: #f8fafc;
@@ -104,7 +102,6 @@
             font-weight: 700;
         }
 
-        /* 입력 폼 및 드롭다운 */
         .filter-select, .date-input {
             height: 40px;
             padding: 0 14px;
@@ -178,13 +175,14 @@
                 </div>
             </div>
 
-            <a th:href="@{/exam/omr-matrix(examId=${currentExamId})}" class="btn-secondary">
-                ← 채점 화면
-            </a>
+            <!-- 💡 지능형 뒤로가기 버튼 (이전에 머물던 페이지로 정확히 복귀) -->
+            <button type="button" class="btn-secondary" onclick="goBackSmartly()">
+                ← 뒤로 가기
+            </button>
         </div>
     </div>
 
-    <!-- 차트 그리드 (가장 가독성 좋은 이전 그래프 스타일 복원) -->
+    <!-- 차트 그리드 -->
     <div class="chart-grid">
         <div class="chart-box">
             <div class="chart-title">
@@ -209,7 +207,6 @@
 
     <!-- 소분류 Top 3 & Worst 3 요약 카드 -->
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
-        <!-- Top 3 우수 영역 -->
         <div class="card" style="border-left: 6px solid #10b981; margin-bottom: 0;">
             <div style="font-size: 15px; font-weight: 700; color: #065f46; margin-bottom: 16px; display: flex; align-items: center; gap: 6px;">
                 <span>🔥 가장 우수한 영역 TOP 3</span>
@@ -227,7 +224,6 @@
             </div>
         </div>
 
-        <!-- Worst 3 취약 영역 -->
         <div class="card" style="border-left: 6px solid #ef4444; margin-bottom: 0;">
             <div style="font-size: 15px; font-weight: 700; color: #991b1b; margin-bottom: 16px; display: flex; align-items: center; gap: 6px;">
                 <span>⚠️ 집중 학습이 필요한 취약 영역 WORST 3</span>
@@ -246,7 +242,7 @@
         </div>
     </div>
 
-    <!-- 유형별 세부 성취도 분석 (시험지별 필터링 적용) -->
+    <!-- 유형별 세부 성취도 분석 -->
     <div class="card" style="margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="font-size: 16px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
@@ -332,7 +328,15 @@
     let lineChartInstance = null;
     let radarChartInstance = null;
 
-    // 💡 가장 깔끔하고 가독성 좋았던 이전 버전의 그래프 스타일 복원
+    // 💡 지능형 뒤로가기 함수 (이전 페이지가 존재하면 히스토리 백, 없으면 기본 학생 리스트로 안전 복귀)
+    function goBackSmartly() {
+        if (document.referrer && document.referrer !== window.location.href) {
+            history.back();
+        } else {
+            location.href = '/analytics/teacher/students';
+        }
+    }
+
     function renderLineChart(dataList) {
         const labels = dataList.map(h => h.examTitle || '시험');
         const studentScores = dataList.map(h => h.studentScore || 0);
