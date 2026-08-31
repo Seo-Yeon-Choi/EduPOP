@@ -260,6 +260,22 @@
         )
     </insert>
 
+    <!-- 기존 OMR 채점 결과 수정 -->
+    <update id="updateExamAttemptScore"
+            parameterType="com.example.EduPOP.domain.exam.ExamAttempt">
+        UPDATE exam_attempts
+        SET
+        total_score = #{totalScore},
+        max_score = #{maxScore},
+        correct_count = #{correctCount},
+        total_question_count = #{totalQuestionCount},
+        primary_weak_tag = #{primaryWeakTag},
+        entry_method = 'MANUAL',
+        status = 'GRADED',
+        graded_at = NOW()
+        WHERE attempt_id = #{attemptId}
+    </update>
+
     <!-- 문항별 답안 상세 저장 -->
     <insert id="batchInsertExamAnswers">
         INSERT INTO exam_answers (

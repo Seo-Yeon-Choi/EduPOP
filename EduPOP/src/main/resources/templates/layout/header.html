@@ -4,19 +4,44 @@
 
 <body>
 
-<!--
-    공통 상단 Header
-
-    사용 방법
-    <div th:replace="~{layout/header :: header}"></div>
--->
 <header th:fragment="header" class="top-header">
 
     <!-- 로고 -->
     <div class="header-logo">
-        <a th:href="@{/}" class="logo-link">
+
+        <th:block th:if="${session.loginUser != null}"
+                  th:switch="${session.loginUser.role.toString()}">
+
+            <!-- 학생 -->
+            <a th:case="'STUDENT'"
+               th:href="@{/main/studentMain}"
+               class="logo-link">
+                EduPOP
+            </a>
+
+            <!-- 선생님 -->
+            <a th:case="'TEACHER'"
+               th:href="@{/main/teacherMain}"
+               class="logo-link">
+                EduPOP
+            </a>
+
+            <!-- 관리자 -->
+            <a th:case="'ADMIN'"
+               th:href="@{/main/adminMain}"
+               class="logo-link">
+                EduPOP
+            </a>
+
+        </th:block>
+
+        <!-- 비로그인 -->
+        <a th:if="${session.loginUser == null}"
+           th:href="@{/}"
+           class="logo-link">
             EduPOP
         </a>
+
     </div>
 
     <!-- 우측 사용자 정보 -->
@@ -35,12 +60,6 @@
                 STUDENT
             </span>
 
-            <!--
-            <a th:href="@{/logout}"
-               class="logout-link">
-                로그아웃
-            </a>
-            -->
             <form th:action="@{/logout}"
                   method="post">
 

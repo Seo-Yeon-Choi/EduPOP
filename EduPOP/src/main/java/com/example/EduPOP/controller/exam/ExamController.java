@@ -33,7 +33,7 @@ public class ExamController {
      * 시험 리스트 및 OMR 관리 메인 화면 (좌측 사이드바 반별 필터링 지원)
      */
     @GetMapping
-    public String examList(
+    public String OMRList(
             @RequestParam(name = "classId", required = false) Long classId,
             HttpSession session,
             Model model
@@ -54,6 +54,18 @@ public class ExamController {
 
         model.addAttribute("exams", exams);
         return "exam/exam-list";
+    }
+
+    @GetMapping("/lists")
+    public String examList(HttpSession session, Model model) {
+        Long teacherId = getLoginTeacherId(session);
+
+        if (teacherId == null) {
+            return "redirect:/LocalLogin";
+        }
+
+        model.addAttribute("exams", examService.getExamListByTeacher(teacherId));
+        return "layout/exam/list";
     }
 
     @GetMapping("/create")
