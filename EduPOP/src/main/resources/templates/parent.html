@@ -2,238 +2,276 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EduPOP - 학부모 리포트</title>
-    <!-- Chart.js: 꺾은선 및 다각형 그래프 렌더링 라이브러리 -->
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link rel="stylesheet" th:href="@{/css/common.css}">
-    <style>
-        body { background-color: #f8f9fa; font-family: 'Pretendard', sans-serif; }
-        .page-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-        .page-desc { color: #6c757d; font-size: 14px; margin-bottom: 24px; }
-
-        /* 상단 학생 정보 바 영역 */
-        .info-bar { display: flex; gap: 15px; margin-bottom: 24px; align-items: center; }
-        .info-dropdown { padding: 12px 20px; background: white; border: 1px solid #e9ecef; border-radius: 8px; font-weight: bold; color: #343a40; display: flex; align-items: center; gap: 10px;}
-        .btn-compare { background-color: #845ef7; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-left: auto; }
-
-        /* 4개 카드 그리드 레이아웃 */
-        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
-        .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.03); border: 1px solid #f1f3f5; }
-        .card-title { font-size: 16px; font-weight: bold; color: #343a40; margin-bottom: 20px; }
-
-        /* 카드 1: 성과 지표 스타일 */
-        .score-box-wrap { display: flex; gap: 10px; }
-        .score-box { flex: 1; background: #f8f9ff; border: 1px solid #e7f1ff; border-radius: 12px; padding: 20px 0; text-align: center; }
-        .score-label { font-size: 13px; color: #495057; margin-bottom: 10px; }
-        .score-value { font-size: 32px; font-weight: bold; color: #339af0; }
-        .score-avg { font-size: 12px; color: #868e96; margin-top: 10px; }
-
-        /* 카드 3: 학습 태도 지표 스타일 */
-        .attitude-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f3f5; font-size: 14px; }
-        .attitude-item:last-child { border-bottom: none; }
-        .attitude-val { font-weight: bold; color: #212529; }
-
-        /* 카드 4: 서술형 평가 스타일 */
-        .teacher-comment { background: #f8f9ff; border-radius: 12px; padding: 20px; font-size: 13px; color: #495057; line-height: 1.6; position: relative; }
-        .quote-icon { font-size: 24px; color: #b197fc; margin-right: 8px; vertical-align: top; }
-
-        /* 하단 차트 카드 영역 및 페이징 버튼 */
-        .chart-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.03); border: 1px solid #f1f3f5; }
-        .btn-chart-nav {
-            background: #f1f3f5; border: none; padding: 6px 12px; border-radius: 6px;
-            cursor: pointer; font-weight: bold; color: #495057; font-size: 13px;
-        }
-        .btn-chart-nav:hover { background: #e9ecef; }
-        .btn-chart-nav:disabled { opacity: 0.3; cursor: not-allowed; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/parent-report.css}">
 </head>
+
 <body>
 
 <main class="main-content">
-    <div class="page-title">학부모 리포트</div>
-    <div class="page-desc">우리 아이의 성장을 한눈에 확인하세요.</div>
 
-    <!-- 상단 학생 및 평가 기간 정보 -->
-    <div class="info-bar">
-        <div class="info-dropdown">
-            👦 <span th:text="${report.studentName} + ' (' + ${report.gradeInfo} + ')'">학생 이름</span>
-            <span style="margin: 0 10px; color: #dee2e6;">|</span>
-            👨‍🏫 <span th:text="${report.teacherName} + ' 선생님'">선생님 이름</span> ∨
-        </div>
-        <div class="info-dropdown">
-            📅 <span th:text="${#temporals.format(report.periodStart, 'yyyy년 M월 d일')} + ' ~ ' + ${#temporals.format(report.periodEnd, 'yyyy년 M월 d일')}">날짜</span> ∨
-        </div>
-    </div>
+    <header class="report-header">
+        <h1 class="page-title">학부모 리포트</h1>
+        <p class="page-desc">
+            우리 아이의 성장을 한눈에 확인하세요.
+        </p>
+    </header>
 
-    <!-- 4개 지표 카드 그리드 -->
-    <div class="grid-container">
-        <!-- 1. 성과 지표 -->
-        <div class="card">
-            <div class="card-title">1. 성과 지표</div>
+    <!-- 학생 / 담당 교사 / 평가 기간 -->
+    <section class="info-bar">
+
+        <div class="info-dropdown">
+            <span>👦</span>
+
+            <span th:text="${report.studentName} + ' (' + ${report.gradeInfo} + ')'">
+                학생 이름
+            </span>
+
+            <span class="info-divider">|</span>
+
+            <span>👨‍🏫</span>
+
+            <span th:text="${report.teacherName} + ' 선생님'">
+                선생님 이름
+            </span>
+        </div>
+
+        <div class="info-dropdown">
+            <span>📅</span>
+
+            <span th:text="${#temporals.format(report.periodStart, 'yyyy년 M월 d일')}
+                + ' ~ '
+                + ${#temporals.format(report.periodEnd, 'yyyy년 M월 d일')}">
+                날짜
+            </span>
+        </div>
+
+    </section>
+
+    <!-- 상단 지표 카드 -->
+    <section class="grid-container">
+
+        <!-- 성과 지표 -->
+        <article class="card">
+            <h2 class="card-title">1. 성과 지표</h2>
+
             <div class="score-box-wrap">
+
                 <div class="score-box">
-                    <div class="score-label">이번 달 월말평가 점수</div>
-                    <div class="score-value" th:text="${report.monthlyExamScore}">0<span style="font-size:16px;"> 점</span></div>
-                    <div class="score-avg" th:text="'반 평균: ' + ${report.classAverageScore} + ' 점'">반 평균: 0 점</div>
+                    <div class="score-label">
+                        이번 달 월말평가 점수
+                    </div>
+
+                    <div class="score-value-row">
+                        <span class="score-value"
+                              th:text="${report.monthlyExamScore}">
+                            0
+                        </span>
+
+                        <span class="score-unit">
+                            점
+                        </span>
+                    </div>
+
+                    <div class="score-avg"
+                         th:text="'반 평균: ' + ${report.classAverageScore} + ' 점'">
+                        반 평균: 0 점
+                    </div>
                 </div>
-                <div class="score-box" style="background:#f4faf6; border-color:#d1e7dd;">
-                    <div class="score-label">학습 이해도</div>
-                    <div class="score-value" style="color:#20c997;" th:text="${report.comprehensionLevel}">-</div>
-                    <div class="score-avg">성취도 등급</div>
+
+                <div class="score-box score-box-comprehension">
+
+                    <div class="score-label">
+                        학습 이해도
+                    </div>
+
+                    <div class="comprehension-value"
+                         th:text="${report.comprehensionLevel}">
+                        -
+                    </div>
+
+                    <div class="score-avg">
+                        성취도 등급
+                    </div>
+
                 </div>
+
             </div>
-        </div>
+        </article>
 
-        <!-- 2. 영역별 성취도 (동적 다각형 차트) -->
-        <div class="card">
+        <!-- 영역별 성취도 -->
+        <article class="card">
+            <h2 class="card-title">
+                2. 영역별 성취도
+            </h2>
 
-            <div class="card-title">
-                영역별 성취도
-            </div>
-
-            <div
-                    style="
-            position: relative;
-            width: 100%;
-            height: 280px;
-            "
-            >
-
+            <div class="radar-chart-container">
                 <canvas id="parentRadarChart"></canvas>
+            </div>
+        </article>
+
+        <!-- 학습 태도 -->
+        <article class="card">
+            <h2 class="card-title">
+                3. 학습 태도 및 달성 지표
+            </h2>
+
+            <div class="attitude-list">
+
+                <div class="attitude-item">
+                    <div class="attitude-label">
+                        <span class="attitude-icon icon-word">📝</span>
+                        단어 시험 응시율
+                    </div>
+
+                    <div class="attitude-val"
+                         th:text="${report.wordExamCompletionRate} + ' %'">
+                        0 %
+                    </div>
+                </div>
+
+                <div class="attitude-item">
+                    <div class="attitude-label">
+                        <span class="attitude-icon icon-book">📖</span>
+                        완독 도서 권수
+                    </div>
+
+                    <div class="attitude-val"
+                         th:text="${report.booksReadCount} + ' 권'">
+                        0 권
+                    </div>
+                </div>
+
+                <div class="attitude-item">
+                    <div class="attitude-label">
+                        <span class="attitude-icon icon-review">🎯</span>
+                        오답 노트 극복 문제 수
+                    </div>
+
+                    <div class="attitude-val"
+                         th:text="${report.overcomeWrongCount} + ' 개'">
+                        0 개
+                    </div>
+                </div>
+
+                <div class="attitude-item">
+                    <div class="attitude-label">
+                        <span class="attitude-icon icon-weak">⚠️</span>
+                        최다 오답 취약 유형
+                    </div>
+
+                    <div class="attitude-val"
+                         th:text="${report.topWeakTypeTag}">
+                        분석 중
+                    </div>
+                </div>
 
             </div>
+        </article>
 
-        </div>
+        <!-- 교사 평가 -->
+        <article class="card">
+            <h2 class="card-title">
+                4. 서술형 평가
+            </h2>
 
-        <!-- 3. 학습 태도 및 달성 지표 -->
-        <div class="card">
-            <div class="card-title">3. 학습 태도 및 달성 지표</div>
-            <div class="attitude-item">
-                <div><span style="color:#339af0; margin-right:8px;">📝</span>단어 시험 응시율</div>
-                <div class="attitude-val" th:text="${report.wordExamCompletionRate} + ' %'">0 %</div>
-            </div>
-            <div class="attitude-item">
-                <div><span style="color:#845ef7; margin-right:8px;">📖</span>완독 도서 권수</div>
-                <div class="attitude-val" th:text="${report.booksReadCount} + ' 권'">0 권</div>
-            </div>
-            <div class="attitude-item">
-                <div><span style="color:#fcc419; margin-right:8px;">🎯</span>오답 노트 극복 문제 수</div>
-                <div class="attitude-val" th:text="${report.overcomeWrongCount} + ' 개'">0 개</div>
-            </div>
-            <div class="attitude-item">
-                <div><span style="color:#ff6b6b; margin-right:8px;">⚠️</span>최다 오답 취약 유형</div>
-                <div class="attitude-val" th:text="${report.topWeakTypeTag}">분석 중</div>
-            </div>
-        </div>
+            <p class="comment-label">
+                선생님 코멘트
+            </p>
 
-        <!-- 4. 서술형 평가 (코멘트) -->
-        <div class="card">
-            <div class="card-title">4. 서술형 평가</div>
-            <div style="font-size: 12px; color: #868e96; margin-bottom: 10px;">선생님 코멘트</div>
             <div class="teacher-comment">
                 <span class="quote-icon">❝</span>
-                <span th:text="${report.teacherComment}">선생님 코멘트가 이곳에 출력됩니다.</span>
-            </div>
-        </div>
-    </div>
 
-    <!-- 5. 점수 추이 (1년 단위 시계열 페이징 차트) -->
-    <div class="chart-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <div class="card-title" style="margin-bottom: 0;">5. 월말평가 점수 추이 (1년 단위)</div>
-
-            <!-- 페이징 컨트롤 영역 -->
-            <div>
-                <button id="btnPrevChart" class="btn-chart-nav">◀ 이전 1년</button>
-                <span id="chartPageInfo" style="font-size: 14px; font-weight: bold; margin: 0 15px; color: #495057;">1 / 2</span>
-                <button id="btnNextChart" class="btn-chart-nav">다음 1년 ▶</button>
+                <span th:text="${report.teacherComment}">
+                    선생님 코멘트가 이곳에 출력됩니다.
+                </span>
             </div>
+        </article>
+
+    </section>
+
+    <!-- 점수 추이 -->
+    <section class="chart-card">
+
+        <div class="chart-header">
+
+            <h2 class="card-title chart-title">
+                5. 월말평가 점수 추이
+            </h2>
+
+            <div class="chart-navigation">
+
+                <button type="button"
+                        id="btnPrevChart"
+                        class="btn-chart-nav">
+                    ◀ 이전 1년
+                </button>
+
+                <span id="chartPageInfo"
+                      class="chart-page-info">
+                    1 / 2
+                </span>
+
+                <button type="button"
+                        id="btnNextChart"
+                        class="btn-chart-nav">
+                    다음 1년 ▶
+                </button>
+
+            </div>
+
         </div>
-        <div style="height: 250px; width: 100%;">
+
+        <div class="line-chart-container">
             <canvas id="scoreTrendChart"></canvas>
         </div>
-    </div>
+
+    </section>
+
 </main>
 
-<!-- =========================================================
-     영역별 성취도 레이더 차트
-     ========================================================= -->
 
 <script th:inline="javascript">
-
-    // =========================================================
-    // Controller에서 전달받은
-    // StudentTrendResponse.radarStats
-    // =========================================================
 
     const radarStats =
         /*[[${radarStats}]]*/ [];
 
 
-    console.log(
-        "학부모 리포트 영역별 성취도:",
-        radarStats
-    );
-
-
-    // =========================================================
-    // 영역명
-    //
-    // student-trend.html과 동일하게
-    // radarStats.tag를 사용한다.
-    // =========================================================
-
     const radarLabels =
-        radarStats.map(
-            stat => stat.tag || "기타"
-        );
+        radarStats.map(function (stat) {
+            return stat.tag || '기타';
+        });
 
-
-    // =========================================================
-    // 학생의 영역별 성취도
-    //
-    // student-trend.html과 동일하게
-    // studentScoreRate를 사용한다.
-    // =========================================================
 
     const studentRadarScores =
-        radarStats.map(
-            stat =>
-                stat.studentScoreRate != null
-                    ? stat.studentScoreRate
-                    : 0
-        );
+        radarStats.map(function (stat) {
 
+            return stat.studentScoreRate != null
+                ? stat.studentScoreRate
+                : 0;
+        });
 
-    // =========================================================
-    // 반 평균 영역별 성취도
-    //
-    // 필요하면 같이 표시할 수 있도록
-    // classAvgScoreRate도 동일한 데이터에서 가져온다.
-    // =========================================================
 
     const classRadarScores =
-        radarStats.map(
-            stat =>
-                stat.classAvgScoreRate != null
-                    ? stat.classAvgScoreRate
-                    : 0
-        );
+        radarStats.map(function (stat) {
 
+            return stat.classAvgScoreRate != null
+                ? stat.classAvgScoreRate
+                : 0;
+        });
 
-    // =========================================================
-    // Canvas 존재 여부 확인
-    // =========================================================
 
     const radarCanvas =
         document.getElementById(
-            "parentRadarChart"
+            'parentRadarChart'
         );
 
-
-    // =========================================================
-    // 데이터가 있을 때만 차트 생성
-    // =========================================================
 
     if (
         radarCanvas &&
@@ -241,63 +279,50 @@
     ) {
 
         new Chart(
-            radarCanvas.getContext("2d"),
+            radarCanvas.getContext('2d'),
             {
-
-                type: "radar",
+                type: 'radar',
 
                 data: {
-
                     labels: radarLabels,
 
                     datasets: [
-
-                        // -------------------------------------
-                        // 학생 성취도
-                        // -------------------------------------
-
                         {
-                            label: "학생 성취도",
+                            label: '학생 성취도',
 
-                            data: studentRadarScores,
+                            data:
+                            studentRadarScores,
 
                             backgroundColor:
-                                "rgba(236, 72, 153, 0.20)",
+                                'rgba(236, 72, 153, 0.20)',
 
                             borderColor:
-                                "#ec4899",
+                                '#ec4899',
 
                             pointBackgroundColor:
-                                "#ec4899",
+                                '#ec4899',
 
                             borderWidth: 2,
 
-                            pointRadius: 4,
+                            pointRadius: 3,
 
                             fill: true
                         },
 
-                        // -------------------------------------
-                        // 반 평균
-                        //
-                        // student-trend의 RadarStatDto에
-                        // classAvgScoreRate가 있으므로
-                        // 필요하면 같이 표시할 수 있다.
-                        // -------------------------------------
-
                         {
-                            label: "반 평균",
+                            label: '반 평균',
 
-                            data: classRadarScores,
+                            data:
+                            classRadarScores,
 
                             backgroundColor:
-                                "rgba(148, 163, 184, 0.10)",
+                                'rgba(148, 163, 184, 0.10)',
 
                             borderColor:
-                                "#94a3b8",
+                                '#94a3b8',
 
                             pointBackgroundColor:
-                                "#94a3b8",
+                                '#94a3b8',
 
                             borderWidth: 2,
 
@@ -305,139 +330,277 @@
 
                             fill: false
                         }
-
                     ]
                 },
 
-
                 options: {
-
                     responsive: true,
 
                     maintainAspectRatio: false,
 
                     scales: {
-
                         r: {
-
                             min: 0,
-
                             max: 100,
 
                             ticks: {
-
                                 stepSize: 20,
-
                                 display: false
-
                             }
-
                         }
-
                     },
 
-
                     plugins: {
-
                         legend: {
-
-                            position: "bottom"
-
+                            position: 'bottom'
                         }
-
                     }
-
                 }
-
             }
         );
-
-    } else {
-
-        console.log(
-            "영역별 성취도 데이터가 없습니다."
-        );
-
     }
 
 </script>
 
+
 <script th:inline="javascript">
-        // ==========================================
-        // 2. 월말평가 점수 추이 차트 (Line Chart) 페이징 로직
-        // ==========================================
 
-        // 서버에서 전달받은 전체 기간의 시계열 데이터
-        const allLabels = /*[[${chartLabels}]]*/ [];
-        const allStudentScores = /*[[${studentScores}]]*/ [];
-        const allClassScores = /*[[${classScores}]]*/ [];
+    const allLabels =
+        /*[[${chartLabels}]]*/ [];
 
-        const itemsPerPage = 12; // 1년(12개월) 단위 분할
-        let totalPages = Math.ceil(allLabels.length / itemsPerPage);
-        if(totalPages === 0) totalPages = 1;
+    const allStudentScores =
+        /*[[${studentScores}]]*/ [];
 
-        // 최신 데이터(마지막 페이지)를 기본 화면으로 설정
-        let currentPage = totalPages;
-        let scoreTrendChart = null;
+    const allClassScores =
+        /*[[${classScores}]]*/ [];
 
-        /**
-         * 현재 페이지 번호에 맞춰 데이터를 분할(slice)하고 차트를 재렌더링하는 함수
-         */
-        function renderLineChart() {
-            const startIdx = (currentPage - 1) * itemsPerPage;
-            const endIdx = startIdx + itemsPerPage;
 
-            const slicedLabels = allLabels.slice(startIdx, endIdx);
-            const slicedStudentScores = allStudentScores.slice(startIdx, endIdx);
-            const slicedClassScores = allClassScores.slice(startIdx, endIdx);
+    const itemsPerPage = 12;
 
-            // 페이징 인디케이터 업데이트
-            document.getElementById('chartPageInfo').innerText = currentPage + " / " + totalPages;
 
-            // 페이지 경계 도달 시 버튼 비활성화
-            document.getElementById('btnPrevChart').disabled = (currentPage === 1);
-            document.getElementById('btnNextChart').disabled = (currentPage === totalPages);
+    let totalPages =
+        Math.ceil(
+            allLabels.length /
+            itemsPerPage
+        );
 
-            // 기존 차트 인스턴스가 존재하면 메모리에서 제거
-            if(scoreTrendChart != null) {
-                scoreTrendChart.destroy();
-            }
 
-            const ctxLine = document.getElementById('scoreTrendChart').getContext('2d');
-            scoreTrendChart = new Chart(ctxLine, {
-                type: 'line',
-                data: {
-                    labels: slicedLabels,
-                    datasets: [
-                        { label: '학생 점수', data: slicedStudentScores, borderColor: '#339af0', backgroundColor: '#339af0', tension: 0.1, pointRadius: 6 },
-                        { label: '반 평균', data: slicedClassScores, borderColor: '#ced4da', backgroundColor: '#ced4da', tension: 0.1, pointRadius: 6 }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { y: { min: 0, max: 100 } },
-                    plugins: { legend: { position: 'top', align: 'start' } }
-                }
-            });
+    if (totalPages === 0) {
+        totalPages = 1;
+    }
+
+
+    let currentPage =
+        totalPages;
+
+
+    let scoreTrendChart =
+        null;
+
+
+    function renderLineChart() {
+
+        const startIdx =
+            (currentPage - 1) *
+            itemsPerPage;
+
+
+        const endIdx =
+            startIdx +
+            itemsPerPage;
+
+
+        const slicedLabels =
+            allLabels.slice(
+                startIdx,
+                endIdx
+            );
+
+
+        const slicedStudentScores =
+            allStudentScores.slice(
+                startIdx,
+                endIdx
+            );
+
+
+        const slicedClassScores =
+            allClassScores.slice(
+                startIdx,
+                endIdx
+            );
+
+
+        const pageInfo =
+            document.getElementById(
+                'chartPageInfo'
+            );
+
+
+        const prevButton =
+            document.getElementById(
+                'btnPrevChart'
+            );
+
+
+        const nextButton =
+            document.getElementById(
+                'btnNextChart'
+            );
+
+
+        pageInfo.innerText =
+            currentPage +
+            ' / ' +
+            totalPages;
+
+
+        prevButton.disabled =
+            currentPage === 1;
+
+
+        nextButton.disabled =
+            currentPage === totalPages;
+
+
+        if (scoreTrendChart !== null) {
+
+            scoreTrendChart.destroy();
         }
 
-        // 초기 화면 렌더링 실행
-        renderLineChart();
 
-        // 페이지 이동 이벤트 리스너
-        document.getElementById('btnPrevChart').addEventListener('click', function() {
-            if(currentPage > 1) {
-                currentPage--;
-                renderLineChart();
-            }
-        });
+        const chartCanvas =
+            document.getElementById(
+                'scoreTrendChart'
+            );
 
-        document.getElementById('btnNextChart').addEventListener('click', function() {
-            if(currentPage < totalPages) {
-                currentPage++;
-                renderLineChart();
+
+        if (!chartCanvas) {
+            return;
+        }
+
+
+        const ctxLine =
+            chartCanvas.getContext('2d');
+
+
+        scoreTrendChart =
+            new Chart(
+                ctxLine,
+                {
+                    type: 'line',
+
+                    data: {
+
+                        labels:
+                        slicedLabels,
+
+                        datasets: [
+                            {
+                                label:
+                                    '학생 점수',
+
+                                data:
+                                slicedStudentScores,
+
+                                borderColor:
+                                    '#339af0',
+
+                                backgroundColor:
+                                    '#339af0',
+
+                                tension: 0.1,
+
+                                pointRadius: 5
+                            },
+
+                            {
+                                label:
+                                    '반 평균',
+
+                                data:
+                                slicedClassScores,
+
+                                borderColor:
+                                    '#ced4da',
+
+                                backgroundColor:
+                                    '#ced4da',
+
+                                tension: 0.1,
+
+                                pointRadius: 5
+                            }
+                        ]
+                    },
+
+                    options: {
+                        responsive: true,
+
+                        maintainAspectRatio:
+                            false,
+
+                        scales: {
+                            y: {
+                                min: 0,
+                                max: 100
+                            }
+                        },
+
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                align: 'start'
+                            }
+                        }
+                    }
+                }
+            );
+    }
+
+
+    renderLineChart();
+
+
+    document
+        .getElementById(
+            'btnPrevChart'
+        )
+        .addEventListener(
+            'click',
+            function () {
+
+                if (currentPage > 1) {
+
+                    currentPage--;
+
+                    renderLineChart();
+                }
             }
-        });
+        );
+
+
+    document
+        .getElementById(
+            'btnNextChart'
+        )
+        .addEventListener(
+            'click',
+            function () {
+
+                if (
+                    currentPage <
+                    totalPages
+                ) {
+
+                    currentPage++;
+
+                    renderLineChart();
+                }
+            }
+        );
+
 </script>
+
 </body>
 </html>

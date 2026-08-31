@@ -1,0 +1,103 @@
+/* =========================
+   기본 레이아웃
+========================= */
+
+body {
+    padding-top: 60px;
+}
+
+
+/* =========================
+   관리자 사이드바
+========================= */
+
+.sidebar {
+    position: fixed;
+    top: 60px;
+    bottom: 0;
+    left: 0;
+
+    z-index: 100;
+
+    width: 240px;
+    padding: 0;
+
+    background-color: #ffffff;
+
+    border-right: 1px solid #dee2e6;
+
+    overflow-y: auto;
+}
+
+
+/* =========================
+   메인 콘텐츠
+========================= */
+
+main.main-content {
+    margin-left: 240px !important;
+
+    padding: 2rem;
+
+    min-width: 700px;
+}
+
+
+/* =========================
+   학생 체크 리스트
+========================= */
+
+.student-check-list {
+    height: 380px;
+
+    overflow-y: auto;
+
+    border: 1px solid #dee2e6;
+    border-radius: 0 0 8px 8px;
+
+    background-color: #ffffff;
+}
+
+.student-item {
+    cursor: pointer;
+
+    transition: background-color 0.12s ease;
+
+    user-select: none;
+}
+
+.student-item:hover {
+    background-color: #f8f9fa;
+}
+
+
+/* 학생 검색 결과 숨김 */
+.student-item.is-hidden {
+    display: none !important;
+}
+
+
+/* =========================
+   탭 메뉴
+========================= */
+
+.nav-tabs .nav-link {
+    color: #6c757d;
+
+    font-weight: 600;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+
+    border-bottom: 2px solid #0d6efd;
+}
+
+
+/* =========================
+   Toast
+========================= */
+
+.toast-container {
+    z-index: 1100;
+}

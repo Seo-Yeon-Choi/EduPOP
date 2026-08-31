@@ -1,0 +1,217 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            "Noto Sans KR",
+            sans-serif;
+}
+
+
+/* ==============================
+   전체 페이지
+============================== */
+
+.auth-page {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    min-height: 100vh;
+
+    padding: 70px 16px 24px;
+}
+
+
+/* ==============================
+   인증 카드
+============================== */
+
+.verify-container {
+    width: 100%;
+    max-width: 390px;
+
+    padding: 28px 26px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    box-shadow:
+            0 6px 20px
+            rgba(15, 23, 42, 0.05);
+
+    text-align: center;
+}
+
+
+/* ==============================
+   제목
+============================== */
+
+.verify-title {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.verify-description {
+    margin: 7px 0 22px;
+
+    color: #64748b;
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* ==============================
+   에러 메시지
+============================== */
+
+.error-message {
+    margin-bottom: 16px;
+
+    padding: 10px 12px;
+
+    background: #fef2f2;
+    color: #ef4444;
+
+    border: 1px solid #fecaca;
+    border-radius: 7px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-align: left;
+}
+
+
+/* ==============================
+   폼
+============================== */
+
+.verify-form {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.input-label {
+    display: block;
+
+    margin: 0 0 6px 2px;
+
+    color: #495057;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    text-align: left;
+}
+
+.input-field {
+    width: 100%;
+    height: 42px;
+
+    padding: 0 12px;
+
+    background: #ffffff;
+    color: #0f172a;
+
+    border: 1px solid #ced4da;
+    border-radius: 7px;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+            border-color 0.15s,
+            box-shadow 0.15s;
+}
+
+.input-field::placeholder {
+    color: #adb5bd;
+}
+
+.input-field:focus {
+    border-color: #4f46e5;
+
+    box-shadow:
+            0 0 0 3px
+            rgba(79, 70, 229, 0.08);
+}
+
+
+/* ==============================
+   제출 버튼
+============================== */
+
+.btn-submit {
+    width: 100%;
+    height: 44px;
+
+    margin-top: 2px;
+
+    background: #4f46e5;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 7px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s,
+            transform 0.15s;
+}
+
+.btn-submit:hover {
+    background: #4338ca;
+}
+
+.btn-submit:active {
+    transform: translateY(1px);
+}
+
+
+/* ==============================
+   모바일
+============================== */
+
+@media (max-width: 480px) {
+
+    .auth-page {
+        padding:
+                40px 14px 20px;
+    }
+
+    .verify-container {
+        padding:
+                24px 20px;
+    }
+
+    .verify-title {
+        font-size:
+                20px;
+    }
+}

@@ -13,55 +13,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- 공통 스타일 -->
     <link rel="stylesheet" th:href="@{/css/common.css}">
-    <style>
-        body {
-            padding-top: 60px;
-        }
-        .sidebar {
-            position: fixed;
-            top: 60px;
-            bottom: 0;
-            left: 0;
-            z-index: 100;
-            width: 240px;
-            padding: 0;
-            background-color: #ffffff;
-            border-right: 1px solid #dee2e6;
-            overflow-y: auto;
-        }
-        main.main-content {
-            margin-left: 240px !important;
-            padding: 2rem;
-            min-width: 700px;
-        }
-        .student-check-list {
-            height: 380px;
-            overflow-y: auto;
-            border: 1px solid #dee2e6;
-            border-radius: 0 0 8px 8px;
-            background-color: #fff;
-        }
-        .student-item {
-            cursor: pointer;
-            transition: background-color 0.12s ease;
-            user-select: none;
-        }
-        .student-item:hover {
-            background-color: #f8f9fa;
-        }
-        .nav-tabs .nav-link {
-            color: #6c757d;
-            font-weight: 600;
-        }
-        .nav-tabs .nav-link.active {
-            color: #0d6efd;
-            border-bottom: 2px solid #0d6efd;
-        }
-        /* 토스트 알림 z-index 설정 */
-        .toast-container {
-            z-index: 1100;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/admin-classroom-detail.css}">
 </head>
 <body class="bg-light">
 
@@ -504,9 +456,19 @@
 
     // 💡 4. 체크박스 전체 선택 토글
     function toggleCheckAll(containerId, isChecked) {
-        const container = document.getElementById(containerId);
-        const checkboxes = container.querySelectorAll('.student-item:not([style*="display: none"]) input[type="checkbox"]');
-        checkboxes.forEach(cb => cb.checked = isChecked);
+
+        const container =
+            document.getElementById(containerId);
+
+        const checkboxes =
+            container.querySelectorAll(
+                '.student-item:not(.is-hidden) input[type="checkbox"]'
+            );
+
+        checkboxes.forEach(
+            checkbox =>
+                checkbox.checked = isChecked
+        );
     }
 
     // 💡 5. 선택 학생 오른쪽 배정 (>) - 전반 컨펌 모달 연동
@@ -556,6 +518,7 @@
             }
 
             cb.checked = false;
+            item.classList.remove('is-hidden');
             rightList.appendChild(item); // 💡 왼쪽에서 오른쪽으로 '이동(Move)' (복제가 아님)
         }
 
@@ -570,7 +533,11 @@
         const maxCapacity = Number(document.getElementById('maxCapacityText').innerText);
         const thisClassName = document.getElementById('className').value.trim();
 
-        const visibleItems = Array.from(leftList.querySelectorAll('.student-item:not([style*="display: none"])'));
+        const visibleItems = Array.from(
+            leftList.querySelectorAll(
+                '.student-item:not(.is-hidden)'
+            )
+        );
         if (visibleItems.length === 0) {
             showToast('이동할 수 있는 학생이 없습니다.', false);
             return;
@@ -631,6 +598,7 @@
         checkedBoxes.forEach(cb => {
             const item = cb.closest('.student-item');
             cb.checked = false;
+            item.classList.remove('is-hidden');
             leftList.appendChild(item);
         });
 
@@ -651,6 +619,9 @@
 
         visibleItems.forEach(item => {
             item.querySelector('input[type="checkbox"]').checked = false;
+            item.classList.remove(
+                'is-hidden'
+            );
             leftList.appendChild(item);
         });
 
@@ -667,13 +638,25 @@
 
     // 💡 10. 체크박스 리스트 검색 필터
     function filterCheckList(containerId, keyword) {
-        const container = document.getElementById(containerId);
-        const term = keyword.toLowerCase();
-        const items = container.querySelectorAll('.student-item');
+
+        const container =
+            document.getElementById(containerId);
+
+        const term =
+            keyword.toLowerCase();
+
+        const items =
+            container.querySelectorAll('.student-item');
 
         items.forEach(item => {
-            const text = item.innerText.toLowerCase();
-            item.style.display = text.includes(term) ? '' : 'none';
+
+            const text =
+                item.innerText.toLowerCase();
+
+            item.classList.toggle(
+                'is-hidden',
+                !text.includes(term)
+            );
         });
     }
 

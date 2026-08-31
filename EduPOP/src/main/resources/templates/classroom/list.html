@@ -13,73 +13,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <!-- 공통 스타일시트 -->
   <link rel="stylesheet" th:href="@{/css/common.css}">
-  <style>
-    body {
-      padding-top: 60px;
-    }
-    .sidebar {
-      position: fixed;
-      top: 60px;
-      bottom: 0;
-      left: 0;
-      z-index: 100;
-      width: 240px;
-      padding: 0;
-      background-color: #ffffff;
-      border-right: 1px solid #dee2e6;
-      overflow-y: auto;
-    }
-    main.main-content {
-      margin-left: 240px !important;
-      padding: 2rem;
-      min-width: 800px;
-    }
-
-    /* 💡 [모던 UI] 글래스모피즘 플로팅 토스트 카드 */
-    .toast-container {
-      z-index: 1200;
-    }
-    .custom-modern-toast {
-      background: rgba(255, 255, 255, 0.95) !important;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(222, 226, 230, 0.8) !important;
-      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04) !important;
-      border-radius: 16px !important;
-      min-width: 320px;
-    }
-    .toast-icon-wrapper {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .toast-icon-success {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-    }
-    .toast-icon-error {
-      background-color: #ffebee;
-      color: #c62828;
-    }
-
-    /* 💡 테이블 줄바꿈 방지 및 세로 찌그러짐 원천 차단 */
-    .table-custom th,
-    .table-custom td {
-      white-space: nowrap !important;
-      vertical-align: middle;
-    }
-    .class-name-cell {
-      display: inline-block;
-      max-width: 260px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  </style>
+  <link rel="stylesheet" th:href="@{/css/admin-classroom-list.css}">
 </head>
 <body class="bg-light">
 
@@ -94,10 +28,10 @@
         <i id="toastIcon" class="bi bi-check-lg fs-5"></i>
       </div>
       <div class="flex-grow-1">
-        <div id="toastTitle" class="fw-bold text-dark mb-0" style="font-size: 0.92rem;">완료되었습니다</div>
+        <div id="toastTitle" class="fw-bold text-dark mb-0">완료되었습니다</div>
         <div id="toastMessage" class="text-secondary small">성공적으로 처리되었습니다.</div>
       </div>
-      <button type="button" class="btn-close ms-2" data-bs-dismiss="toast" aria-label="Close" style="font-size: 0.75rem;"></button>
+      <button type="button" class="btn-close ms-2" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
   </div>
 </div>
@@ -185,17 +119,24 @@
             <table class="table table-hover table-custom mb-0 text-center" id="classListTable">
               <thead class="table-light">
               <tr>
-                <th style="width: 45px;">
+                <th class="col-checkbox">
                   <input class="form-check-input" type="checkbox" id="checkAllClass" onchange="toggleCheckAll(this.checked)">
                 </th>
-                <th style="width: 70px;">No</th>
-                <th class="text-start" style="min-width: 180px;">반 명칭</th>
-                <th style="width: 100px;">대상 학년</th>
-                <th style="width: 130px;">대표 담임</th>
-                <th style="width: 90px;">정원</th>
-                <th style="width: 100px;">상태</th>
-                <th style="width: 120px;">개설일</th>
-                <th style="width: 150px;">관리</th>
+                <th class="col-number">No</th>
+
+                <th class="text-start col-class-name">반 명칭</th>
+
+                <th class="col-grade">대상 학년</th>
+
+                <th class="col-teacher">대표 담임</th>
+
+                <th class="col-capacity">정원</th>
+
+                <th class="col-status">상태</th>
+
+                <th class="col-created-at">개설일</th>
+
+                <th class="col-management">관리</th>
               </tr>
               </thead>
               <tbody>
@@ -318,25 +259,52 @@
 
   // 💡 1. 반 목록 실시간 즉시 검색 필터
   function filterClassList(keyword) {
-    const term = keyword.toLowerCase().trim();
-    const rows = document.querySelectorAll('#classListTable tbody .class-row-item');
+
+    const term =
+            keyword
+                    .toLowerCase()
+                    .trim();
+
+    const rows =
+            document.querySelectorAll(
+                    '#classListTable tbody .class-row-item'
+            );
 
     rows.forEach(row => {
-      const nameCell = row.querySelector('.class-name-cell')?.innerText.toLowerCase() || '';
-      const teacherCell = row.querySelector('.teacher-name-cell')?.innerText.toLowerCase() || '';
 
-      if (nameCell.includes(term) || teacherCell.includes(term)) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
+      const nameCell =
+              row.querySelector('.class-name-cell')
+                      ?.innerText
+                      .toLowerCase() || '';
+
+      const teacherCell =
+              row.querySelector('.teacher-name-cell')
+                      ?.innerText
+                      .toLowerCase() || '';
+
+      const matched =
+              nameCell.includes(term) ||
+              teacherCell.includes(term);
+
+      row.classList.toggle(
+              'is-hidden',
+              !matched
+      );
     });
   }
 
   // 💡 2. 체크박스 전체 선택 토글
   function toggleCheckAll(isChecked) {
-    const checkboxes = document.querySelectorAll('#classListTable tbody .class-row-item:not([style*="display: none"]) .class-checkbox');
-    checkboxes.forEach(cb => cb.checked = isChecked);
+
+    const checkboxes =
+            document.querySelectorAll(
+                    '#classListTable tbody .class-row-item:not(.is-hidden) .class-checkbox'
+            );
+
+    checkboxes.forEach(
+            checkbox =>
+                    checkbox.checked = isChecked
+    );
   }
 
   // 💡 3. 단일 반 종강 / 재개 처리

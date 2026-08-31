@@ -1,514 +1,1850 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="_csrf" th:content="${_csrf.token}">
-    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="_csrf"
+          th:content="${_csrf.token}">
+
+    <meta name="_csrf_header"
+          th:content="${_csrf.headerName}">
+
     <title>EduPOP - 반별 시험 및 성적 관리</title>
-    <link rel="stylesheet" th:href="@{/css/common.css}">
-    <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; }
-        .page-content-wrapper { margin-left: 240px !important; margin-top: 70px !important; padding: 24px 32px; min-height: calc(100vh - 70px); background-color: #f8fafc; }
 
-        /* 2열 스플릿 워크스페이스 */
-        .workspace-layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
-        .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); padding: 20px 24px; margin-bottom: 20px; }
+    <link rel="stylesheet"
+          th:href="@{/css/common.css}">
 
-        /* 좌측 반 리스트 사이드바 스타일 */
-        .class-sidebar { padding: 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; }
-        .sidebar-title { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-        .class-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #334155; text-decoration: none; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; transition: all 0.15s ease; }
-        .class-item:hover, .class-item.active { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
-
-        .header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .common-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .common-table th { background-color: #f8fafc; color: #475569; font-weight: 600; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 12px 10px; text-align: center; }
-        .common-table td { border-bottom: 1px solid #e2e8f0; padding: 12px 10px; text-align: center; vertical-align: middle; }
-        .common-table tr:hover td { background-color: #fcfdfe; }
-
-        .btn-primary { background-color: #2563eb; color: #ffffff; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
-        .btn-secondary { background-color: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
-        .btn-secondary:hover { background-color: #f1f5f9; }
-        .btn-danger { background-color: #fee2e2; color: #dc2626; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
-        .btn-danger:hover { background-color: #fecaca; }
-
-        /* 모달 스타일 */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-box { background: #ffffff; border-radius: 10px; width: 680px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px; }
-        .form-input, .form-select { width: 100%; height: 38px; padding: 0 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
-
-        /* 문항 행 그리드 */
-        .question-builder-row { display: grid; grid-template-columns: 45px 115px 1fr 55px 55px; gap: 6px; align-items: center; margin-bottom: 8px; }
-    </style>
+    <link rel="stylesheet"
+          th:href="@{/css/teacher-exam-management.css}">
 </head>
+
 <body>
 
 <th:block th:replace="~{layout/header :: header}"></th:block>
 <th:block th:replace="~{layout/sidebar-teacher :: sidebar}"></th:block>
 
+
 <div class="page-content-wrapper">
 
+    <!-- 페이지 상단 -->
     <div class="header-box">
+
         <div>
-            <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #0f172a;">📋 반별 시험 및 OMR 채점 관리</h1>
-            <p style="margin: 4px 0 0 0; color: #64748b; font-size: 13px;">왼쪽에서 반을 선택하거나 새로운 시험을 등록하여 OMR 채점을 진행하세요.</p>
+
+            <h1 class="page-title">
+                📋 반별 시험 및 OMR 채점 관리
+            </h1>
+
+            <p class="page-description">
+                왼쪽에서 반을 선택하거나 새로운 시험을 등록하여 OMR 채점을 진행하세요.
+            </p>
+
         </div>
+
         <div>
-            <button type="button" class="btn-primary" onclick="openCreateModal()">+ 새 시험 등록 및 문항 틀 설정</button>
+
+            <button type="button"
+                    class="btn-primary"
+                    onclick="openCreateModal()">
+                + 새 시험 등록 및 문항 틀 설정
+            </button>
+
         </div>
+
     </div>
 
-    <!-- 2열 스플릿 워크스페이스 레이아웃 -->
+
+    <!-- 2열 워크스페이스 -->
     <div class="workspace-layout">
 
-        <!-- 1. 좌측: 담당 반 사이드바 리스트 -->
+
+        <!-- =========================
+             왼쪽 담당 반 목록
+        ========================== -->
         <div class="class-sidebar">
+
             <div class="sidebar-title">
-                <span>🏫 내 담당 반 목록</span>
-                <span style="font-size: 11px; background: #eff6ff; color: #2563eb; padding: 2px 6px; border-radius: 4px;" th:text="${classList != null ? classList.size() + '개 반' : '0개 반'}">0개 반</span>
+
+                <span>
+                    🏫 내 담당 반 목록
+                </span>
+
+                <span class="class-count-badge"
+                      th:text="${classList != null ? classList.size() + '개 반' : '0개 반'}">
+                    0개 반
+                </span>
+
             </div>
+
+
             <div>
-                <!-- 전체 반 보기 버튼은 항상 유지 -->
-                <a th:href="@{/exam/list}"
+
+                <!-- 전체 반 보기 -->
+                <a th:href="@{/teacher/exams}"
                    th:classappend="${currentClassId == null} ? 'active' : ''"
                    class="class-item">
-                    <span>전체 반 보기</span>
-                    <span>→</span>
+
+                    <span>
+                        전체 반 보기
+                    </span>
+
+                    <span>
+                        →
+                    </span>
+
                 </a>
 
+
+                <!-- 담당 반 -->
                 <a th:each="cls : ${classList}"
                    th:href="@{/teacher/exams(classId=${cls.classId})}"
                    th:classappend="${currentClassId != null and currentClassId == cls.classId} ? 'active' : ''"
                    class="class-item">
-                    <span th:text="${cls.name}"></span>
-                    <span style="font-size: 11px; color: #64748b;" th:text="${cls.targetGrade}"></span>
+
+                    <span th:text="${cls.name}">
+                        반 이름
+                    </span>
+
+                    <span class="class-grade"
+                          th:text="${cls.targetGrade}">
+                        중2
+                    </span>
+
                 </a>
 
-                <!--  담당 반이 없을 때 안내 문구 출력 -->
-                <div th:if="${classList == null or classList.isEmpty()}" style="padding: 15px 10px; font-size: 12px; color: #94a3b8; text-align: center; background: #f8fafc; border-radius: 6px; margin-top: 6px;">
+
+                <!-- 담당 반 없음 -->
+                <div th:if="${classList == null or classList.isEmpty()}"
+                     class="class-empty">
+
                     등록된 반이 없습니다.
+
                 </div>
+
             </div>
+
         </div>
 
-        <!-- 2. 우측: 시험 리스트 및 관리 테이블 -->
-        <div class="card" style="margin-bottom: 0;">
+
+        <!-- =========================
+             오른쪽 시험 목록
+        ========================== -->
+        <div class="card exam-list-card">
+
             <table class="common-table">
+
                 <thead>
+
                 <tr>
-                    <th style="width: 70px;">회차</th>
-                    <th>시험명</th>
-                    <th style="width: 130px;">배정 반</th>
-                    <th style="width: 110px;">시행일자</th>
-                    <th style="width: 90px;">문항수</th>
-                    <th style="width: 140px;">관리</th>
+
+                    <th class="exam-col-round">
+                        회차
+                    </th>
+
+                    <th>
+                        시험명
+                    </th>
+
+                    <th class="exam-col-class">
+                        배정 반
+                    </th>
+
+                    <th class="exam-col-date">
+                        시행일자
+                    </th>
+
+                    <th class="exam-col-count">
+                        문항수
+                    </th>
+
+                    <th class="exam-col-action">
+                        관리
+                    </th>
+
                 </tr>
+
                 </thead>
+
+
                 <tbody>
+
+                <!-- 시험 없음 -->
                 <tr th:if="${exams == null or exams.isEmpty()}">
-                    <td colspan="6" style="padding: 30px; color: #94a3b8;">등록된 시험이 없습니다. 상단 버튼을 눌러 새 시험을 등록해주세요.</td>
-                </tr>
-                <tr th:each="ex : ${exams}">
-                    <td style="font-weight: 700; color: #64748b;" th:text="${ex.examRound} + '회차'">1회차</td>
-                    <td style="text-align: left; font-weight: 600; color: #0f172a;" th:text="${ex.title}">월말평가</td>
-                    <td th:text="${ex.className}">중2 심화A반</td>
-                    <td style="color: #64748b;" th:text="${ex.examDate}">2026-08-25</td>
-                    <td><span style="font-weight: bold; color: #2563eb;" th:text="${ex.totalQuestions} + '문항'">20문항</span></td>
-                    <td>
-                        <a th:href="@{/exam/omr-matrix(examId=${ex.examId})}" class="btn-secondary" style="padding: 4px 10px; font-size: 12px; color: #2563eb; border-color: #bfdbfe; background: #eff6ff;">
-                            ✏️ OMR 채점
-                        </a>
+
+                    <td colspan="6"
+                        class="exam-empty">
+
+                        등록된 시험이 없습니다.
+                        상단 버튼을 눌러 새 시험을 등록해주세요.
+
                     </td>
+
                 </tr>
+
+
+                <!-- 시험 목록 -->
+                <tr th:each="ex : ${exams}">
+
+                    <td class="exam-round"
+                        th:text="${ex.examRound} + '회차'">
+                        1회차
+                    </td>
+
+                    <td class="exam-title"
+                        th:text="${ex.title}">
+                        월말평가
+                    </td>
+
+                    <td th:text="${ex.className}">
+                        중2 심화A반
+                    </td>
+
+                    <td class="exam-date"
+                        th:text="${ex.examDate}">
+                        2026-08-25
+                    </td>
+
+                    <td>
+
+                        <span class="exam-question-count"
+                              th:text="${ex.totalQuestions} + '문항'">
+                            20문항
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <a th:href="@{/exam/omr-matrix(examId=${ex.examId})}"
+                           class="btn-secondary omr-button">
+
+                            ✏️ OMR 채점
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
                 </tbody>
+
             </table>
+
         </div>
 
     </div>
 
 </div>
 
-<!-- 1. 새 시험 등록 모달 -->
-<div id="createExamModal" class="modal-overlay">
+
+<!-- =====================================================
+     새 시험 등록 모달
+===================================================== -->
+<div id="createExamModal"
+     class="modal-overlay">
+
     <div class="modal-box">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="margin: 0; font-size: 16px; font-weight: 800;">📝 새 시험 등록 및 문항별 대·소분류 설정</h3>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <button type="button" class="btn-secondary" style="padding: 4px 10px; font-size: 12px; background: #eff6ff; color: #2563eb; border-color: #bfdbfe;" onclick="openCategoryManageModal()">⚙️ 분류 항목 관리</button>
-                <span style="cursor: pointer; font-size: 18px; color: #94a3b8;" onclick="closeCreateModal()">✕</span>
+
+
+        <!-- 모달 헤더 -->
+        <div class="modal-header-custom">
+
+            <h3 class="modal-title">
+                📝 새 시험 등록 및 문항별 대·소분류 설정
+            </h3>
+
+            <div class="modal-header-actions">
+
+                <button type="button"
+                        class="btn-secondary category-manage-button"
+                        onclick="openCategoryManageModal()">
+
+                    ⚙️ 분류 항목 관리
+
+                </button>
+
+                <span class="modal-close"
+                      onclick="closeCreateModal()">
+                    ✕
+                </span>
+
             </div>
+
         </div>
+
 
         <form id="examForm">
+
+
+            <!-- 시험명 -->
             <div class="form-group">
-                <label>시험명</label>
-                <input type="text" id="examTitle" class="form-input" placeholder="예: 8월 정기 월말평가 또는 토플 실전" required>
+
+                <label for="examTitle">
+                    시험명
+                </label>
+
+                <input type="text"
+                       id="examTitle"
+                       class="form-input"
+                       placeholder="예: 8월 정기 월말평가 또는 토플 실전"
+                       required>
+
             </div>
 
+
+            <!-- 시험 분류 -->
             <div class="form-group">
-                <label>시험 분류 유형</label>
-                <select id="examType" class="form-select">
-                    <!-- 마스터 API 동적 로드 -->
+
+                <label for="examType">
+                    시험 분류 유형
+                </label>
+
+                <select id="examType"
+                        class="form-select">
+
+                    <!-- API에서 동적 생성 -->
+
                 </select>
+
             </div>
 
+
+            <!-- 반 선택 -->
             <div class="form-group">
-                <label>배정 반 선택</label>
-                <select id="classIdSelect" class="form-select">
-                    <option th:each="cls : ${classList}" th:value="${cls.classId}" th:text="${cls.name} + ' (' + cls.targetGrade + ')'">중2 심화A반</option>
+
+                <label for="classIdSelect">
+                    배정 반 선택
+                </label>
+
+                <select id="classIdSelect"
+                        class="form-select">
+
+                    <option th:each="cls : ${classList}"
+                            th:value="${cls.classId}"
+                            th:text="${cls.name} + ' (' + cls.targetGrade + ')'">
+
+                        중2 심화A반
+
+                    </option>
+
                 </select>
+
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+
+            <!-- 회차 / 시행일자 -->
+            <div class="form-two-column">
+
                 <div class="form-group">
-                    <label>회차</label>
-                    <input type="number" id="examRound" class="form-input" value="1" min="1" max="10">
+
+                    <label for="examRound">
+                        회차
+                    </label>
+
+                    <input type="number"
+                           id="examRound"
+                           class="form-input"
+                           value="1"
+                           min="1"
+                           max="10">
+
                 </div>
+
+
                 <div class="form-group">
-                    <label>시행일자</label>
-                    <input type="date" id="examDate" class="form-input" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+
+                    <label for="examDate">
+                        시행일자
+                    </label>
+
+                    <input type="date"
+                           id="examDate"
+                           class="form-input"
+                           th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+
                 </div>
+
             </div>
 
+
+            <!-- 출제 방식 -->
             <div class="form-group">
-                <label>출제 방식</label>
-                <select id="createMode" class="form-select" onchange="toggleCreateMode(this.value)">
-                    <option value="custom">문항별 대분류·소분류 및 배점 직접 설정</option>
-                    <option value="template">기존 시험 템플릿 복제</option>
+
+                <label for="createMode">
+                    출제 방식
+                </label>
+
+                <select id="createMode"
+                        class="form-select"
+                        onchange="toggleCreateMode(this.value)">
+
+                    <option value="custom">
+                        문항별 대분류·소분류 및 배점 직접 설정
+                    </option>
+
+                    <option value="template">
+                        기존 시험 템플릿 복제
+                    </option>
+
                 </select>
+
             </div>
 
-            <div id="templateBox" class="form-group" style="display: none;">
-                <label>불러올 템플릿 선택</label>
-                <select id="templateExamId" class="form-select">
-                    <option th:each="tpl : ${templates}" th:value="${tpl.examId}" th:text="${tpl.title}">기존 템플릿</option>
+
+            <!-- 템플릿 복제 -->
+            <div id="templateBox"
+                 class="form-group is-hidden">
+
+                <label for="templateExamId">
+                    불러올 템플릿 선택
+                </label>
+
+                <select id="templateExamId"
+                        class="form-select">
+
+                    <option th:each="tpl : ${templates}"
+                            th:value="${tpl.examId}"
+                            th:text="${tpl.title}">
+
+                        기존 템플릿
+
+                    </option>
+
                 </select>
+
             </div>
 
-            <div id="customBox" class="form-group">
-                <label>총 문항 수 설정</label>
-                <input type="number" id="totalQuestionsInput" class="form-input" value="5" min="1" max="30" onchange="generateQuestionRows(this.value)">
 
-                <div style="margin-top: 10px; max-height: 220px; overflow-y: auto; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; background: #f8fafc;" id="questionRowsContainer">
+            <!-- 직접 문항 생성 -->
+            <div id="customBox"
+                 class="form-group">
+
+                <label for="totalQuestionsInput">
+                    총 문항 수 설정
+                </label>
+
+                <input type="number"
+                       id="totalQuestionsInput"
+                       class="form-input"
+                       value="5"
+                       min="1"
+                       max="30"
+                       onchange="generateQuestionRows(this.value)">
+
+
+                <div id="questionRowsContainer"
+                     class="question-rows-container">
                 </div>
+
             </div>
 
+
+            <!-- 자동완성 데이터 -->
             <datalist id="savedLargeCategories"></datalist>
+
             <datalist id="savedSubCategoryTags"></datalist>
 
-            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
-                <button type="button" class="btn-secondary" onclick="closeCreateModal()">취소</button>
-                <button type="button" class="btn-primary" onclick="submitNewExam()">시험지 생성 및 OMR 이동</button>
+
+            <!-- 버튼 -->
+            <div class="form-actions">
+
+                <button type="button"
+                        class="btn-secondary"
+                        onclick="closeCreateModal()">
+
+                    취소
+
+                </button>
+
+                <button type="button"
+                        class="btn-primary"
+                        onclick="submitNewExam()">
+
+                    시험지 생성 및 OMR 이동
+
+                </button>
+
             </div>
+
         </form>
+
     </div>
+
 </div>
 
-<!-- 2. ⚙️ 분류 항목 관리 모달 -->
-<div id="categoryManageModal" class="modal-overlay">
-    <div class="modal-box" style="width: 500px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="margin: 0; font-size: 16px; font-weight: 800;">⚙️ 시험 분류 및 대·소분류 관리</h3>
-            <span style="cursor: pointer; font-size: 18px; color: #94a3b8;" onclick="closeCategoryManageModal()">✕</span>
+
+<!-- =====================================================
+     분류 항목 관리 모달
+===================================================== -->
+<div id="categoryManageModal"
+     class="modal-overlay">
+
+    <div class="modal-box category-modal-box">
+
+
+        <!-- 모달 헤더 -->
+        <div class="modal-header-custom">
+
+            <h3 class="modal-title">
+                ⚙️ 시험 분류 및 대·소분류 관리
+            </h3>
+
+            <span class="modal-close"
+                  onclick="closeCategoryManageModal()">
+                ✕
+            </span>
+
         </div>
 
+
+        <!-- 관리 종류 -->
         <div class="form-group">
-            <label>분류 구분 선택</label>
-            <select id="manageCategoryType" class="form-select" onchange="renderManageCategoryList()">
-                <option value="EXAM_TYPE">시험 분류 유형 (월말평가 등)</option>
-                <option value="LARGE">대분류 (VOCAB 등)</option>
-                <option value="SMALL">소분류 (관계대명사 등)</option>
+
+            <label for="manageCategoryType">
+                분류 구분 선택
+            </label>
+
+            <select id="manageCategoryType"
+                    class="form-select"
+                    onchange="renderManageCategoryList()">
+
+                <option value="EXAM_TYPE">
+                    시험 분류 유형 (월말평가 등)
+                </option>
+
+                <option value="LARGE">
+                    대분류 (VOCAB 등)
+                </option>
+
+                <option value="SMALL">
+                    소분류 (관계대명사 등)
+                </option>
+
             </select>
+
         </div>
 
-        <div class="form-group" style="display: flex; gap: 8px;">
-            <input type="text" id="newCategoryNameInput" class="form-input" placeholder="새로운 항목명을 입력하세요">
-            <button type="button" class="btn-primary" style="white-space: nowrap;" onclick="addNewCategoryFromModal()">+ 추가</button>
+
+        <!-- 새 항목 추가 -->
+        <div class="form-group category-add-row">
+
+            <input type="text"
+                   id="newCategoryNameInput"
+                   class="form-input"
+                   placeholder="새로운 항목명을 입력하세요">
+
+            <button type="button"
+                    class="btn-primary category-add-button"
+                    onclick="addNewCategoryFromModal()">
+
+                + 추가
+
+            </button>
+
         </div>
 
+
+        <!-- 등록 목록 -->
         <div class="form-group">
-            <label>현재 등록된 항목 목록</label>
-            <div id="manageCategoryListContainer" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; background: #f8fafc;">
+
+            <label>
+                현재 등록된 항목 목록
+            </label>
+
+            <div id="manageCategoryListContainer"
+                 class="manage-category-list">
             </div>
+
         </div>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-            <button type="button" class="btn-secondary" onclick="closeCategoryManageModal()">닫기</button>
+
+        <!-- 닫기 -->
+        <div class="form-actions-single">
+
+            <button type="button"
+                    class="btn-secondary"
+                    onclick="closeCategoryManageModal()">
+
+                닫기
+
+            </button>
+
         </div>
+
     </div>
+
 </div>
+
 
 <script>
-    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+    /* =====================================================
+       CSRF
+    ===================================================== */
+
+    const csrfToken =
+        document.querySelector(
+            'meta[name="_csrf"]'
+        ).content;
+
+    const csrfHeader =
+        document.querySelector(
+            'meta[name="_csrf_header"]'
+        ).content;
+
 
     let globalCategoryData = null;
 
-    window.addEventListener('DOMContentLoaded', function() {
-        loadMasterCategories();
-    });
+
+    /* =====================================================
+       초기화
+    ===================================================== */
+
+    window.addEventListener(
+        'DOMContentLoaded',
+        function () {
+
+            loadMasterCategories();
+
+        }
+    );
+
+
+    /* =====================================================
+       분류 데이터 로드
+    ===================================================== */
 
     function loadMasterCategories() {
+
         fetch('/exam/api/categories')
-            .then(res => res.json())
-            .then(data => {
-                globalCategoryData = data;
-                updateAllCategoryUI(data);
+
+            .then(res => {
+
+                if (!res.ok) {
+                    throw new Error(
+                        '분류 데이터 조회 실패'
+                    );
+                }
+
+                return res.json();
             })
-            .catch(err => console.log('마스터 분류 로드 에러:', err));
+
+            .then(data => {
+
+                globalCategoryData = data;
+
+                updateAllCategoryUI(data);
+
+            })
+
+            .catch(err => {
+
+                console.error(
+                    '마스터 분류 로드 에러:',
+                    err
+                );
+
+            });
     }
 
+
+    /* =====================================================
+       분류 UI 갱신
+    ===================================================== */
+
     function updateAllCategoryUI(data) {
-        // 1. 시험 분류 유형 토글 채우기
-        const examTypeSelect = document.getElementById('examType');
-        if (examTypeSelect && data.examTypes) {
+
+        /* 시험 분류 */
+
+        const examTypeSelect =
+            document.getElementById(
+                'examType'
+            );
+
+
+        if (
+            examTypeSelect &&
+            data.examTypes
+        ) {
+
             examTypeSelect.innerHTML = '';
-            data.examTypes.forEach(t => {
-                const opt = document.createElement('option');
-                opt.value = t.categoryName;
-                opt.textContent = t.categoryName;
-                examTypeSelect.appendChild(opt);
+
+
+            data.examTypes.forEach(type => {
+
+                const option =
+                    document.createElement(
+                        'option'
+                    );
+
+                option.value =
+                    type.categoryName;
+
+                option.textContent =
+                    type.categoryName;
+
+                examTypeSelect.appendChild(
+                    option
+                );
+
             });
         }
 
-        // 2. 대분류 datalist 확실하게 재생성 및 채우기
-        let largeDatalist = document.getElementById('savedLargeCategories');
+
+        /* 대분류 */
+
+        let largeDatalist =
+            document.getElementById(
+                'savedLargeCategories'
+            );
+
+
         if (!largeDatalist) {
-            largeDatalist = document.createElement('datalist');
-            largeDatalist.id = 'savedLargeCategories';
-            document.body.appendChild(largeDatalist);
+
+            largeDatalist =
+                document.createElement(
+                    'datalist'
+                );
+
+            largeDatalist.id =
+                'savedLargeCategories';
+
+            document.body.appendChild(
+                largeDatalist
+            );
         }
+
+
         largeDatalist.innerHTML = '';
-        const largeList = data.largeCategories || [];
-        largeList.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t.categoryName;
-            largeDatalist.appendChild(opt);
+
+
+        const largeList =
+            data.largeCategories || [];
+
+
+        largeList.forEach(item => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+            option.value =
+                item.categoryName;
+
+            largeDatalist.appendChild(
+                option
+            );
+
         });
 
-        // 3. 소분류 datalist 확실하게 재생성 및 채우기
-        let smallDatalist = document.getElementById('savedSubCategoryTags');
+
+        /* 소분류 */
+
+        let smallDatalist =
+            document.getElementById(
+                'savedSubCategoryTags'
+            );
+
+
         if (!smallDatalist) {
-            smallDatalist = document.createElement('datalist');
-            smallDatalist.id = 'savedSubCategoryTags';
-            document.body.appendChild(smallDatalist);
+
+            smallDatalist =
+                document.createElement(
+                    'datalist'
+                );
+
+            smallDatalist.id =
+                'savedSubCategoryTags';
+
+            document.body.appendChild(
+                smallDatalist
+            );
         }
+
+
         smallDatalist.innerHTML = '';
-        const smallList = data.smallCategories || [];
-        smallList.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t.categoryName;
-            smallDatalist.appendChild(opt);
+
+
+        const smallList =
+            data.smallCategories || [];
+
+
+        smallList.forEach(item => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+            option.value =
+                item.categoryName;
+
+            smallDatalist.appendChild(
+                option
+            );
+
         });
     }
+
+
+    /* =====================================================
+       시험 등록 모달
+    ===================================================== */
 
     function openCreateModal() {
-        document.getElementById('createExamModal').style.display = 'flex';
-        loadMasterCategories(); // 팝업 열 때 최신 마스터 데이터 강제 동기화
-        generateQuestionRows(5);
+
+        document
+            .getElementById(
+                'createExamModal'
+            )
+            .classList
+            .add('open');
+
+
+        loadMasterCategories();
+
+
+        const count =
+            document.getElementById(
+                'totalQuestionsInput'
+            ).value;
+
+
+        generateQuestionRows(count);
     }
+
 
     function closeCreateModal() {
-        document.getElementById('createExamModal').style.display = 'none';
+
+        document
+            .getElementById(
+                'createExamModal'
+            )
+            .classList
+            .remove('open');
     }
 
+
+    /* =====================================================
+       분류 관리 모달
+    ===================================================== */
+
     function openCategoryManageModal() {
-        document.getElementById('categoryManageModal').style.display = 'flex';
+
+        document
+            .getElementById(
+                'categoryManageModal'
+            )
+            .classList
+            .add('open');
+
+
         renderManageCategoryList();
     }
 
+
     function closeCategoryManageModal() {
-        document.getElementById('categoryManageModal').style.display = 'none';
-        loadMasterCategories(); // 관리 창 닫을 때 메인 화면 데이터 즉시 갱신
+
+        document
+            .getElementById(
+                'categoryManageModal'
+            )
+            .classList
+            .remove('open');
+
+
+        loadMasterCategories();
     }
 
+
+    /* =====================================================
+       분류 목록 출력
+    ===================================================== */
+
     function renderManageCategoryList() {
-        const type = document.getElementById('manageCategoryType').value;
-        const container = document.getElementById('manageCategoryListContainer');
+
+        const type =
+            document.getElementById(
+                'manageCategoryType'
+            ).value;
+
+
+        const container =
+            document.getElementById(
+                'manageCategoryListContainer'
+            );
+
+
         container.innerHTML = '';
 
-        if (!globalCategoryData) return;
 
-        let list = [];
-        if (type === 'EXAM_TYPE') list = globalCategoryData.examTypes;
-        else if (type === 'LARGE') list = globalCategoryData.largeCategories;
-        else if (type === 'SMALL') list = globalCategoryData.smallCategories;
+        if (!globalCategoryData) {
 
-        if (!list || list.length === 0) {
-            container.innerHTML = '<div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 10px;">등록된 항목이 없습니다.</div>';
+            container.innerHTML = `
+                <div class="category-list-empty">
+                    분류 데이터를 불러오는 중입니다.
+                </div>
+            `;
+
             return;
         }
 
-        list.forEach(item => {
-            const row = document.createElement('div');
-            row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-size: 13px; background: #ffffff; margin-bottom: 4px; border-radius: 4px;';
-            row.innerHTML = `
-                <span>${item.categoryName}</span>
-                <button type="button" class="btn-danger" onclick="deleteCategoryItem(${item.categoryId})">삭제</button>
+
+        let list = [];
+
+
+        if (type === 'EXAM_TYPE') {
+
+            list =
+                globalCategoryData.examTypes || [];
+
+        } else if (type === 'LARGE') {
+
+            list =
+                globalCategoryData.largeCategories || [];
+
+        } else if (type === 'SMALL') {
+
+            list =
+                globalCategoryData.smallCategories || [];
+
+        }
+
+
+        if (list.length === 0) {
+
+            container.innerHTML = `
+                <div class="category-list-empty">
+                    등록된 항목이 없습니다.
+                </div>
             `;
-            container.appendChild(row);
+
+            return;
+        }
+
+
+        list.forEach(item => {
+
+            const row =
+                document.createElement(
+                    'div'
+                );
+
+
+            row.className =
+                'category-list-row';
+
+
+            const nameSpan =
+                document.createElement(
+                    'span'
+                );
+
+
+            nameSpan.textContent =
+                item.categoryName;
+
+
+            const deleteButton =
+                document.createElement(
+                    'button'
+                );
+
+
+            deleteButton.type =
+                'button';
+
+
+            deleteButton.className =
+                'btn-danger';
+
+
+            deleteButton.textContent =
+                '삭제';
+
+
+            deleteButton.addEventListener(
+                'click',
+                function () {
+
+                    deleteCategoryItem(
+                        item.categoryId
+                    );
+
+                }
+            );
+
+
+            row.appendChild(
+                nameSpan
+            );
+
+            row.appendChild(
+                deleteButton
+            );
+
+            container.appendChild(
+                row
+            );
+
         });
     }
 
+
+    /* =====================================================
+       분류 추가
+    ===================================================== */
+
     function addNewCategoryFromModal() {
-        const type = document.getElementById('manageCategoryType').value;
-        const nameInput = document.getElementById('newCategoryNameInput');
-        const name = nameInput.value.trim();
+
+        const type =
+            document.getElementById(
+                'manageCategoryType'
+            ).value;
+
+
+        const nameInput =
+            document.getElementById(
+                'newCategoryNameInput'
+            );
+
+
+        const name =
+            nameInput.value.trim();
+
 
         if (!name) {
-            alert('항목명을 입력해주세요.');
+
+            alert(
+                '항목명을 입력해주세요.'
+            );
+
+            nameInput.focus();
+
             return;
         }
 
-        fetch('/exam/api/categories', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken
-            },
-            body: JSON.stringify({ academyId: 1, categoryType: type, categoryName: name, sortOrder: 1 })
-        })
-            .then(res => {
-                if (res.ok) {
-                    nameInput.value = '';
-                    fetch('/exam/api/categories')
-                        .then(r => r.json())
-                        .then(data => {
-                            globalCategoryData = data;
-                            renderManageCategoryList();
-                            updateAllCategoryUI(data); // 즉시 datalist 업데이트
-                        });
-                } else {
-                    alert('추가 실패');
+
+        fetch(
+            '/exam/api/categories',
+            {
+
+                method: 'POST',
+
+                headers: {
+
+                    'Content-Type':
+                        'application/json',
+
+                    [csrfHeader]:
+                    csrfToken
+                },
+
+                body: JSON.stringify({
+
+                    academyId: 1,
+
+                    categoryType:
+                    type,
+
+                    categoryName:
+                    name,
+
+                    sortOrder: 1
+                })
+            }
+        )
+
+            .then(async res => {
+
+                if (!res.ok) {
+
+                    const message =
+                        await res.text();
+
+                    throw new Error(
+                        message || '추가 실패'
+                    );
                 }
-            });
-    }
 
-    function deleteCategoryItem(categoryId) {
-        if (!confirm('정말 이 항목을 삭제하시겠습니까?')) return;
+                return fetch(
+                    '/exam/api/categories'
+                );
+            })
 
-        fetch('/exam/api/categories/' + categoryId, {
-            method: 'DELETE',
-            headers: { [csrfHeader]: csrfToken }
-        })
             .then(res => {
-                if (res.ok) {
-                    fetch('/exam/api/categories')
-                        .then(r => r.json())
-                        .then(data => {
-                            globalCategoryData = data;
-                            renderManageCategoryList();
-                            updateAllCategoryUI(data); // 즉시 datalist 업데이트
-                        });
-                } else {
-                    alert('삭제 실패');
+
+                if (!res.ok) {
+
+                    throw new Error(
+                        '분류 목록 갱신 실패'
+                    );
                 }
-            });
-    }
 
-    function toggleCreateMode(mode) {
-        if (mode === 'template') {
-            document.getElementById('templateBox').style.display = 'block';
-            document.getElementById('customBox').style.display = 'none';
-        } else {
-            document.getElementById('templateBox').style.display = 'none';
-            document.getElementById('customBox').style.display = 'block';
-        }
-    }
-
-    function generateQuestionRows(count) {
-        const container = document.getElementById('questionRowsContainer');
-        container.innerHTML = `
-            <div style="display: grid; grid-template-columns: 45px 115px 1fr 55px 55px; gap: 6px; margin-bottom: 6px; font-size: 11px; font-weight: bold; color: #475569; text-align: center;">
-                <span>번호</span><span>대분류</span><span>소분류</span><span>배점</span><span>정답</span>
-            </div>
-        `;
-        count = parseInt(count) || 5;
-
-        for (let i = 1; i <= count; i++) {
-            const row = document.createElement('div');
-            row.className = 'question-builder-row';
-            row.innerHTML = `
-                <span style="font-size: 11px; font-weight: 700; color: #64748b; text-align: center;">${i}번</span>
-                <!-- 💡 value="VOCAB"을 지우고 placeholder를 넣어 빈칸 상태로 변경 -->
-                <input type="text" class="form-input q-type" list="savedLargeCategories" value="" placeholder="대분류 선택" style="height: 32px; font-size: 11px;" title="대분류 입력/수정">
-                <input type="text" class="form-input q-tag" list="savedSubCategoryTags" placeholder="소분류 선택" style="height: 32px; font-size: 11px;" title="소분류 입력/수정">
-                <input type="number" class="form-input q-score" value="5" style="height: 32px; font-size: 11px; text-align: center;" title="배점">
-                <input type="text" class="form-input q-ans" value="1" style="height: 32px; font-size: 11px; text-align: center;" title="정답">
-            `;
-            container.appendChild(row);
-        }
-    }
-
-    function submitNewExam() {
-        const title = document.getElementById('examTitle').value;
-        const examType = document.getElementById('examType').value;
-        const classId = parseInt(document.getElementById('classIdSelect').value);
-        const examRound = parseInt(document.getElementById('examRound').value);
-        const examDate = document.getElementById('examDate').value;
-        const mode = document.getElementById('createMode').value;
-
-        if (!title) {
-            alert('시험명을 입력해주세요.');
-            return;
-        }
-
-        let payload = {
-            academyId: 1,
-            title: title,
-            examType: examType,
-            classId: classId,
-            examRound: examRound,
-            examDate: examDate
-        };
-
-        if (mode === 'template') {
-            payload.templateExamId = parseInt(document.getElementById('templateExamId').value);
-        } else {
-            let customQuestions = [];
-            const rows = document.querySelectorAll('.question-builder-row');
-            rows.forEach((row, idx) => {
-                const type = row.querySelector('.q-type').value.trim() || 'VOCAB';
-                const tag = row.querySelector('.q-tag').value.trim() || '기본';
-                const score = parseInt(row.querySelector('.q-score').value) || 5;
-                const ans = row.querySelector('.q-ans').value.trim() || '1';
-
-                customQuestions.push({
-                    questionNumber: idx + 1,
-                    questionType: type,
-                    questionTypeTag: tag,
-                    score: score,
-                    correctAnswer: ans
-                });
-            });
-            payload.customQuestions = customQuestions;
-        }
-
-        fetch('/exam/api/create-sheet', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken
-            },
-            body: JSON.stringify(payload)
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('시험 생성 실패');
                 return res.json();
             })
-            .then(examId => {
-                alert('새 시험과 문항별 대·소분류 설정이 성공적으로 등록되었습니다!');
-                location.href = '/exam/omr-matrix?examId=' + examId;
+
+            .then(data => {
+
+                nameInput.value = '';
+
+                globalCategoryData =
+                    data;
+
+                renderManageCategoryList();
+
+                updateAllCategoryUI(
+                    data
+                );
+
             })
+
             .catch(err => {
-                console.error(err);
-                alert('시험 등록 중 오류가 발생했습니다.');
+
+                console.error(
+                    err
+                );
+
+                alert(
+                    err.message ||
+                    '분류 항목 추가 중 오류가 발생했습니다.'
+                );
+
             });
     }
+
+
+    /* =====================================================
+       분류 삭제
+    ===================================================== */
+
+    function deleteCategoryItem(
+        categoryId
+    ) {
+
+        if (
+            !confirm(
+                '정말 이 항목을 삭제하시겠습니까?'
+            )
+        ) {
+
+            return;
+        }
+
+
+        fetch(
+            '/exam/api/categories/' +
+            categoryId,
+            {
+
+                method:
+                    'DELETE',
+
+                headers: {
+
+                    [csrfHeader]:
+                    csrfToken
+                }
+            }
+        )
+
+            .then(async res => {
+
+                if (!res.ok) {
+
+                    const message =
+                        await res.text();
+
+                    throw new Error(
+                        message || '삭제 실패'
+                    );
+                }
+
+
+                return fetch(
+                    '/exam/api/categories'
+                );
+
+            })
+
+            .then(res => {
+
+                if (!res.ok) {
+
+                    throw new Error(
+                        '분류 목록 갱신 실패'
+                    );
+                }
+
+                return res.json();
+
+            })
+
+            .then(data => {
+
+                globalCategoryData =
+                    data;
+
+                renderManageCategoryList();
+
+                updateAllCategoryUI(
+                    data
+                );
+
+            })
+
+            .catch(err => {
+
+                console.error(
+                    err
+                );
+
+                alert(
+                    err.message ||
+                    '분류 항목 삭제 중 오류가 발생했습니다.'
+                );
+
+            });
+    }
+
+
+    /* =====================================================
+       출제 방식 변경
+    ===================================================== */
+
+    function toggleCreateMode(
+        mode
+    ) {
+
+        const templateBox =
+            document.getElementById(
+                'templateBox'
+            );
+
+
+        const customBox =
+            document.getElementById(
+                'customBox'
+            );
+
+
+        if (mode === 'template') {
+
+            templateBox
+                .classList
+                .remove('is-hidden');
+
+
+            customBox
+                .classList
+                .add('is-hidden');
+
+        } else {
+
+            templateBox
+                .classList
+                .add('is-hidden');
+
+
+            customBox
+                .classList
+                .remove('is-hidden');
+
+        }
+    }
+
+
+    /* =====================================================
+       문항 행 생성
+    ===================================================== */
+
+    function generateQuestionRows(
+        count
+    ) {
+
+        const container =
+            document.getElementById(
+                'questionRowsContainer'
+            );
+
+
+        count =
+            parseInt(count, 10) || 5;
+
+
+        if (count < 1) {
+
+            count = 1;
+
+        } else if (count > 30) {
+
+            count = 30;
+
+        }
+
+
+        document.getElementById(
+            'totalQuestionsInput'
+        ).value = count;
+
+
+        container.innerHTML = '';
+
+
+        /* 헤더 */
+
+        const header =
+            document.createElement(
+                'div'
+            );
+
+
+        header.className =
+            'question-builder-header';
+
+
+        [
+            '번호',
+            '대분류',
+            '소분류',
+            '배점',
+            '정답'
+        ].forEach(text => {
+
+            const span =
+                document.createElement(
+                    'span'
+                );
+
+            span.textContent =
+                text;
+
+            header.appendChild(
+                span
+            );
+
+        });
+
+
+        container.appendChild(
+            header
+        );
+
+
+        /* 문제 행 */
+
+        for (
+            let i = 1;
+            i <= count;
+            i++
+        ) {
+
+            const row =
+                document.createElement(
+                    'div'
+                );
+
+
+            row.className =
+                'question-builder-row';
+
+
+            /* 번호 */
+
+            const number =
+                document.createElement(
+                    'span'
+                );
+
+
+            number.className =
+                'question-number';
+
+
+            number.textContent =
+                `${i}번`;
+
+
+            /* 대분류 */
+
+            const typeInput =
+                document.createElement(
+                    'input'
+                );
+
+
+            typeInput.type =
+                'text';
+
+
+            typeInput.className =
+                'form-input question-input q-type';
+
+
+            typeInput.setAttribute(
+                'list',
+                'savedLargeCategories'
+            );
+
+
+            typeInput.placeholder =
+                '대분류 선택';
+
+
+            typeInput.title =
+                '대분류 입력/수정';
+
+
+            /* 소분류 */
+
+            const tagInput =
+                document.createElement(
+                    'input'
+                );
+
+
+            tagInput.type =
+                'text';
+
+
+            tagInput.className =
+                'form-input question-input q-tag';
+
+
+            tagInput.setAttribute(
+                'list',
+                'savedSubCategoryTags'
+            );
+
+
+            tagInput.placeholder =
+                '소분류 선택';
+
+
+            tagInput.title =
+                '소분류 입력/수정';
+
+
+            /* 배점 */
+
+            const scoreInput =
+                document.createElement(
+                    'input'
+                );
+
+
+            scoreInput.type =
+                'number';
+
+
+            scoreInput.className =
+                'form-input question-input-center q-score';
+
+
+            scoreInput.value =
+                '5';
+
+
+            scoreInput.min =
+                '0';
+
+
+            scoreInput.title =
+                '배점';
+
+
+            /* 정답 */
+
+            const answerInput =
+                document.createElement(
+                    'input'
+                );
+
+
+            answerInput.type =
+                'text';
+
+
+            answerInput.className =
+                'form-input question-input-center q-ans';
+
+
+            answerInput.value =
+                '1';
+
+
+            answerInput.title =
+                '정답';
+
+
+            row.appendChild(
+                number
+            );
+
+            row.appendChild(
+                typeInput
+            );
+
+            row.appendChild(
+                tagInput
+            );
+
+            row.appendChild(
+                scoreInput
+            );
+
+            row.appendChild(
+                answerInput
+            );
+
+
+            container.appendChild(
+                row
+            );
+
+        }
+    }
+
+
+    /* =====================================================
+       시험 생성
+    ===================================================== */
+
+    function submitNewExam() {
+
+        const title =
+            document
+                .getElementById(
+                    'examTitle'
+                )
+                .value
+                .trim();
+
+
+        const examType =
+            document
+                .getElementById(
+                    'examType'
+                )
+                .value;
+
+
+        const classId =
+            parseInt(
+                document
+                    .getElementById(
+                        'classIdSelect'
+                    )
+                    .value,
+                10
+            );
+
+
+        const examRound =
+            parseInt(
+                document
+                    .getElementById(
+                        'examRound'
+                    )
+                    .value,
+                10
+            );
+
+
+        const examDate =
+            document
+                .getElementById(
+                    'examDate'
+                )
+                .value;
+
+
+        const mode =
+            document
+                .getElementById(
+                    'createMode'
+                )
+                .value;
+
+
+        if (!title) {
+
+            alert(
+                '시험명을 입력해주세요.'
+            );
+
+            document
+                .getElementById(
+                    'examTitle'
+                )
+                .focus();
+
+            return;
+        }
+
+
+        if (!examType) {
+
+            alert(
+                '시험 분류 유형을 선택해주세요.'
+            );
+
+            return;
+        }
+
+
+        if (
+            Number.isNaN(classId)
+        ) {
+
+            alert(
+                '시험을 배정할 반을 선택해주세요.'
+            );
+
+            return;
+        }
+
+
+        if (
+            Number.isNaN(examRound)
+        ) {
+
+            alert(
+                '회차를 입력해주세요.'
+            );
+
+            return;
+        }
+
+
+        if (!examDate) {
+
+            alert(
+                '시행일자를 선택해주세요.'
+            );
+
+            return;
+        }
+
+
+        const payload = {
+
+            academyId: 1,
+
+            title:
+            title,
+
+            examType:
+            examType,
+
+            classId:
+            classId,
+
+            examRound:
+            examRound,
+
+            examDate:
+            examDate
+        };
+
+
+        /* 템플릿 */
+
+        if (
+            mode === 'template'
+        ) {
+
+            const templateExamId =
+                parseInt(
+                    document
+                        .getElementById(
+                            'templateExamId'
+                        )
+                        .value,
+                    10
+                );
+
+
+            if (
+                Number.isNaN(
+                    templateExamId
+                )
+            ) {
+
+                alert(
+                    '복제할 시험 템플릿을 선택해주세요.'
+                );
+
+                return;
+            }
+
+
+            payload.templateExamId =
+                templateExamId;
+
+        } else {
+
+
+            /* 직접 입력 */
+
+            const customQuestions = [];
+
+
+            const rows =
+                document.querySelectorAll(
+                    '.question-builder-row'
+                );
+
+
+            rows.forEach(
+                (
+                    row,
+                    index
+                ) => {
+
+                    const type =
+                        row
+                            .querySelector(
+                                '.q-type'
+                            )
+                            .value
+                            .trim();
+
+
+                    const tag =
+                        row
+                            .querySelector(
+                                '.q-tag'
+                            )
+                            .value
+                            .trim();
+
+
+                    const score =
+                        parseInt(
+                            row
+                                .querySelector(
+                                    '.q-score'
+                                )
+                                .value,
+                            10
+                        ) || 5;
+
+
+                    const answer =
+                        row
+                            .querySelector(
+                                '.q-ans'
+                            )
+                            .value
+                            .trim();
+
+
+                    customQuestions.push({
+
+                        questionNumber:
+                            index + 1,
+
+                        questionType:
+                            type || 'VOCAB',
+
+                        questionTypeTag:
+                            tag || '기본',
+
+                        score:
+                        score,
+
+                        correctAnswer:
+                            answer || '1'
+
+                    });
+
+                }
+            );
+
+
+            payload.customQuestions =
+                customQuestions;
+        }
+
+
+        fetch(
+            '/exam/api/create-sheet',
+            {
+
+                method: 'POST',
+
+                headers: {
+
+                    'Content-Type':
+                        'application/json',
+
+                    [csrfHeader]:
+                    csrfToken
+
+                },
+
+                body:
+                    JSON.stringify(
+                        payload
+                    )
+
+            }
+        )
+
+            .then(async res => {
+
+                if (!res.ok) {
+
+                    const message =
+                        await res.text();
+
+
+                    throw new Error(
+                        message ||
+                        '시험 생성 실패'
+                    );
+                }
+
+
+                return res.json();
+
+            })
+
+            .then(examId => {
+
+                alert(
+                    '새 시험과 문항별 대·소분류 설정이 성공적으로 등록되었습니다!'
+                );
+
+
+                location.href =
+                    '/exam/omr-matrix?examId=' +
+                    examId;
+
+            })
+
+            .catch(err => {
+
+                console.error(
+                    '시험 생성 오류:',
+                    err
+                );
+
+
+                alert(
+                    err.message ||
+                    '시험 등록 중 오류가 발생했습니다.'
+                );
+
+            });
+    }
+
 </script>
+
 </body>
 </html>

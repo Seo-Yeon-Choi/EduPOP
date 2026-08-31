@@ -1,443 +1,1066 @@
 <!DOCTYPE html>
-<!-- xmlns:th="http://www.thymeleaf.org" : 스프링 부트의 타임리프 엔진을 사용하겠다는 선언입니다. -->
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EduPOP - 자아성찰 리포트</title>
 
-    <!-- 공통 CSS 파일을 불러옵니다 -->
     <link rel="stylesheet" th:href="@{/css/common.css}">
-
-    <!-- 이 화면에서만 사용하는 전용 스타일 (CSS) -->
-    <style>
-        .layout-wrapper { display: flex; gap: 24px; margin-top: 20px; max-width: 1200px; }
-        .left-panel { flex: 1; display: flex; flex-direction: column; gap: 20px; }
-        .kpt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .kpt-full { grid-column: 1 / -1; }
-        .right-panel { width: 320px; background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #f1f3f5; height: fit-content; }
-        .box { border-radius: 12px; padding: 20px; width: 100%; box-sizing: border-box; }
-
-        .box-past { background-color: #f8f9ff; border: 1px solid #dbe4ff; }
-        .box-keep { background-color: #f4faf6; border: 1px solid #d1e7dd; }
-        .box-problem { background-color: #fff5f8; border: 1px solid #f8d7da; }
-        .box-feedback { background-color: #fffbeb; border: 1px solid #ffe69c; }
-        .box-try { background-color: #f8f9fa; border: 1px solid #e2e3e5; }
-        .box-mood { background-color: #ffffff; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;}
-        .box-concept { background-color: #ffffff; border: 1px solid #e2e8f0; }
-
-        .title { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
-        .desc { font-size: 12px; color: #868e96; margin-bottom: 15px; }
-
-        textarea { width: 100%; height: 60px; border: none; background-color: rgba(255,255,255,0.7); resize: none; font-size: 14px; outline: none; padding: 12px; border-radius: 8px; box-sizing: border-box; color: #212529; }
-        .readonly-box { width: 100%; min-height: 60px; background-color: #ffffff; font-size: 14px; padding: 12px; border-radius: 8px; box-sizing: border-box; color: #495057; line-height: 1.5; }
-
-        .status-msg { font-size: 12px; margin-top: 10px; text-align: right; height: 15px; font-weight: bold; }
-        .concept-wrap { display: flex; gap: 15px; }
-        .concept-wrap textarea { height: 80px; background-color: #f8f9fa; border: 1px solid #f1f3f5; }
-
-        .right-title { font-size: 16px; font-weight: bold; color: #343a40; margin-bottom: 20px; margin-top: 0; }
-        .metric-item { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid #f1f3f5; }
-        .metric-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .icon-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .ic-blue { background-color: #e7f1ff; color: #0d6efd; }
-        .ic-green { background-color: #d1e7dd; color: #198754; }
-        .ic-orange { background-color: #fff3cd; color: #fd7e14; }
-        .ic-purple { background-color: #f3f0ff; color: #6f42c1; }
-        .ic-red { background-color: #ffe3e3; color: #fa5252; }
-        .metric-info { flex: 1; }
-        .metric-name { font-size: 13px; color: #868e96; margin-bottom: 4px; }
-        .metric-value { font-size: 22px; font-weight: bold; color: #212529; line-height: 1; }
-        .metric-unit { font-size: 14px; font-weight: normal; color: #495057; }
-        .metric-compare { font-size: 11px; color: #adb5bd; margin-top: 6px; display: flex; justify-content: space-between; }
-        .trend-up { color: #20c997; font-weight: bold; }
-        .trend-down { color: #fa5252; font-weight: bold; }
-
-        .report-footer { display: flex; justify-content: center; gap: 40px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e9ecef; font-size: 13px; color: #868e96; }
-        .footer-item { display: flex; align-items: center; gap: 12px; }
-        .footer-value { color: #495057; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/self-reflection.css}">
 </head>
 
 <body>
 
-<!-- 공통 헤더와 사이드바를 불러옵니다 -->
 <div th:replace="~{layout/header :: header}"></div>
 <div th:replace="~{layout/sidebar-student :: sidebar}"></div>
 
 <main class="main-content">
-    <h1 class="page-title">자아성찰</h1>
-    <p style="color: #6c757d; margin-bottom: 20px;">나를 돌아보고 더 나은 내일을 준비해요.</p>
+
+    <header class="page-header">
+        <h1 class="page-title">자아성찰</h1>
+        <p class="page-description">
+            나를 돌아보고 더 나은 내일을 준비해요.
+        </p>
+    </header>
 
     <div class="layout-wrapper">
-        <!-- ========================================================================= -->
-        <!-- 🟢 왼쪽 패널: 사용자 입력 영역 (회고 KPT, 다짐, 기분 등) -->
-        <!-- ========================================================================= -->
-        <div class="left-panel">
+
+        <!-- 왼쪽 입력 영역 -->
+        <section class="left-panel">
+
             <div class="kpt-grid">
 
-                <!-- 1. 과거의 목표 (읽기 전용: 이전 달 리포트에서 가져온 데이터) -->
-                <div class="box box-past">
-                    <div class="title" style="color: #339af0;">1. 과거의 목표 (Past)</div>
-                    <div class="desc">4주 전, 이 달을 시작하며 세웠던 목표</div>
-                    <!-- th:text로 자바에서 넘겨준 pastResolution 값을 출력합니다. 값이 없으면 '이전 달 다짐이 없습니다.' 출력 -->
-                    <div class="readonly-box" th:text="${report.pastResolution ?: '이전 달 다짐이 없습니다.'}"></div>
-                </div>
+                <!-- 과거 목표 -->
+                <article class="box box-past">
 
-                <!-- 2. Keep (칭찬하고 싶은 점) -->
-                <div class="box box-keep">
-                    <div class="title" style="color: #20c997;">2. 가장 칭찬하고 싶은 점 (Keep)</div>
-                    <div class="desc">이번 달, 나 스스로를 가장 칭찬해주고 싶은 순간</div>
-                    <!-- onblur: 사용자가 글을 쓰고 바깥을 클릭하는 순간 하단의 saveData() JS 함수를 호출하여 자동 저장합니다. -->
-                    <textarea id="proudestInput" onblur="saveData('proudest-moment', 'proudestMoment', 'proudestInput', 'status-keep')" placeholder="ex) 저번 달 목표 달성!" th:text="${report.proudestMoment}"></textarea>
-                    <div id="status-keep" class="status-msg"></div>
-                </div>
+                    <h2 class="box-title title-past">
+                        1. 과거의 목표 (Past)
+                    </h2>
 
-                <!-- 3. Problem (고치고 싶은 점) -->
-                <div class="box box-problem">
-                    <div class="title" style="color: #ff6b6b;">3. 고치고 싶은 점 (Problem)</div>
-                    <div class="desc">다음 달을 위해 꼭 고치고 싶거나 버리고 싶은 습관</div>
-                    <textarea id="habitInput" onblur="saveData('habit-to-improve', 'habitToImprove', 'habitInput', 'status-problem')" placeholder="ex) 스마트폰을 자꾸 오래 사용했다." th:text="${report.habitToImprove}"></textarea>
-                    <div id="status-problem" class="status-msg"></div>
-                </div>
+                    <p class="box-description">
+                        4주 전, 이 달을 시작하며 세웠던 목표
+                    </p>
 
-                <!-- 4. Feedback (나의 셀프 피드백) -->
-                <div class="box box-feedback">
-                    <div class="title" style="color: #f59f00;">4. 나의 셀프 피드백 (Feedback)</div>
-                    <div class="desc">4주간의 나를 종합적으로 돌아보는 자유로운 일기</div>
-                    <textarea id="feedbackInput" onblur="saveData('self-feedback', 'selfFeedback', 'feedbackInput', 'status-feedback')" placeholder="ex) 시험 기간에 힘들었지만 포기하지 않았다." th:text="${report.selfFeedback}"></textarea>
-                    <div id="status-feedback" class="status-msg"></div>
-                </div>
+                    <div class="readonly-box"
+                         th:text="${report.pastResolution ?: '이전 달 다짐이 없습니다.'}">
+                    </div>
 
-                <!-- 5. Try (다음 달 목표) -->
-                <div class="box box-try kpt-full">
-                    <div class="title" style="color: #845ef7;">5. 다음 달 목표 (Try)</div>
-                    <div class="desc">다음 4주를 위해 새롭게 다짐하는 목표와 행동</div>
-                    <textarea id="resolutionInput" onblur="saveData('next-resolution', 'nextResolution', 'resolutionInput', 'status-try')" placeholder="ex) 다음 달에는 매일 30분 이상 독서를 할 것이다." th:text="${report.nextResolution}"></textarea>
-                    <div id="status-try" class="status-msg"></div>
-                </div>
+                </article>
+
+                <!-- Keep -->
+                <article class="box box-keep">
+
+                    <h2 class="box-title title-keep">
+                        2. 가장 칭찬하고 싶은 점 (Keep)
+                    </h2>
+
+                    <p class="box-description">
+                        이번 달, 나 스스로를 가장 칭찬해주고 싶은 순간
+                    </p>
+
+                    <textarea id="proudestInput"
+                              class="reflection-textarea"
+                              onblur="saveData(
+                                  'proudest-moment',
+                                  'proudestMoment',
+                                  'proudestInput',
+                                  'status-keep'
+                              )"
+                              placeholder="ex) 저번 달 목표 달성!"
+                              th:text="${report.proudestMoment}"></textarea>
+
+                    <div id="status-keep"
+                         class="status-msg">
+                    </div>
+
+                </article>
+
+                <!-- Problem -->
+                <article class="box box-problem">
+
+                    <h2 class="box-title title-problem">
+                        3. 고치고 싶은 점 (Problem)
+                    </h2>
+
+                    <p class="box-description">
+                        다음 달을 위해 꼭 고치고 싶거나 버리고 싶은 습관
+                    </p>
+
+                    <textarea id="habitInput"
+                              class="reflection-textarea"
+                              onblur="saveData(
+                                  'habit-to-improve',
+                                  'habitToImprove',
+                                  'habitInput',
+                                  'status-problem'
+                              )"
+                              placeholder="ex) 스마트폰을 자꾸 오래 사용했다."
+                              th:text="${report.habitToImprove}"></textarea>
+
+                    <div id="status-problem"
+                         class="status-msg">
+                    </div>
+
+                </article>
+
+                <!-- Feedback -->
+                <article class="box box-feedback">
+
+                    <h2 class="box-title title-feedback">
+                        4. 나의 셀프 피드백 (Feedback)
+                    </h2>
+
+                    <p class="box-description">
+                        4주간의 나를 종합적으로 돌아보는 자유로운 일기
+                    </p>
+
+                    <textarea id="feedbackInput"
+                              class="reflection-textarea"
+                              onblur="saveData(
+                                  'self-feedback',
+                                  'selfFeedback',
+                                  'feedbackInput',
+                                  'status-feedback'
+                              )"
+                              placeholder="ex) 시험 기간에 힘들었지만 포기하지 않았다."
+                              th:text="${report.selfFeedback}"></textarea>
+
+                    <div id="status-feedback"
+                         class="status-msg">
+                    </div>
+
+                </article>
+
+                <!-- Try -->
+                <article class="box box-try kpt-full">
+
+                    <h2 class="box-title title-try">
+                        5. 다음 달 목표 (Try)
+                    </h2>
+
+                    <p class="box-description">
+                        다음 4주를 위해 새롭게 다짐하는 목표와 행동
+                    </p>
+
+                    <textarea id="resolutionInput"
+                              class="reflection-textarea"
+                              onblur="saveData(
+                                  'next-resolution',
+                                  'nextResolution',
+                                  'resolutionInput',
+                                  'status-try'
+                              )"
+                              placeholder="ex) 다음 달에는 매일 30분 이상 독서를 할 것이다."
+                              th:text="${report.nextResolution}"></textarea>
+
+                    <div id="status-try"
+                         class="status-msg">
+                    </div>
+
+                </article>
+
             </div>
 
-            <!-- 만족도 별점 & 기분 상태 (수동 저장 버튼 사용) -->
-            <div class="box box-mood">
-                <div>
-                    <div class="title">이번 달 나의 성실 만족도</div>
-                    <div class="desc" style="margin-bottom:0;">결과보다 과정의 나를 칭찬해요! &nbsp;&nbsp;
-                        <input type="number" id="scoreInput" min="1" max="5" placeholder="점수" style="width: 50px; padding: 2px;" th:value="${report.selfEffortScore}"> / 5점
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <div class="title">이번 달 나의 기분</div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <input type="text" id="moodInput" placeholder="예) 뿌듯함" style="padding: 5px; width: 100px;" th:value="${report.monthlyMood}">
-                        <!-- onclick: 버튼을 클릭하면 saveMoodAndScore() 함수를 호출하여 두 데이터를 한 번에 서버로 보냅니다. -->
-                        <button onclick="saveMoodAndScore()" style="padding: 6px 12px; background: #845ef7; color: white; border: none; border-radius: 5px; cursor: pointer;">저장</button>
-                    </div>
-                    <div id="status-mood" class="status-msg" style="margin-top: 5px;"></div>
-                </div>
-            </div>
 
-            <!-- 학습 개념 정리 -->
-            <div class="box box-concept">
-                <div class="title">모르는 개념과 아는 개념 구별</div>
-                <div class="desc">이번 달 학습 내용을 돌아보고, 나의 이해도를 점검해요.</div>
-                <div class="concept-wrap" style="margin-top: 10px;">
-                    <div style="flex: 1;">
-                        <div style="color: #20c997; font-weight: bold; margin-bottom: 5px;">아는 개념 ✔️</div>
-                        <textarea id="knownInput" placeholder="• 영어 단어 (중단원 1~8)" th:text="${report.knownConcepts}"></textarea>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="color: #ff6b6b; font-weight: bold; margin-bottom: 5px;">모르는 개념 ❓</div>
-                        <textarea id="unknownInput" placeholder="• 수학: 함수와 그래프" th:text="${report.unknownConcepts}"></textarea>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <button onclick="saveConcepts()" style="margin-top: 10px; padding: 6px 15px; background: #339af0; color: white; border: none; border-radius: 5px; cursor: pointer;">저장</button>
-                    <div id="status-concept" class="status-msg"></div>
-                </div>
-            </div>
-        </div>
+            <!-- 만족도 / 기분 -->
+            <section class="box box-mood">
 
-        <!-- ========================================================================= -->
-        <!-- 🔵 오른쪽 패널: 객관적 행동 지표 (이전 달과 데이터 비교 및 증감 표시) -->
-        <!-- ========================================================================= -->
-        <div class="right-panel">
-            <h3 class="right-title">이번 달 행동 지표</h3>
+                <div class="mood-section">
 
-            <!-- 1. 읽은 책 수 -->
+                    <h2 class="box-title">
+                        이번 달 나의 성실 만족도
+                    </h2>
+
+                    <div class="mood-description-row">
+
+                        <span>
+                            결과보다 과정의 나를 칭찬해요!
+                        </span>
+
+                        <div class="score-input-wrap">
+
+                            <input type="number"
+                                   id="scoreInput"
+                                   class="score-input"
+                                   min="1"
+                                   max="5"
+                                   placeholder="점수"
+                                   th:value="${report.selfEffortScore}">
+
+                            <span>/ 5점</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mood-section mood-right">
+
+                    <h2 class="box-title">
+                        이번 달 나의 기분
+                    </h2>
+
+                    <div class="mood-input-wrap">
+
+                        <input type="text"
+                               id="moodInput"
+                               class="mood-input"
+                               placeholder="예) 뿌듯함"
+                               th:value="${report.monthlyMood}">
+
+                        <button type="button"
+                                class="btn-save btn-purple"
+                                onclick="saveMoodAndScore()">
+                            저장
+                        </button>
+
+                    </div>
+
+                    <div id="status-mood"
+                         class="status-msg status-mood">
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- 개념 정리 -->
+            <section class="box box-concept">
+
+                <h2 class="box-title">
+                    모르는 개념과 아는 개념 구별
+                </h2>
+
+                <p class="box-description">
+                    이번 달 학습 내용을 돌아보고, 나의 이해도를 점검해요.
+                </p>
+
+                <div class="concept-wrap">
+
+                    <div class="concept-column">
+
+                        <h3 class="concept-title concept-known">
+                            아는 개념 ✔️
+                        </h3>
+
+                        <textarea id="knownInput"
+                                  class="concept-textarea"
+                                  placeholder="• 영어 단어 (중단원 1~8)"
+                                  th:text="${report.knownConcepts}"></textarea>
+
+                    </div>
+
+
+                    <div class="concept-column">
+
+                        <h3 class="concept-title concept-unknown">
+                            모르는 개념 ❓
+                        </h3>
+
+                        <textarea id="unknownInput"
+                                  class="concept-textarea"
+                                  placeholder="• 수학: 함수와 그래프"
+                                  th:text="${report.unknownConcepts}"></textarea>
+
+                    </div>
+
+                </div>
+
+                <div class="concept-actions">
+
+                    <button type="button"
+                            class="btn-save btn-blue"
+                            onclick="saveConcepts()">
+                        저장
+                    </button>
+
+                    <div id="status-concept"
+                         class="status-msg">
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+
+        <!-- 오른쪽 지표 영역 -->
+        <aside class="right-panel">
+
+            <h2 class="right-title">
+                이번 달 행동 지표
+            </h2>
+
+            <!-- 읽은 책 -->
             <div class="metric-item">
-                <div class="icon-circle ic-blue">📖</div>
+
+                <div class="icon-circle ic-blue">
+                    📖
+                </div>
+
                 <div class="metric-info">
-                    <div class="metric-name">읽은 책 수</div>
-                    <!-- 이번 달 데이터 출력 -->
-                    <div class="metric-value"><span th:text="${report.booksReadCount ?: 0}"></span><span class="metric-unit">권</span></div>
+
+                    <div class="metric-name">
+                        읽은 책 수
+                    </div>
+
+                    <div class="metric-value">
+
+                        <span th:text="${report.booksReadCount ?: 0}">
+                            0
+                        </span>
+
+                        <span class="metric-unit">
+                            권
+                        </span>
+
+                    </div>
 
                     <div class="metric-compare">
-                        <!-- 지난 달 데이터 출력 -->
-                        <span th:text="'지난 달 ' + (${lastMonthBooks ?: 0}) + '권'"></span>
 
-                        <!-- 서버(자바)에서 계산해서 넘겨준 booksDiff 값에 따라 상승(▲), 하락(▼), 변동 없음을 선택적으로 렌더링합니다 -->
-                        <!-- 양수(+)일 경우 초록색 상승 아이콘 렌더링 -->
-                        <span th:if="${booksDiff != null && booksDiff > 0}" class="trend-up" th:text="'▲ ' + ${booksDiff} + '권'"></span>
-                        <!-- 음수(-)일 경우 빨간색 하락 아이콘 렌더링 (보기 좋게 - 기호를 없애기 위해 -booksDiff 처리) -->
-                        <span th:if="${booksDiff != null && booksDiff < 0}" class="trend-down" th:text="'▼ ' + ${-booksDiff} + '권'"></span>
-                        <!-- 변화가 없을 경우 (0) -->
-                        <span th:if="${booksDiff == null || booksDiff == 0}" style="color: #adb5bd;">- 변동 없음</span>
+                        <span th:text="'지난 달 ' + (${lastMonthBooks ?: 0}) + '권'">
+                        </span>
+
+                        <span th:if="${booksDiff != null && booksDiff > 0}"
+                              class="trend-up"
+                              th:text="'▲ ' + ${booksDiff} + '권'">
+                        </span>
+
+                        <span th:if="${booksDiff != null && booksDiff < 0}"
+                              class="trend-down"
+                              th:text="'▼ ' + ${-booksDiff} + '권'">
+                        </span>
+
+                        <span th:if="${booksDiff == null || booksDiff == 0}"
+                              class="trend-none">
+                            - 변동 없음
+                        </span>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- 2. 시험 응시율 -->
+
+            <!-- 시험 응시율 -->
             <div class="metric-item">
-                <div class="icon-circle ic-green">📝</div>
-                <div class="metric-info">
-                    <div class="metric-name">시험 응시율</div>
-                    <div class="metric-value"><span th:text="${report.examCompletionRate ?: 0}"></span><span class="metric-unit">%</span></div>
-                    <div class="metric-compare">
-                        <span th:text="'지난 달 ' + (${lastMonthExam ?: 0}) + '%'"></span>
-                        <span th:if="${examDiff != null && examDiff > 0}" class="trend-up" th:text="'▲ ' + ${examDiff} + '%p'"></span>
-                        <span th:if="${examDiff != null && examDiff < 0}" class="trend-down" th:text="'▼ ' + ${-examDiff} + '%p'"></span>
-                        <span th:if="${examDiff == null || examDiff == 0}" style="color: #adb5bd;">- 변동 없음</span>
-                    </div>
+
+                <div class="icon-circle ic-green">
+                    📝
                 </div>
+
+                <div class="metric-info">
+
+                    <div class="metric-name">
+                        시험 응시율
+                    </div>
+
+                    <div class="metric-value">
+
+                        <span th:text="${report.examCompletionRate ?: 0}">
+                            0
+                        </span>
+
+                        <span class="metric-unit">
+                            %
+                        </span>
+
+                    </div>
+
+                    <div class="metric-compare">
+
+                        <span th:text="'지난 달 ' + (${lastMonthExam ?: 0}) + '%'">
+                        </span>
+
+                        <span th:if="${examDiff != null && examDiff > 0}"
+                              class="trend-up"
+                              th:text="'▲ ' + ${examDiff} + '%p'">
+                        </span>
+
+                        <span th:if="${examDiff != null && examDiff < 0}"
+                              class="trend-down"
+                              th:text="'▼ ' + ${-examDiff} + '%p'">
+                        </span>
+
+                        <span th:if="${examDiff == null || examDiff == 0}"
+                              class="trend-none">
+                            - 변동 없음
+                        </span>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <!-- 3. 재시험 응시율 -->
+
+            <!-- 재시험 응시율 -->
             <div class="metric-item">
-                <div class="icon-circle ic-orange">🔄</div>
-                <div class="metric-info">
-                    <div class="metric-name">재시험 응시율</div>
-                    <div class="metric-value"><span th:text="${report.retestCompletionRate ?: 0}"></span><span class="metric-unit">%</span></div>
-                    <div class="metric-compare">
-                        <span th:text="'지난 달 ' + (${lastMonthRetest ?: 0}) + '%'"></span>
-                        <span th:if="${retestDiff != null && retestDiff > 0}" class="trend-up" th:text="'▲ ' + ${retestDiff} + '%p'"></span>
-                        <span th:if="${retestDiff != null && retestDiff < 0}" class="trend-down" th:text="'▼ ' + ${-retestDiff} + '%p'"></span>
-                        <span th:if="${retestDiff == null || retestDiff == 0}" style="color: #adb5bd;">- 변동 없음</span>
-                    </div>
+
+                <div class="icon-circle ic-orange">
+                    🔄
                 </div>
+
+                <div class="metric-info">
+
+                    <div class="metric-name">
+                        재시험 응시율
+                    </div>
+
+                    <div class="metric-value">
+
+                        <span th:text="${report.retestCompletionRate ?: 0}">
+                            0
+                        </span>
+
+                        <span class="metric-unit">
+                            %
+                        </span>
+
+                    </div>
+
+                    <div class="metric-compare">
+
+                        <span th:text="'지난 달 ' + (${lastMonthRetest ?: 0}) + '%'">
+                        </span>
+
+                        <span th:if="${retestDiff != null && retestDiff > 0}"
+                              class="trend-up"
+                              th:text="'▲ ' + ${retestDiff} + '%p'">
+                        </span>
+
+                        <span th:if="${retestDiff != null && retestDiff < 0}"
+                              class="trend-down"
+                              th:text="'▼ ' + ${-retestDiff} + '%p'">
+                        </span>
+
+                        <span th:if="${retestDiff == null || retestDiff == 0}"
+                              class="trend-none">
+                            - 변동 없음
+                        </span>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <!-- 4. 학습 출석 일수 -->
+
+            <!-- 출석 -->
             <div class="metric-item">
-                <div class="icon-circle ic-purple">📅</div>
-                <div class="metric-info">
-                    <div class="metric-name">학습 출석 일수</div>
-                    <div class="metric-value"><span th:text="${report.studyAttendanceDays ?: 0}"></span><span class="metric-unit">일</span></div>
-                    <div class="metric-compare">
-                        <span th:text="'지난 달 ' + (${lastMonthAtt ?: 0}) + '일'"></span>
-                        <span th:if="${attDiff != null && attDiff > 0}" class="trend-up" th:text="'▲ ' + ${attDiff} + '일'"></span>
-                        <span th:if="${attDiff != null && attDiff < 0}" class="trend-down" th:text="'▼ ' + ${-attDiff} + '일'"></span>
-                        <span th:if="${attDiff == null || attDiff == 0}" style="color: #adb5bd;">- 변동 없음</span>
-                    </div>
+
+                <div class="icon-circle ic-purple">
+                    📅
                 </div>
+
+                <div class="metric-info">
+
+                    <div class="metric-name">
+                        학습 출석 일수
+                    </div>
+
+                    <div class="metric-value">
+
+                        <span th:text="${report.studyAttendanceDays ?: 0}">
+                            0
+                        </span>
+
+                        <span class="metric-unit">
+                            일
+                        </span>
+
+                    </div>
+
+                    <div class="metric-compare">
+
+                        <span th:text="'지난 달 ' + (${lastMonthAtt ?: 0}) + '일'">
+                        </span>
+
+                        <span th:if="${attDiff != null && attDiff > 0}"
+                              class="trend-up"
+                              th:text="'▲ ' + ${attDiff} + '일'">
+                        </span>
+
+                        <span th:if="${attDiff != null && attDiff < 0}"
+                              class="trend-down"
+                              th:text="'▼ ' + ${-attDiff} + '일'">
+                        </span>
+
+                        <span th:if="${attDiff == null || attDiff == 0}"
+                              class="trend-none">
+                            - 변동 없음
+                        </span>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <!-- 5. 극복한 문제 수 -->
+
+            <!-- 극복 문제 -->
             <div class="metric-item">
-                <div class="icon-circle ic-red">🎯</div>
-                <div class="metric-info">
-                    <div class="metric-name">극복한 문제 수</div>
-                    <div class="metric-value"><span th:text="${report.overcomeWrongCount ?: 0}"></span><span class="metric-unit">문제</span></div>
-                    <div class="metric-compare">
-                        <span th:text="'지난 달 ' + (${lastMonthOvercome ?: 0}) + '문제'"></span>
-                        <span th:if="${overcomeDiff != null && overcomeDiff > 0}" class="trend-up" th:text="'▲ ' + ${overcomeDiff} + '문제'"></span>
-                        <span th:if="${overcomeDiff != null && overcomeDiff < 0}" class="trend-down" th:text="'▼ ' + ${-overcomeDiff} + '문제'"></span>
-                        <span th:if="${overcomeDiff == null || overcomeDiff == 0}" style="color: #adb5bd;">- 변동 없음</span>
-                    </div>
+
+                <div class="icon-circle ic-red">
+                    🎯
                 </div>
+
+                <div class="metric-info">
+
+                    <div class="metric-name">
+                        극복한 문제 수
+                    </div>
+
+                    <div class="metric-value">
+
+                        <span th:text="${report.overcomeWrongCount ?: 0}">
+                            0
+                        </span>
+
+                        <span class="metric-unit">
+                            문제
+                        </span>
+
+                    </div>
+
+                    <div class="metric-compare">
+
+                        <span th:text="'지난 달 ' + (${lastMonthOvercome ?: 0}) + '문제'">
+                        </span>
+
+                        <span th:if="${overcomeDiff != null && overcomeDiff > 0}"
+                              class="trend-up"
+                              th:text="'▲ ' + ${overcomeDiff} + '문제'">
+                        </span>
+
+                        <span th:if="${overcomeDiff != null && overcomeDiff < 0}"
+                              class="trend-down"
+                              th:text="'▼ ' + ${-overcomeDiff} + '문제'">
+                        </span>
+
+                        <span th:if="${overcomeDiff == null || overcomeDiff == 0}"
+                              class="trend-none">
+                            - 변동 없음
+                        </span>
+
+                    </div>
+
+                </div>
+
             </div>
 
-        </div>
+        </aside>
+
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- 🚀 하단: 리포트 시스템 메타데이터 정보 (DB에서 읽어옴) -->
-    <!-- ========================================================================= -->
-    <div class="report-footer">
+
+    <!-- 리포트 정보 -->
+    <footer class="report-footer">
+
         <div class="footer-item">
+
             <span>🕒 리포트 시작일</span>
-            <span class="footer-value" th:text="${report.periodStart}"></span>
+
+            <span class="footer-value"
+                  th:text="${report.periodStart}">
+            </span>
+
         </div>
+
         <div class="footer-item">
+
             <span>🔄 리포트 종료일</span>
-            <span class="footer-value" th:text="${report.periodEnd}"></span>
+
+            <span class="footer-value"
+                  th:text="${report.periodEnd}">
+            </span>
+
         </div>
+
         <div class="footer-item">
+
             <span>📄 리포트 ID</span>
-            <span class="footer-value" th:text="${report.reportId}"></span>
+
+            <span class="footer-value"
+                  th:text="${report.reportId}">
+            </span>
+
         </div>
-    </div>
+
+    </footer>
+
 </main>
 
-<!-- ========================================================================= -->
-<!-- 💡 자바스크립트 영역: 프론트엔드와 백엔드 API 간의 통신(Fetch)을 담당합니다 -->
-<!-- ========================================================================= -->
+
 <script th:inline="javascript">
-    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
 
-    // 현재 로그인한 학생에게 생성된 리포트 ID
-    const REPORT_ID = /*[[${report.reportId}]]*/ 0;
+    const csrfToken =
+        document.querySelector(
+            'meta[name="_csrf"]'
+        ).content;
 
-    /**
-     * KPT 4가지 항목(Keep, Problem, Feedback, Try)의 자동 저장을 처리하는 공용 함수
-     * @param apiPath 서버의 엔드포인트 주소 (예: 'proudest-moment')
-     * @param jsonKey 서버(DTO)에서 요구하는 JSON 필드명 (예: 'proudestMoment')
-     * @param inputId 화면에 있는 텍스트박스의 HTML ID
-     * @param statusId "저장 완료" 메시지를 띄워줄 HTML ID
-     */
-    function saveData(apiPath, jsonKey, inputId, statusId) {
-        const inputText = document.getElementById(inputId).value;
-        const statusDiv = document.getElementById(statusId);
+    const csrfHeader =
+        document.querySelector(
+            'meta[name="_csrf_header"]'
+        ).content;
 
-        // 글씨가 한 글자라도 들어있는지 검사 (빈칸 여부 확인)
-        const hasText = inputText.trim() !== "";
+    const REPORT_ID =
+        /*[[${report.reportId}]]*/ 0;
 
-        // 빈칸일 때는 "저장 중..." 이라는 메시지를 숨겨서 조용히(Silent) 삭제 처리되게 합니다.
+
+    function setStatus(
+        statusDiv,
+        message,
+        type
+    ) {
+
+        statusDiv.innerText =
+            message;
+
+        statusDiv.classList.remove(
+            'status-saving',
+            'status-success',
+            'status-error'
+        );
+
+
+        if (type) {
+            statusDiv.classList.add(
+                type
+            );
+        }
+    }
+
+
+    function clearStatusLater(
+        statusDiv
+    ) {
+
+        setTimeout(
+            function () {
+
+                statusDiv.innerText =
+                    '';
+
+                statusDiv.classList.remove(
+                    'status-saving',
+                    'status-success',
+                    'status-error'
+                );
+
+            },
+            2000
+        );
+    }
+
+
+    function saveData(
+        apiPath,
+        jsonKey,
+        inputId,
+        statusId
+    ) {
+
+        const input =
+            document.getElementById(
+                inputId
+            );
+
+        const statusDiv =
+            document.getElementById(
+                statusId
+            );
+
+        const inputText =
+            input.value;
+
+        const hasText =
+            inputText.trim() !== '';
+
+
         if (hasText) {
-            statusDiv.innerText = "저장 중... ⏳";
-            statusDiv.style.color = "#0d6efd";
+
+            setStatus(
+                statusDiv,
+                '저장 중... ⏳',
+                'status-saving'
+            );
+
         } else {
-            statusDiv.innerText = "";
+
+            setStatus(
+                statusDiv,
+                '',
+                null
+            );
         }
 
-        // 서버로 보낼 JSON 데이터를 조립합니다. { "proudestMoment" : "입력한내용" }
+
         const requestBody = {};
-        requestBody[jsonKey] = inputText;
 
-        // JS 비동기 통신(Fetch API)을 통해 서버(자바 컨트롤러)로 데이터를 쏩니다.
-        // async 키워드: 서버의 응답을 기다렸다가(await) 처리하기 위해 사용합니다.
-        fetch('/api/student-reports/' + REPORT_ID + '/' + apiPath, {
-            method: 'PATCH', // 데이터의 일부만 수정하므로 PATCH 메서드 사용
-            headers: {
-                'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken
-            },
-            body: JSON.stringify(requestBody)
-        }).then(async response => {
-            // 서버가 200 OK (정상 처리) 응답을 보냈을 때
-            if(response.ok) {
-                // ★ 비속어 필터링 핵심 로직 ★
-                // 서버(Java)가 저장할 때 비속어를 '***'로 바꾼 뒤 그 결과물을 텍스트(문자열)로 돌려줍니다.
-                // await response.text() 로 그 서버의 응답을 꺼냅니다.
-                const filteredText = await response.text();
+        requestBody[jsonKey] =
+            inputText;
 
-                // 화면의 텍스트박스 내용을 서버가 준 안전한(필터링된) 글씨로 강제 교체합니다!
-                document.getElementById(inputId).value = filteredText;
 
-                // 성공 메시지 표시 처리 (글씨가 있을 때만 '✅ 완료!'를 띄우고 2초 뒤 사라지게 함)
-                if (hasText) {
-                    statusDiv.innerText = "✅ 자동 저장 완료!";
-                    statusDiv.style.color = "#20c997";
-                    setTimeout(() => { statusDiv.innerText = ""; }, 2000);
-                } else {
-                    statusDiv.innerText = "";
-                }
-            } else {
-                // 서버 처리 실패 (400, 500 에러 등)
-                statusDiv.innerText = "❌ 저장 실패";
-                statusDiv.style.color = "red";
+        fetch(
+            '/api/student-reports/' +
+            REPORT_ID +
+            '/' +
+            apiPath,
+            {
+                method: 'PATCH',
+
+                headers: {
+                    'Content-Type':
+                        'application/json',
+
+                    [csrfHeader]:
+                    csrfToken
+                },
+
+                body:
+                    JSON.stringify(
+                        requestBody
+                    )
             }
-        });
+        )
+            .then(
+                async function (response) {
+
+                    if (!response.ok) {
+
+                        setStatus(
+                            statusDiv,
+                            '❌ 저장 실패',
+                            'status-error'
+                        );
+
+                        return;
+                    }
+
+
+                    const filteredText =
+                        await response.text();
+
+
+                    input.value =
+                        filteredText;
+
+
+                    if (hasText) {
+
+                        setStatus(
+                            statusDiv,
+                            '✅ 자동 저장 완료!',
+                            'status-success'
+                        );
+
+                        clearStatusLater(
+                            statusDiv
+                        );
+
+                    } else {
+
+                        setStatus(
+                            statusDiv,
+                            '',
+                            null
+                        );
+                    }
+                }
+            )
+            .catch(
+                function () {
+
+                    setStatus(
+                        statusDiv,
+                        '❌ 통신 오류',
+                        'status-error'
+                    );
+                }
+            );
     }
 
-    /**
-     * 성실 만족도(별점)와 기분을 묶어서 한 번에 서버로 전송하는 함수
-     */
+
     function saveMoodAndScore() {
-        const mood = document.getElementById('moodInput').value;
-        const score = document.getElementById('scoreInput').value;
-        const statusDiv = document.getElementById('status-mood');
 
-        const finalMood = mood.trim() === "" ? null : mood;
-        const finalScore = score.trim() === "" ? null : parseInt(score);
+        const moodInput =
+            document.getElementById(
+                'moodInput'
+            );
 
-        statusDiv.innerText = "저장 중... ⏳";
-        statusDiv.style.color = "#0d6efd";
+        const scoreInput =
+            document.getElementById(
+                'scoreInput'
+            );
 
-        fetch('/api/student-reports/' + REPORT_ID + '/mood-and-score', {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken
-            },
-            body: JSON.stringify({ monthlyMood: finalMood, selfEffortScore: finalScore })
-        })
-            .then(async response => { // ★ async 추가
-                if(response.ok) {
-                    // ★ 서버가 던져준 JSON 상자를 열어서 데이터를 꺼냅니다!
-                    const updatedData = await response.json();
+        const statusDiv =
+            document.getElementById(
+                'status-mood'
+            );
 
-                    // ★ 필터링된 기분 텍스트를 화면에 강제로 덮어씌웁니다 (값이 없으면 빈칸)
-                    document.getElementById('moodInput').value = updatedData.monthlyMood || "";
 
-                    if (finalMood === null && finalScore === null) {
-                        statusDiv.innerText = "";
-                    } else {
-                        statusDiv.innerText = "✅ 저장 완료!";
-                        statusDiv.style.color = "#20c997";
-                        setTimeout(() => { statusDiv.innerText = ""; }, 2000);
+        const mood =
+            moodInput.value;
+
+        const score =
+            scoreInput.value;
+
+
+        const finalMood =
+            mood.trim() === ''
+                ? null
+                : mood;
+
+
+        const finalScore =
+            score.trim() === ''
+                ? null
+                : parseInt(score);
+
+
+        setStatus(
+            statusDiv,
+            '저장 중... ⏳',
+            'status-saving'
+        );
+
+
+        fetch(
+            '/api/student-reports/' +
+            REPORT_ID +
+            '/mood-and-score',
+            {
+                method: 'PATCH',
+
+                headers: {
+                    'Content-Type':
+                        'application/json',
+
+                    [csrfHeader]:
+                    csrfToken
+                },
+
+                body:
+                    JSON.stringify({
+                        monthlyMood:
+                        finalMood,
+
+                        selfEffortScore:
+                        finalScore
+                    })
+            }
+        )
+            .then(
+                async function (response) {
+
+                    if (!response.ok) {
+
+                        setStatus(
+                            statusDiv,
+                            '❌ 저장 실패',
+                            'status-error'
+                        );
+
+                        return;
                     }
-                } else {
-                    statusDiv.innerText = "❌ 저장 실패";
-                    statusDiv.style.color = "red";
+
+
+                    const updatedData =
+                        await response.json();
+
+
+                    moodInput.value =
+                        updatedData.monthlyMood ||
+                        '';
+
+
+                    if (
+                        finalMood === null &&
+                        finalScore === null
+                    ) {
+
+                        setStatus(
+                            statusDiv,
+                            '',
+                            null
+                        );
+
+                        return;
+                    }
+
+
+                    setStatus(
+                        statusDiv,
+                        '✅ 저장 완료!',
+                        'status-success'
+                    );
+
+
+                    clearStatusLater(
+                        statusDiv
+                    );
                 }
-            })
-            .catch(error => {
-                statusDiv.innerText = "❌ 통신 오류";
-                statusDiv.style.color = "red";
-            });
+            )
+            .catch(
+                function () {
+
+                    setStatus(
+                        statusDiv,
+                        '❌ 통신 오류',
+                        'status-error'
+                    );
+                }
+            );
     }
 
-    /**
-     * 아는 개념과 모르는 개념을 묶어서 한 번에 서버로 전송하는 함수
-     */
+
     function saveConcepts() {
-        const known = document.getElementById('knownInput').value;
-        const unknown = document.getElementById('unknownInput').value;
-        const statusDiv = document.getElementById('status-concept');
 
-        const finalKnown = known.trim() === "" ? null : known;
-        const finalUnknown = unknown.trim() === "" ? null : unknown;
+        const knownInput =
+            document.getElementById(
+                'knownInput'
+            );
 
-        statusDiv.innerText = "저장 중... ⏳";
-        statusDiv.style.color = "#0d6efd";
+        const unknownInput =
+            document.getElementById(
+                'unknownInput'
+            );
 
-        fetch('/api/student-reports/' + REPORT_ID + '/learning-concepts', {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken
-            },
-            body: JSON.stringify({ knownConcepts: finalKnown, unknownConcepts: finalUnknown })
-        })
-            .then(async response => { // ★ async 추가
-                if(response.ok) {
-                    // ★ 서버가 던져준 JSON 상자 꺼내기!
-                    const updatedData = await response.json();
+        const statusDiv =
+            document.getElementById(
+                'status-concept'
+            );
 
-                    // ★ 필터링된 아는 개념/모르는 개념 텍스트를 화면에 강제로 덮어씌웁니다!
-                    document.getElementById('knownInput').value = updatedData.knownConcepts || "";
-                    document.getElementById('unknownInput').value = updatedData.unknownConcepts || "";
 
-                    if (finalKnown === null && finalUnknown === null) {
-                        statusDiv.innerText = "";
-                    } else {
-                        statusDiv.innerText = "✅ 저장 완료!";
-                        statusDiv.style.color = "#20c997";
-                        setTimeout(() => { statusDiv.innerText = ""; }, 2000);
+        const known =
+            knownInput.value;
+
+        const unknown =
+            unknownInput.value;
+
+
+        const finalKnown =
+            known.trim() === ''
+                ? null
+                : known;
+
+
+        const finalUnknown =
+            unknown.trim() === ''
+                ? null
+                : unknown;
+
+
+        setStatus(
+            statusDiv,
+            '저장 중... ⏳',
+            'status-saving'
+        );
+
+
+        fetch(
+            '/api/student-reports/' +
+            REPORT_ID +
+            '/learning-concepts',
+            {
+                method: 'PATCH',
+
+                headers: {
+                    'Content-Type':
+                        'application/json',
+
+                    [csrfHeader]:
+                    csrfToken
+                },
+
+                body:
+                    JSON.stringify({
+                        knownConcepts:
+                        finalKnown,
+
+                        unknownConcepts:
+                        finalUnknown
+                    })
+            }
+        )
+            .then(
+                async function (response) {
+
+                    if (!response.ok) {
+
+                        setStatus(
+                            statusDiv,
+                            '❌ 저장 실패',
+                            'status-error'
+                        );
+
+                        return;
                     }
-                } else {
-                    statusDiv.innerText = "❌ 저장 실패";
-                    statusDiv.style.color = "red";
+
+
+                    const updatedData =
+                        await response.json();
+
+
+                    knownInput.value =
+                        updatedData.knownConcepts ||
+                        '';
+
+
+                    unknownInput.value =
+                        updatedData.unknownConcepts ||
+                        '';
+
+
+                    if (
+                        finalKnown === null &&
+                        finalUnknown === null
+                    ) {
+
+                        setStatus(
+                            statusDiv,
+                            '',
+                            null
+                        );
+
+                        return;
+                    }
+
+
+                    setStatus(
+                        statusDiv,
+                        '✅ 저장 완료!',
+                        'status-success'
+                    );
+
+
+                    clearStatusLater(
+                        statusDiv
+                    );
                 }
-            })
-            .catch(error => {
-                statusDiv.innerText = "❌ 통신 오류";
-                statusDiv.style.color = "red";
-            });
+            )
+            .catch(
+                function () {
+
+                    setStatus(
+                        statusDiv,
+                        '❌ 통신 오류',
+                        'status-error'
+                    );
+                }
+            );
     }
+
 </script>
+
 </body>
 </html>

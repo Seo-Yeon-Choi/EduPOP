@@ -1,144 +1,23 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EduPOP - 학생 성적 분석</title>
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+    <link rel="stylesheet"
+          as="style"
+          crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+
     <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/teacher-student-analysis.css}">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --bg-page: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --brand-primary: #4f46e5;
-            --brand-light: #eef2ff;
-            --border-light: #e2e8f0;
-            --shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
-        }
-
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-page);
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: var(--text-main);
-            letter-spacing: -0.02em;
-        }
-
-        .page-content-wrapper {
-            margin-left: 240px !important;
-            margin-top: 70px !important;
-            padding: 36px 44px;
-            min-height: calc(100vh - 70px);
-        }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: var(--shadow-subtle);
-            margin-bottom: 24px;
-        }
-
-        .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
-        .chart-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: var(--shadow-subtle);
-            display: flex;
-            flex-direction: column;
-        }
-        .chart-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .common-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
-        .common-table th {
-            background-color: #f8fafc;
-            color: var(--text-muted);
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-light);
-            padding: 16px 14px;
-            text-align: center;
-        }
-        .common-table td {
-            border-bottom: 1px solid #f1f5f9;
-            padding: 16px 14px;
-            text-align: center;
-            vertical-align: middle;
-            color: var(--text-main);
-        }
-        .common-table tr:hover td { background-color: #fafbfc; }
-
-        .stat-badge {
-            background: var(--brand-light);
-            color: var(--brand-primary);
-            font-weight: 700;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            display: inline-block;
-        }
-
-        .weak-tag {
-            background: #fff1f2;
-            color: #e11d48;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .filter-select, .date-input {
-            height: 40px;
-            padding: 0 14px;
-            border: 1px solid var(--border-light);
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-main);
-            outline: none;
-            background: #ffffff;
-            transition: border-color 0.2s;
-        }
-        .filter-select:focus, .date-input:focus {
-            border-color: var(--brand-primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .btn-secondary {
-            background-color: #ffffff;
-            color: var(--text-muted);
-            border: 1px solid var(--border-light);
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            transition: all 0.2s;
-        }
-        .btn-secondary:hover {
-            background-color: #f1f5f9;
-            color: var(--text-main);
-        }
-    </style>
 </head>
+
 <body>
 
 <th:block th:replace="~{layout/header :: header}"></th:block>
@@ -146,367 +25,989 @@
 
 <div class="page-content-wrapper">
 
-    <!-- 상단 학생 프로필 요약 카드 -->
-    <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+    <!-- 학생 프로필 -->
+    <div class="card profile-card">
+
         <div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                <span style="font-size: 12px; background: var(--brand-light); color: var(--brand-primary); font-weight: 700; padding: 4px 10px; border-radius: 6px;" th:text="${report.schoolGrade}">중2</span>
-                <h2 style="margin: 0; font-size: 24px; font-weight: 800; color: var(--text-main);" th:text="${report.studentName} + ' 학생 성적 리포트'">학생 성적 리포트</h2>
+
+            <div class="profile-title-row">
+
+                <span class="grade-badge"
+                      th:text="${report.schoolGrade}">
+                    중2
+                </span>
+
+                <h2 class="profile-title"
+                    th:text="${report.studentName} + ' 학생 성적 리포트'">
+                    학생 성적 리포트
+                </h2>
+
             </div>
-            <p style="margin: 0; color: var(--text-muted); font-size: 14px; font-weight: 500;">
-                소속 반: <b style="color: var(--text-main);" th:text="${report.className}">반 정보 없음</b> &nbsp;&bull;&nbsp;
-                최근 평균 점수: <span style="color: var(--brand-primary); font-weight: 700;" th:text="${report.recentAverageScore} + '점'">0점</span>
+
+            <p class="profile-description">
+
+                소속 반:
+
+                <b class="profile-class-name"
+                   th:text="${report.className}">
+                    반 정보 없음
+                </b>
+
+                &nbsp;&bull;&nbsp;
+
+                최근 평균 점수:
+
+                <span class="profile-average-score"
+                      th:text="${report.recentAverageScore} + '점'">
+                    0점
+                </span>
+
             </p>
+
         </div>
 
-        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-muted);">
+        <div class="profile-actions">
+
+            <div class="period-filter-group">
+
                 <span>조회 기간</span>
-                <select id="periodFilter" class="filter-select" onchange="toggleCustomDate(this.value)">
+
+                <select id="periodFilter"
+                        class="filter-select"
+                        onchange="toggleCustomDate(this.value)">
+
                     <option value="all">전체 기간</option>
                     <option value="1m">최근 1개월</option>
                     <option value="3m">최근 3개월</option>
                     <option value="custom">맞춤 조회</option>
+
                 </select>
-                <div id="customDateBox" style="display: none; gap: 6px; align-items: center;">
-                    <input type="date" id="startDate" class="date-input" onchange="applyCustomFilter()">
+
+                <div id="customDateBox"
+                     class="custom-date-box">
+
+                    <input type="date"
+                           id="startDate"
+                           class="date-input"
+                           onchange="applyCustomFilter()">
+
                     <span>~</span>
-                    <input type="date" id="endDate" class="date-input" onchange="applyCustomFilter()">
+
+                    <input type="date"
+                           id="endDate"
+                           class="date-input"
+                           onchange="applyCustomFilter()">
+
                 </div>
+
             </div>
 
-            <!-- 💡 지능형 뒤로가기 버튼 (이전에 머물던 페이지로 정확히 복귀) -->
-            <button type="button" class="btn-secondary" onclick="goBackSmartly()">
+            <button type="button"
+                    class="btn-secondary"
+                    onclick="goBackSmartly()">
                 ← 뒤로 가기
             </button>
+
         </div>
+
     </div>
 
-    <!-- 차트 그리드 -->
+
+    <!-- 차트 -->
     <div class="chart-grid">
+
         <div class="chart-box">
+
             <div class="chart-title">
-                <span>📈 회차별 점수 변화 추이</span>
-                <span style="font-size: 13px; font-weight: 500; color: var(--text-muted);" id="periodLabel">(전체 기간)</span>
+
+                <span>
+                    📈 회차별 점수 변화 추이
+                </span>
+
+                <span class="chart-subtitle"
+                      id="periodLabel">
+                    (전체 기간)
+                </span>
+
             </div>
-            <div style="position: relative; height: 260px; width: 100%;">
+
+            <div class="chart-container">
                 <canvas id="lineTrendChart"></canvas>
             </div>
+
         </div>
+
 
         <div class="chart-box">
+
             <div class="chart-title">
-                <span>🎯 영역별 성취도 밸런스</span>
-                <span style="font-size: 13px; font-weight: 500; color: var(--text-muted);">(100점 만점 환산)</span>
+
+                <span>
+                    🎯 영역별 성취도 밸런스
+                </span>
+
+                <span class="chart-subtitle">
+                    (100점 만점 환산)
+                </span>
+
             </div>
-            <div style="position: relative; height: 260px; width: 100%;">
+
+            <div class="chart-container">
                 <canvas id="radarAbilityChart"></canvas>
             </div>
+
         </div>
+
     </div>
 
-    <!-- 소분류 Top 3 & Worst 3 요약 카드 -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
-        <div class="card" style="border-left: 6px solid #10b981; margin-bottom: 0;">
-            <div style="font-size: 15px; font-weight: 700; color: #065f46; margin-bottom: 16px; display: flex; align-items: center; gap: 6px;">
-                <span>🔥 가장 우수한 영역 TOP 3</span>
+
+    <!-- TOP / WORST -->
+    <div class="category-summary-grid">
+
+        <!-- TOP 3 -->
+        <div class="card summary-card best">
+
+            <div class="summary-title best">
+                <span>
+                    🔥 가장 우수한 영역 TOP 3
+                </span>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <div th:if="${report.top3SubCategories == null or report.top3SubCategories.isEmpty()}" style="font-size: 13px; color: #94a3b8;">데이터가 없습니다.</div>
-                <div th:each="t, iter : ${report.top3SubCategories}" style="display: flex; justify-content: space-between; align-items: center; background: #f0fdf4; padding: 12px 16px; border-radius: 12px; font-size: 13px;">
-                    <div>
-                        <span style="font-weight: 800; color: #059669; margin-right: 8px;" th:text="${iter.count} + '.'">1.</span>
-                        <b style="color: var(--text-main);" th:text="${t.smallCategory}">빈칸추론</b>
-                        <span style="font-size: 12px; color: var(--text-muted); margin-left: 6px;" th:text="'(' + ${t.largeCategory} + ')'">(독해)</span>
-                    </div>
-                    <span style="font-weight: 700; color: #059669; font-size: 14px;" th:text="${t.studentScoreRate} + '%'">100.0%</span>
+
+            <div class="summary-list">
+
+                <div th:if="${report.top3SubCategories == null or report.top3SubCategories.isEmpty()}"
+                     class="summary-empty">
+                    데이터가 없습니다.
                 </div>
-            </div>
-        </div>
 
-        <div class="card" style="border-left: 6px solid #ef4444; margin-bottom: 0;">
-            <div style="font-size: 15px; font-weight: 700; color: #991b1b; margin-bottom: 16px; display: flex; align-items: center; gap: 6px;">
-                <span>⚠️ 집중 학습이 필요한 취약 영역 WORST 3</span>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <div th:if="${report.worst3SubCategories == null or report.worst3SubCategories.isEmpty()}" style="font-size: 13px; color: #94a3b8;">데이터가 없습니다.</div>
-                <div th:each="w, iter : ${report.worst3SubCategories}" style="display: flex; justify-content: space-between; align-items: center; background: #fff1f2; padding: 12px 16px; border-radius: 12px; font-size: 13px;">
+                <div th:each="t, iter : ${report.top3SubCategories}"
+                     class="summary-item best">
+
                     <div>
-                        <span style="font-weight: 800; color: #e11d48; margin-right: 8px;" th:text="${iter.count} + '.'">1.</span>
-                        <b style="color: var(--text-main);" th:text="${w.smallCategory}">관계대명사</b>
-                        <span style="font-size: 12px; color: var(--text-muted); margin-left: 6px;" th:text="'(' + ${w.largeCategory} + ')'">(문법)</span>
+
+                        <span class="summary-rank best"
+                              th:text="${iter.count} + '.'">
+                            1.
+                        </span>
+
+                        <b class="summary-category-name"
+                           th:text="${t.smallCategory}">
+                            빈칸추론
+                        </b>
+
+                        <span class="summary-large-category"
+                              th:text="'(' + ${t.largeCategory} + ')'">
+                            (독해)
+                        </span>
+
                     </div>
-                    <span style="font-weight: 700; color: #e11d48; font-size: 14px;" th:text="${w.studentScoreRate} + '%'">0.0%</span>
+
+                    <span class="summary-score best"
+                          th:text="${t.studentScoreRate} + '%'">
+                        100.0%
+                    </span>
+
                 </div>
+
             </div>
+
         </div>
+
+
+        <!-- WORST 3 -->
+        <div class="card summary-card worst">
+
+            <div class="summary-title worst">
+
+                <span>
+                    ⚠️ 집중 학습이 필요한 취약 영역 WORST 3
+                </span>
+
+            </div>
+
+            <div class="summary-list">
+
+                <div th:if="${report.worst3SubCategories == null or report.worst3SubCategories.isEmpty()}"
+                     class="summary-empty">
+                    데이터가 없습니다.
+                </div>
+
+                <div th:each="w, iter : ${report.worst3SubCategories}"
+                     class="summary-item worst">
+
+                    <div>
+
+                        <span class="summary-rank worst"
+                              th:text="${iter.count} + '.'">
+                            1.
+                        </span>
+
+                        <b class="summary-category-name"
+                           th:text="${w.smallCategory}">
+                            관계대명사
+                        </b>
+
+                        <span class="summary-large-category"
+                              th:text="'(' + ${w.largeCategory} + ')'">
+                            (문법)
+                        </span>
+
+                    </div>
+
+                    <span class="summary-score worst"
+                          th:text="${w.studentScoreRate} + '%'">
+                        0.0%
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- 유형별 세부 성취도 분석 -->
-    <div class="card" style="margin-bottom: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 16px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                <span>🔍 시험지별 유형 세부 성취도 분석</span>
-            </div>
 
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <select id="examFilterSelect" class="filter-select" style="height: 40px; font-size: 13px;" onchange="filterExamItems(this.value)">
-                    <option value="ALL">전체 시험 모아보기</option>
-                    <option th:each="h : ${report.examHistories}" th:value="${h.examTitle}" th:text="${h.examTitle}">시험명</option>
-                </select>
-                <button type="button" id="toggleBtn" class="btn-secondary" style="padding: 10px 18px; font-size: 13px;" onclick="toggleSubCategoryTable()">펼치기 ▾</button>
-            </div>
-        </div>
-
-        <div id="subCategoryTableBox" style="display: none; margin-top: 24px; border-top: 1px solid var(--border-light); padding-top: 24px;">
-            <table class="common-table">
-                <thead>
-                <tr>
-                    <th style="width: 150px;">대분류 영역</th>
-                    <th>유형별 세부 항목</th>
-                    <th style="width: 150px;">나의 정답률</th>
-                    <th style="width: 180px;">성취 수준</th>
-                </tr>
-                </thead>
-                <tbody id="subCategoryTableBody">
-                <tr th:if="${report.subCategoryStats == null or report.subCategoryStats.isEmpty()}">
-                    <td colspan="4" style="padding: 40px; color: #94a3b8;">조회된 유형별 세부 성취도 데이터가 없습니다.</td>
-                </tr>
-                <tr class="sub-item-row" th:each="sub : ${report.subCategoryStats}" th:attr="data-exam-title=${sub.examTitle}">
-                    <td style="font-weight: 700; color: var(--brand-primary);" th:text="${sub.largeCategory}">독해</td>
-                    <td style="text-align: left; font-weight: 600;" th:text="${sub.smallCategory}">빈칸추론</td>
-                    <td>
-                        <span class="stat-badge" th:text="${sub.studentScoreRate} + '%'">85.0%</span>
-                    </td>
-                    <td>
-                        <span th:if="${sub.studentScoreRate >= 80}" style="background: #dcfce7; color: #15803d; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">우수 (A)</span>
-                        <span th:if="${sub.studentScoreRate >= 50 and sub.studentScoreRate < 80}" style="background: var(--brand-light); color: var(--brand-primary); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">보통 (B)</span>
-                        <span th:if="${sub.studentScoreRate < 50}" style="background: #fff1f2; color: #e11d48; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">취약 (C)</span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- 세부 응시 이력 테이블 -->
+    <!-- 유형별 성취도 -->
     <div class="card">
-        <div style="font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 20px;">📋 상세 시험 응시 이력</div>
-        <table class="common-table" id="historyTable">
+
+        <div class="analysis-header">
+
+            <div class="analysis-title">
+                <span>
+                    🔍 시험지별 유형 세부 성취도 분석
+                </span>
+            </div>
+
+            <div class="analysis-actions">
+
+                <select id="examFilterSelect"
+                        class="filter-select"
+                        onchange="filterExamItems(this.value)">
+
+                    <option value="ALL">
+                        전체 시험 모아보기
+                    </option>
+
+                    <option th:each="h : ${report.examHistories}"
+                            th:value="${h.examTitle}"
+                            th:text="${h.examTitle}">
+                        시험명
+                    </option>
+
+                </select>
+
+                <button type="button"
+                        id="toggleBtn"
+                        class="btn-secondary"
+                        onclick="toggleSubCategoryTable()">
+                    펼치기 ▾
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div id="subCategoryTableBox"
+             class="subcategory-table-box">
+
+            <table class="common-table">
+
+                <thead>
+
+                <tr>
+
+                    <th class="table-col-150">
+                        대분류 영역
+                    </th>
+
+                    <th>
+                        유형별 세부 항목
+                    </th>
+
+                    <th class="table-col-150">
+                        나의 정답률
+                    </th>
+
+                    <th class="table-col-180">
+                        성취 수준
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody id="subCategoryTableBody">
+
+                <tr th:if="${report.subCategoryStats == null or report.subCategoryStats.isEmpty()}">
+
+                    <td colspan="4"
+                        class="table-empty">
+
+                        조회된 유형별 세부 성취도 데이터가 없습니다.
+
+                    </td>
+
+                </tr>
+
+
+                <tr class="sub-item-row"
+                    th:each="sub : ${report.subCategoryStats}"
+                    th:attr="data-exam-title=${sub.examTitle}">
+
+                    <td class="category-large"
+                        th:text="${sub.largeCategory}">
+                        독해
+                    </td>
+
+                    <td class="table-left category-small"
+                        th:text="${sub.smallCategory}">
+                        빈칸추론
+                    </td>
+
+                    <td>
+
+                        <span class="stat-badge"
+                              th:text="${sub.studentScoreRate} + '%'">
+                            85.0%
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <span th:if="${sub.studentScoreRate >= 80}"
+                              class="achievement-badge achievement-excellent">
+                            우수 (A)
+                        </span>
+
+                        <span th:if="${sub.studentScoreRate >= 50 and sub.studentScoreRate < 80}"
+                              class="achievement-badge achievement-normal">
+                            보통 (B)
+                        </span>
+
+                        <span th:if="${sub.studentScoreRate < 50}"
+                              class="achievement-badge achievement-weak">
+                            취약 (C)
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- 상세 응시 이력 -->
+    <div class="card">
+
+        <div class="history-title">
+            📋 상세 시험 응시 이력
+        </div>
+
+        <table class="common-table"
+               id="historyTable">
+
             <thead>
+
             <tr>
-                <th style="width: 90px;">회차</th>
-                <th>시험명</th>
-                <th style="width: 150px;">시행일자</th>
-                <th style="width: 110px;">내 점수</th>
-                <th style="width: 120px;">전체 반 평균</th>
-                <th style="width: 140px;">취약 영역</th>
+
+                <th class="table-col-small">
+                    회차
+                </th>
+
+                <th>
+                    시험명
+                </th>
+
+                <th class="table-col-150">
+                    시행일자
+                </th>
+
+                <th class="table-col-110">
+                    내 점수
+                </th>
+
+                <th class="table-col-120">
+                    전체 반 평균
+                </th>
+
+                <th class="table-col-140">
+                    취약 영역
+                </th>
+
             </tr>
+
             </thead>
+
+
             <tbody id="historyTableBody">
+
             <tr th:if="${report.examHistories == null or report.examHistories.isEmpty()}">
-                <td colspan="6" style="padding: 40px; color: #94a3b8;">조회된 시험 응시 이력이 없습니다.</td>
+
+                <td colspan="6"
+                    class="table-empty">
+
+                    조회된 시험 응시 이력이 없습니다.
+
+                </td>
+
             </tr>
-            <tr th:each="h : ${report.examHistories}" th:data-date="${h.examDate}">
-                <td style="font-weight: 700; color: var(--text-muted);" th:text="${h.examRound} + '회차'">1회차</td>
-                <td style="text-align: left; font-weight: 600;" th:text="${h.examTitle}">평가</td>
-                <td style="color: var(--text-muted);" th:text="${h.examDate}">2026-08-25</td>
-                <td><span class="stat-badge" th:text="${#numbers.formatDecimal(h.studentScore, 0, 0)} + '점'">100점</span></td>
-                <td><b style="color: var(--text-muted);" th:text="${h.classAverageScore != null ? h.classAverageScore + '점' : '-'}">75점</b></td>
-                <td><span class="weak-tag">VOCAB</span></td>
+
+
+            <tr th:each="h : ${report.examHistories}"
+                th:data-date="${h.examDate}">
+
+                <td class="history-round"
+                    th:text="${h.examRound} + '회차'">
+                    1회차
+                </td>
+
+                <td class="history-exam-title"
+                    th:text="${h.examTitle}">
+                    평가
+                </td>
+
+                <td class="history-date"
+                    th:text="${h.examDate}">
+                    2026-08-25
+                </td>
+
+                <td>
+
+                    <span class="stat-badge"
+                          th:text="${#numbers.formatDecimal(h.studentScore, 0, 0)} + '점'">
+                        100점
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <b class="history-average"
+                       th:text="${h.classAverageScore != null ? h.classAverageScore + '점' : '-'}">
+                        75점
+                    </b>
+
+                </td>
+
+                <td>
+                    <span class="weak-tag">
+                        VOCAB
+                    </span>
+                </td>
+
             </tr>
+
             </tbody>
+
         </table>
+
     </div>
 
 </div>
 
+
 <script th:inline="javascript">
+
     const rawHistories = /*[[${report.examHistories}]]*/ [];
     const radarStats = /*[[${report.radarStats}]]*/ [];
 
     let lineChartInstance = null;
     let radarChartInstance = null;
 
-    // 💡 지능형 뒤로가기 함수 (이전 페이지가 존재하면 히스토리 백, 없으면 기본 학생 리스트로 안전 복귀)
+
     function goBackSmartly() {
-        if (document.referrer && document.referrer !== window.location.href) {
+
+        if (
+            document.referrer &&
+            document.referrer !== window.location.href
+        ) {
+
             history.back();
+
         } else {
+
             location.href = '/analytics/teacher/students';
         }
     }
 
+
     function renderLineChart(dataList) {
-        const labels = dataList.map(h => h.examTitle || '시험');
-        const studentScores = dataList.map(h => h.studentScore || 0);
-        const avgScores = dataList.map(h => h.classAverageScore || 0);
 
-        const ctx = document.getElementById('lineTrendChart');
-        if (!ctx) return;
-        if (lineChartInstance) lineChartInstance.destroy();
+        const labels =
+            dataList.map(h => h.examTitle || '시험');
 
-        lineChartInstance = new Chart(ctx.getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        type: 'bar',
-                        label: '내 점수',
-                        data: studentScores,
-                        backgroundColor: 'rgba(79, 70, 229, 0.75)',
-                        borderColor: '#4f46e5',
-                        borderWidth: 1,
-                        borderRadius: 6,
-                        barPercentage: 0.4
+        const studentScores =
+            dataList.map(h => h.studentScore || 0);
+
+        const avgScores =
+            dataList.map(h => h.classAverageScore || 0);
+
+        const ctx =
+            document.getElementById('lineTrendChart');
+
+        if (!ctx) {
+            return;
+        }
+
+        if (lineChartInstance) {
+            lineChartInstance.destroy();
+        }
+
+
+        lineChartInstance =
+            new Chart(
+                ctx.getContext('2d'),
+                {
+
+                    type: 'line',
+
+                    data: {
+
+                        labels: labels,
+
+                        datasets: [
+
+                            {
+                                type: 'bar',
+                                label: '내 점수',
+                                data: studentScores,
+
+                                backgroundColor:
+                                    'rgba(79, 70, 229, 0.75)',
+
+                                borderColor:
+                                    '#4f46e5',
+
+                                borderWidth: 1,
+                                borderRadius: 6,
+                                barPercentage: 0.4
+                            },
+
+                            {
+                                type: 'line',
+
+                                label: '전체 반 평균',
+
+                                data: avgScores,
+
+                                borderColor:
+                                    '#f59e0b',
+
+                                backgroundColor:
+                                    '#f59e0b',
+
+                                borderWidth: 3,
+
+                                pointBackgroundColor:
+                                    '#ffffff',
+
+                                pointBorderColor:
+                                    '#f59e0b',
+
+                                pointBorderWidth: 2,
+                                pointRadius: 5,
+
+                                fill: false,
+                                tension: 0.4
+                            }
+
+                        ]
+
                     },
-                    {
-                        type: 'line',
-                        label: '전체 반 평균',
-                        data: avgScores,
-                        borderColor: '#f59e0b',
-                        backgroundColor: '#f59e0b',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#f59e0b',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        fill: false,
-                        tension: 0.4
+
+                    options: {
+
+                        responsive: true,
+                        maintainAspectRatio: false,
+
+                        scales: {
+
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+
+                                grid: {
+                                    color: '#f1f5f9'
+                                }
+                            },
+
+                            x: {
+
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+
+                        plugins: {
+
+                            legend: {
+
+                                position: 'bottom',
+
+                                labels: {
+
+                                    boxWidth: 12,
+
+                                    font: {
+                                        weight: 600
+                                    }
+                                }
+                            }
+                        }
                     }
-                ]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' } },
-                    x: { grid: { display: false } }
-                },
-                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { weight: 600 } } } }
-            }
-        });
+                }
+            );
     }
 
-    function toggleCustomDate(val) {
-        const box = document.getElementById('customDateBox');
-        if (val === 'custom') {
-            box.style.display = 'inline-flex';
+
+    function toggleCustomDate(value) {
+
+        const box =
+            document.getElementById('customDateBox');
+
+        if (value === 'custom') {
+
+            box.classList.add('open');
+
         } else {
-            box.style.display = 'none';
-            filterByPeriodType(val);
+
+            box.classList.remove('open');
+
+            filterByPeriodType(value);
         }
     }
+
 
     function filterByPeriodType(type) {
+
         let filtered = [...rawHistories];
+
         const now = new Date();
+
+
         if (type === '1m') {
-            const oneMonthAgo = new Date(now.setMonth(now.getMonth() - 1));
-            filtered = rawHistories.filter(h => new Date(h.examDate) >= oneMonthAgo);
-            document.getElementById('periodLabel').innerText = '(최근 1개월)';
+
+            const oneMonthAgo =
+                new Date(
+                    new Date().setMonth(
+                        now.getMonth() - 1
+                    )
+                );
+
+            filtered =
+                rawHistories.filter(
+                    h =>
+                        new Date(h.examDate) >=
+                        oneMonthAgo
+                );
+
+            document
+                .getElementById('periodLabel')
+                .innerText =
+                '(최근 1개월)';
+
+
         } else if (type === '3m') {
-            const threeMonthsAgo = new Date(now.setMonth(now.getMonth() - 3));
-            filtered = rawHistories.filter(h => new Date(h.examDate) >= threeMonthsAgo);
-            document.getElementById('periodLabel').innerText = '(최근 3개월)';
+
+            const threeMonthsAgo =
+                new Date(
+                    new Date().setMonth(
+                        now.getMonth() - 3
+                    )
+                );
+
+            filtered =
+                rawHistories.filter(
+                    h =>
+                        new Date(h.examDate) >=
+                        threeMonthsAgo
+                );
+
+            document
+                .getElementById('periodLabel')
+                .innerText =
+                '(최근 3개월)';
+
+
         } else {
-            document.getElementById('periodLabel').innerText = '(전체 기간)';
+
+            document
+                .getElementById('periodLabel')
+                .innerText =
+                '(전체 기간)';
         }
+
         updateTableAndChart(filtered);
     }
+
 
     function applyCustomFilter() {
-        const start = document.getElementById('startDate').value;
-        const end = document.getElementById('endDate').value;
-        if (!start || !end) return;
 
-        const startDate = new Date(start);
-        const endDate = new Date(end);
-        endDate.setHours(23, 59, 59);
+        const start =
+            document.getElementById('startDate').value;
 
-        const filtered = rawHistories.filter(h => {
-            const d = new Date(h.examDate);
-            return d >= startDate && d <= endDate;
-        });
-        document.getElementById('periodLabel').innerText = `(${start} ~ ${end})`;
+        const end =
+            document.getElementById('endDate').value;
+
+
+        if (!start || !end) {
+            return;
+        }
+
+
+        const startDate =
+            new Date(start);
+
+        const endDate =
+            new Date(end);
+
+        endDate.setHours(
+            23,
+            59,
+            59,
+            999
+        );
+
+
+        const filtered =
+            rawHistories.filter(h => {
+
+                const date =
+                    new Date(h.examDate);
+
+                return (
+                    date >= startDate &&
+                    date <= endDate
+                );
+            });
+
+
+        document
+            .getElementById('periodLabel')
+            .innerText =
+            `(${start} ~ ${end})`;
+
+
         updateTableAndChart(filtered);
     }
 
+
     function updateTableAndChart(dataList) {
+
         renderLineChart(dataList);
-        const rows = document.querySelectorAll('#historyTableBody tr');
+
+        const rows =
+            document.querySelectorAll(
+                '#historyTableBody tr'
+            );
+
+
         rows.forEach(row => {
-            const dateAttr = row.getAttribute('data-date');
-            if (!dateAttr) return;
-            const match = dataList.some(h => h.examDate === dateAttr);
-            row.style.display = match ? '' : 'none';
+
+            const dateAttr =
+                row.getAttribute('data-date');
+
+            if (!dateAttr) {
+                return;
+            }
+
+
+            const match =
+                dataList.some(
+                    h =>
+                        h.examDate ===
+                        dateAttr
+                );
+
+
+            row.classList.toggle(
+                'is-hidden',
+                !match
+            );
+
         });
     }
+
 
     function filterExamItems(selectedTitle) {
-        const rows = document.querySelectorAll('.sub-item-row');
+
+        const rows =
+            document.querySelectorAll(
+                '.sub-item-row'
+            );
+
+
         rows.forEach(row => {
-            const rowTitle = row.getAttribute('data-exam-title');
-            if (selectedTitle === 'ALL' || rowTitle === selectedTitle) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+
+            const rowTitle =
+                row.getAttribute(
+                    'data-exam-title'
+                );
+
+
+            const visible =
+                selectedTitle === 'ALL' ||
+                rowTitle === selectedTitle;
+
+
+            row.classList.toggle(
+                'is-hidden',
+                !visible
+            );
+
         });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        renderLineChart(rawHistories);
-
-        const radarCtx = document.getElementById('radarAbilityChart');
-        if (radarCtx && radarStats && radarStats.length > 0) {
-            const radarLabels = radarStats.map(r => r.tag || '기타');
-            const radarScores = radarStats.map(r => r.studentScoreRate || 0);
-
-            if (radarChartInstance) radarChartInstance.destroy();
-
-            radarChartInstance = new Chart(radarCtx.getContext('2d'), {
-                type: 'radar',
-                data: {
-                    labels: radarLabels,
-                    datasets: [{
-                        label: '영역별 성취도 (%)',
-                        data: radarScores,
-                        backgroundColor: 'rgba(236, 72, 153, 0.2)',
-                        borderColor: '#ec4899',
-                        pointBackgroundColor: '#ec4899',
-                        borderWidth: 2,
-                        pointRadius: 4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            min: 0,
-                            max: 100,
-                            ticks: { stepSize: 20, display: false }
-                        }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-    });
 
     function toggleSubCategoryTable() {
-        var box = document.getElementById('subCategoryTableBox');
-        var btn = document.getElementById('toggleBtn');
-        if (box.style.display === 'none') {
-            box.style.display = 'block';
-            btn.innerText = '접기 ▴';
-        } else {
-            box.style.display = 'none';
-            btn.innerText = '펼치기 ▾';
-        }
+
+        const box =
+            document.getElementById(
+                'subCategoryTableBox'
+            );
+
+        const btn =
+            document.getElementById(
+                'toggleBtn'
+            );
+
+
+        const opened =
+            box.classList.toggle('open');
+
+
+        btn.innerText =
+            opened
+                ? '접기 ▴'
+                : '펼치기 ▾';
     }
+
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        () => {
+
+            renderLineChart(
+                rawHistories
+            );
+
+
+            const radarCtx =
+                document.getElementById(
+                    'radarAbilityChart'
+                );
+
+
+            if (
+                radarCtx &&
+                radarStats &&
+                radarStats.length > 0
+            ) {
+
+                const radarLabels =
+                    radarStats.map(
+                        r => r.tag || '기타'
+                    );
+
+                const radarScores =
+                    radarStats.map(
+                        r =>
+                            r.studentScoreRate ||
+                            0
+                    );
+
+
+                if (radarChartInstance) {
+                    radarChartInstance.destroy();
+                }
+
+
+                radarChartInstance =
+                    new Chart(
+                        radarCtx.getContext('2d'),
+                        {
+
+                            type: 'radar',
+
+                            data: {
+
+                                labels:
+                                radarLabels,
+
+                                datasets: [
+
+                                    {
+
+                                        label:
+                                            '영역별 성취도 (%)',
+
+                                        data:
+                                        radarScores,
+
+                                        backgroundColor:
+                                            'rgba(236, 72, 153, 0.2)',
+
+                                        borderColor:
+                                            '#ec4899',
+
+                                        pointBackgroundColor:
+                                            '#ec4899',
+
+                                        borderWidth: 2,
+                                        pointRadius: 4,
+
+                                        fill: true
+                                    }
+
+                                ]
+                            },
+
+                            options: {
+
+                                responsive: true,
+
+                                maintainAspectRatio:
+                                    false,
+
+                                scales: {
+
+                                    r: {
+
+                                        min: 0,
+                                        max: 100,
+
+                                        ticks: {
+                                            stepSize: 20,
+                                            display: false
+                                        }
+                                    }
+                                },
+
+                                plugins: {
+
+                                    legend: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    );
+            }
+        }
+    );
+
 </script>
+
 </body>
 </html>

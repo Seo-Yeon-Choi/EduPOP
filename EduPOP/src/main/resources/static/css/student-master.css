@@ -1,0 +1,413 @@
+:root {
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+
+    --brand-primary: #4f46e5;
+    --brand-light: #eef2ff;
+
+    --border-light: #e2e8f0;
+
+    --shadow-subtle:
+            0 2px 10px
+            rgba(15, 23, 42, 0.04);
+}
+
+
+/* ==============================
+   기본
+============================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    font-family:
+            'Pretendard',
+            sans-serif;
+}
+
+
+/* ==============================
+   페이지 레이아웃
+============================== */
+
+.page-content-wrapper {
+    margin-top: 70px;
+    margin-left: 240px;
+    padding: 22px 28px;
+}
+
+.card {
+    margin-bottom: 14px;
+    padding: 20px 22px;
+
+    background:
+            var(--bg-card);
+
+    border:
+            1px solid
+            var(--border-light);
+
+    border-radius: 12px;
+
+    box-shadow:
+            var(--shadow-subtle);
+}
+
+
+/* ==============================
+   상단 영역
+============================== */
+
+.student-header-card {
+    padding-bottom: 18px;
+}
+
+.student-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.page-title {
+    margin: 0;
+
+    color:
+            var(--text-main);
+
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.page-description {
+    margin: 5px 0 0;
+
+    color:
+            var(--text-muted);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* ==============================
+   반 선택 버튼
+============================== */
+
+.class-toggle-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+
+    margin-top: 14px;
+}
+
+.class-chip {
+    padding: 7px 13px;
+
+    background: #ffffff;
+    color:
+            var(--text-muted);
+
+    border:
+            1px solid
+            var(--border-light);
+
+    border-radius: 16px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s,
+            color 0.15s,
+            border-color 0.15s;
+}
+
+.class-chip:hover {
+    background: #f1f5f9;
+    color:
+            var(--text-main);
+}
+
+.class-chip.active {
+    background:
+            var(--brand-primary);
+
+    color: #ffffff;
+
+    border-color:
+            var(--brand-primary);
+
+    box-shadow:
+            0 2px 7px
+            rgba(79, 70, 229, 0.18);
+}
+
+
+/* ==============================
+   학생 목록
+============================== */
+
+.student-list-card {
+    padding: 18px 22px 14px;
+}
+
+.list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.list-title {
+    margin: 0;
+
+    color:
+            var(--text-main);
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.student-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+/* ==============================
+   학생 테이블
+============================== */
+
+.student-table {
+    width: 100%;
+    margin-top: 12px;
+
+    border-collapse: collapse;
+
+    font-size: 13px;
+}
+
+.student-table th,
+.student-table td {
+    padding: 11px 12px;
+
+    border-bottom:
+            1px solid
+            var(--border-light);
+
+    text-align: left;
+    vertical-align: middle;
+}
+
+.student-table th {
+    background: #f8fafc;
+
+    color:
+            var(--text-muted);
+
+    font-size: 12px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.student-table tbody tr {
+    transition:
+            background-color
+            0.15s;
+}
+
+.student-table tbody tr:hover {
+    background:
+            #fafbff;
+}
+
+.student-name-cell {
+    color:
+            var(--text-main);
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.muted-cell {
+    color:
+            var(--text-muted);
+}
+
+.center-column {
+    text-align: center !important;
+    white-space: nowrap;
+}
+
+
+/* ==============================
+   소속 반 배지
+============================== */
+
+.class-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 8px;
+
+    background:
+            var(--brand-light);
+
+    color:
+            var(--brand-primary);
+
+    border-radius: 6px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* ==============================
+   액션 버튼
+============================== */
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 76px;
+
+    padding: 6px 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s,
+            transform 0.15s;
+}
+
+.btn-action:hover {
+    transform:
+            translateY(-1px);
+}
+
+.btn-score {
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.btn-score:hover {
+    background: #e0e7ff;
+}
+
+.btn-quest {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.btn-quest:hover {
+    background: #fde68a;
+}
+
+.btn-parent {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.btn-parent:hover {
+    background: #bbf7d0;
+}
+
+
+/* ==============================
+   빈 데이터 안내
+============================== */
+
+.empty-message {
+    margin: 0;
+
+    padding: 28px 10px;
+
+    color:
+            var(--text-muted);
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+.empty-table-cell {
+    padding: 28px !important;
+
+    color:
+            var(--text-muted);
+
+    text-align: center !important;
+}
+
+
+/* ==============================
+   반응형
+============================== */
+
+@media (max-width: 1200px) {
+
+    .page-content-wrapper {
+        padding:
+                20px;
+    }
+
+    .student-table {
+        min-width:
+                900px;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .page-content-wrapper {
+        margin-left: 0;
+        padding:
+                16px;
+    }
+
+    .card {
+        padding:
+                16px;
+    }
+
+    .page-title {
+        font-size:
+                19px;
+    }
+
+    .class-toggle-container {
+        gap:
+                6px;
+    }
+
+    .class-chip {
+        padding:
+                6px 10px;
+    }
+}

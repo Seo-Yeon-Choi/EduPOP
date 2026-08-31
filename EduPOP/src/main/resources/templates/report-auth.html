@@ -2,50 +2,88 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EduPOP - 월간 학부모 리포트</title>
-    <!-- 기존 CSS 링크 재활용 -->
+
     <link rel="stylesheet" th:href="@{/css/common.css}">
-    <style>
-        .verify-container { max-width: 400px; margin: 100px auto; padding: 40px 30px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; font-family: sans-serif; }
-        .input-field { width: 100%; padding: 14px; margin: 8px 0 20px 0; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
-        .input-field:focus { border-color: #4f46e5; outline: none; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
-        .btn-submit { width: 100%; padding: 15px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
-        .btn-submit:hover { background: #4338ca; }
-        .input-label { display: block; text-align: left; font-size: 13px; font-weight: bold; color: #495057; margin-left: 2px; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/parent-report-auth.css}">
 </head>
-<body style="background-color: #f8fafc; margin: 0;">
 
-<div class="verify-container">
-    <h2 style="margin-top: 0; color: #0f172a; font-weight: 800;">📖 월간 학부모 리포트</h2>
-    <p style="color: #64748b; font-size: 14px; margin-bottom: 30px; line-height: 1.5;">
-        우리 아이의 맞춤형 학습 리포트를 확인하기 위해<br>학생 정보를 입력해 주세요.
-    </p>
+<body>
 
-    <!-- 에러 메시지 출력 영역 -->
-    <div th:if="${error}" style="color: #ef4444; background: #fef2f2; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; font-weight: bold;" th:text="${error}"></div>
+<main class="auth-page">
 
-    <!-- 🚀 컨트롤러의 @PostMapping("/share/reports/auth/verify") 로 데이터 전송 -->
-    <form th:action="@{/share/reports/auth/verify}" method="post">
+    <div class="verify-container">
 
-        <!-- 링크에 포함되어 있던 반 ID(classId)를 사용자 눈에 안 보이게 숨겨서 같이 서버로 보냅니다. -->
-        <input type="hidden" name="classId" th:value="${classId}">
+        <h1 class="verify-title">
+            📖 월간 학부모 리포트
+        </h1>
 
-        <div>
-            <label class="input-label">학생 이름</label>
-            <input type="text" name="studentName" class="input-field" placeholder="예: 박시은" autocomplete="off" required>
+        <p class="verify-description">
+            우리 아이의 맞춤형 학습 리포트를 확인하기 위해<br>
+            학생 정보를 입력해 주세요.
+        </p>
+
+        <div th:if="${error}"
+             class="error-message"
+             th:text="${error}">
         </div>
 
-        <div>
-            <label class="input-label">학생 전화번호 뒤 4자리</label>
-            <input type="password" name="phoneLast4" class="input-field" placeholder="예: 2222" maxlength="4" inputmode="numeric" required>
-        </div>
+        <form th:action="@{/share/reports/auth/verify}"
+              method="post"
+              class="verify-form">
 
-        <button type="submit" class="btn-submit">
-            리포트 확인하기
-        </button>
-    </form>
-</div>
+            <input type="hidden"
+                   name="classId"
+                   th:value="${classId}">
+
+            <div class="form-group">
+
+                <label for="studentName"
+                       class="input-label">
+                    학생 이름
+                </label>
+
+                <input type="text"
+                       id="studentName"
+                       name="studentName"
+                       class="input-field"
+                       placeholder="예: 박시은"
+                       autocomplete="off"
+                       required>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="phoneLast4"
+                       class="input-label">
+                    학생 전화번호 뒤 4자리
+                </label>
+
+                <input type="password"
+                       id="phoneLast4"
+                       name="phoneLast4"
+                       class="input-field"
+                       placeholder="예: 2222"
+                       maxlength="4"
+                       inputmode="numeric"
+                       autocomplete="off"
+                       required>
+
+            </div>
+
+            <button type="submit"
+                    class="btn-submit">
+                리포트 확인하기
+            </button>
+
+        </form>
+
+    </div>
+
+</main>
 
 </body>
 </html>
