@@ -517,3 +517,8 @@ ADD COLUMN business_start_date DATE NULL COMMENT '개업일자';
 
 ALTER TABLE academies
     MODIFY COLUMN business_cer VARCHAR(100) NULL;
+
+ALTER TABLE exam_questions
+    ADD COLUMN ai_generated BOOLEAN NOT NULL DEFAULT FALSE
+        COMMENT 'FALSE: 기존 문제, TRUE: AI 생성 문제'
+        AFTER source_question_id;

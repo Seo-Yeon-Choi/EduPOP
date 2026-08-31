@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>게임 선택</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/common.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/game/word-game-select.css}">
+
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+
+<main class="game-select-container">
+
+    <section class="game-select-header">
+
+        <span>
+            WORD GAME
+        </span>
+
+        <h1>
+            게임 모드를 선택하세요
+        </h1>
+
+        <p th:text="${exam.title}">
+            단어 시험
+        </p>
+
+    </section>
+
+
+    <section class="game-card-grid">
+
+
+        <!-- 단어 숲 -->
+
+        <a class="game-card"
+
+           th:href="@{/student/exams/{examId}/word-game/falling(
+                examId=${exam.examId}
+           )}">
+
+            <div class="game-icon">
+                🌲
+            </div>
+
+            <h2>
+                단어 숲 수집
+            </h2>
+
+            <p>
+                캐릭터를 움직여
+                떨어지는 정답을 받아보세요.
+            </p>
+
+            <span class="game-difficulty">
+                반응 속도 ★★★
+            </span>
+
+        </a>
+
+
+        <!-- 짝 맞추기 -->
+
+        <a class="game-card"
+
+           th:href="@{/student/exams/{examId}/word-game/matching(
+                examId=${exam.examId}
+           )}">
+
+            <div class="game-icon">
+                🧩
+            </div>
+
+            <h2>
+                단어 짝 맞추기
+            </h2>
+
+            <p>
+                영어 단어와 뜻을
+                올바르게 연결해보세요.
+            </p>
+
+            <span class="game-difficulty">
+                기억력 ★★
+            </span>
+
+        </a>
+
+
+        <!-- 디펜스 -->
+
+        <a class="game-card"
+
+           th:href="@{/student/exams/{examId}/word-game/defense(
+                examId=${exam.examId}
+           )}">
+
+            <div class="game-icon">
+                🏰
+            </div>
+
+            <h2>
+                단어 디펜스
+            </h2>
+
+            <p>
+                정답 몬스터를 공격해
+                성을 지켜보세요.
+            </p>
+
+            <span class="game-difficulty">
+                집중력 ★★★
+            </span>
+
+        </a>
+
+
+        <!-- 미로 -->
+
+        <a class="game-card"
+
+           th:href="@{/student/exams/{examId}/word-game/maze(
+                examId=${exam.examId}
+           )}">
+
+            <div class="game-icon">
+                🗺️
+            </div>
+
+            <h2>
+                단어 미로
+            </h2>
+
+            <p>
+                정답 길을 선택해
+                미로에서 탈출하세요.
+            </p>
+
+            <span class="game-difficulty">
+                탐험 ★★★★
+            </span>
+
+        </a>
+
+
+    </section>
+
+</main>
+
+</body>
+</html>

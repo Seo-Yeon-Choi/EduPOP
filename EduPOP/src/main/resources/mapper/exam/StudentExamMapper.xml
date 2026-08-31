@@ -104,7 +104,7 @@
 
         FROM exam_questions
 
-        WHERE exam_id = #{examId}
+        WHERE exam_id = #{examId} AND ai_generated = FALSE
 
         ORDER BY sort_order, question_number
 
@@ -135,6 +135,7 @@
 
         WHERE a.attempt_id = #{attemptId}
           AND a.is_correct = FALSE
+          AND q.ai_generated = FALSE
 
         ORDER BY q.question_number
 
@@ -650,7 +651,7 @@
                    #{attemptNo},
                    #{attemptType},
                    #{sourceAttemptId},
-                   'ONLINE',
+                   #{entryMethod},
                    'IN_PROGRESS',
                    0,
                    #{maxScore},
@@ -800,6 +801,7 @@
 
     </select>
     <!-- 오늘의 복습 문제 조회 -->
+    <!-- 기존 버전
     <select id="findTodayReviewQuestions"
             resultType="com.example.EduPOP.domain.exam.ExamQuestion">
 
@@ -815,7 +817,9 @@
             q.correct_answer AS correctAnswer,
             q.question_text AS questionText,
             q.passage,
-            q.sort_order AS sortOrder
+            q.sort_order AS sortOrder,
+            q.source_question_id AS sourceQuestionId,
+            q.ai_generated aiGenerated
 
         FROM exam_answers ea
 
@@ -845,7 +849,144 @@
         ORDER BY questionId
 
     </select>
+    -->
+
+    <!-- 오늘의 복습 문제 조회 : 원본 오답 + 해당 AI 유사문제 -->
+    <select id="findTodayReviewQuestions"
+            resultType="com.example.EduPOP.domain.exam.ExamQuestion">
+
+        SELECT DISTINCT
+        review.questionId,
+        review.examId,
+        review.sectionId,
+        review.questionNumber,
+        review.questionType,
+        review.smallCategory,
+        review.largeCategory,
+        review.score,
+        review.correctAnswer,
+        review.questionText,
+        review.passage,
+        review.sortOrder,
+        review.sourceQuestionId,
+        review.aiGenerated
+
+        FROM (
+
+        <!-- ========================================= -->
+        <!-- 1. 학생이 실제로 틀린 원본 문제 -->
+        <!-- ========================================= -->
+
+        SELECT
+        q.question_id AS questionId,
+        q.exam_id AS examId,
+        q.section_id AS sectionId,
+        q.question_number AS questionNumber,
+        q.question_type AS questionType,
+        q.small_category AS smallCategory,
+        q.large_category AS largeCategory,
+        q.score AS score,
+        q.correct_answer AS correctAnswer,
+        q.question_text AS questionText,
+        q.passage AS passage,
+        q.sort_order AS sortOrder,
+        q.source_question_id AS sourceQuestionId,
+        q.ai_generated AS aiGenerated
+
+        FROM exam_answers ea
+
+        JOIN exam_attempts a
+        ON ea.attempt_id = a.attempt_id
+
+        JOIN exams e
+        ON a.exam_id = e.exam_id
+
+        JOIN exam_questions q
+        ON ea.question_id = q.question_id
+
+        WHERE a.student_id = #{studentId}
+
+        AND a.attempt_type = 'EXAM'
+
+        AND a.status = 'GRADED'
+
+        AND ea.is_correct = FALSE
+
+        AND e.exam_type != 'WORD'
+
+        AND e.exam_date BETWEEN
+        DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+        AND CURDATE()
+
+        <!-- 원래 시험 문제만 오답 원본으로 사용 -->
+        AND q.ai_generated = FALSE
+
+
+        UNION ALL
+
+
+        <!-- ========================================= -->
+        <!-- 2. 위 오답을 기반으로 만든 AI 문제 -->
+        <!-- ========================================= -->
+
+        SELECT
+        ai.question_id AS questionId,
+        ai.exam_id AS examId,
+        ai.section_id AS sectionId,
+        ai.question_number AS questionNumber,
+        ai.question_type AS questionType,
+        ai.small_category AS smallCategory,
+        ai.large_category AS largeCategory,
+        ai.score AS score,
+        ai.correct_answer AS correctAnswer,
+        ai.question_text AS questionText,
+        ai.passage AS passage,
+        ai.sort_order AS sortOrder,
+        ai.source_question_id AS sourceQuestionId,
+        ai.ai_generated AS aiGenerated
+
+        FROM exam_answers ea
+
+        JOIN exam_attempts a
+        ON ea.attempt_id = a.attempt_id
+
+        JOIN exams e
+        ON a.exam_id = e.exam_id
+
+        JOIN exam_questions original
+        ON ea.question_id = original.question_id
+
+        JOIN exam_questions ai
+        ON ai.source_question_id = original.question_id
+        AND ai.ai_generated = TRUE
+
+        WHERE a.student_id = #{studentId}
+
+        AND a.attempt_type = 'EXAM'
+
+        AND a.status = 'GRADED'
+
+        AND ea.is_correct = FALSE
+
+        AND e.exam_type != 'WORD'
+
+        AND e.exam_date BETWEEN
+        DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+        AND CURDATE()
+
+        AND original.ai_generated = FALSE
+
+        ) review
+
+        ORDER BY
+        COALESCE(review.sourceQuestionId, review.questionId),
+        review.aiGenerated,
+        review.questionId
+
+    </select>
+
     <!-- 문제 개수 -->
+    <!-- 기존 코드
     <select id="countTodayReviewQuestions"
             resultType="int">
 
@@ -874,6 +1015,90 @@
             AND CURDATE()
 
     </select>
+    -->
+
+    <!-- 오늘의 복습 문제 개수 : 원본 오답 + AI 문제 -->
+    <select id="countTodayReviewQuestions"
+            resultType="int">
+
+        SELECT COUNT(DISTINCT review.question_id)
+
+        FROM (
+
+        <!-- 원본 오답 -->
+        SELECT
+        q.question_id
+
+        FROM exam_answers ea
+
+        JOIN exam_attempts a
+        ON ea.attempt_id = a.attempt_id
+
+        JOIN exams e
+        ON a.exam_id = e.exam_id
+
+        JOIN exam_questions q
+        ON ea.question_id = q.question_id
+
+        WHERE a.student_id = #{studentId}
+
+        AND a.attempt_type = 'EXAM'
+
+        AND a.status = 'GRADED'
+
+        AND ea.is_correct = FALSE
+
+        AND e.exam_type != 'WORD'
+
+        AND e.exam_date BETWEEN
+        DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+        AND CURDATE()
+
+        AND q.ai_generated = FALSE
+
+
+        UNION ALL
+
+
+        <!-- 원본 오답에서 생성된 AI 문제 -->
+        SELECT
+        ai.question_id
+
+        FROM exam_answers ea
+
+        JOIN exam_attempts a
+        ON ea.attempt_id = a.attempt_id
+
+        JOIN exams e
+        ON a.exam_id = e.exam_id
+
+        JOIN exam_questions original
+        ON ea.question_id = original.question_id
+
+        JOIN exam_questions ai
+        ON ai.source_question_id = original.question_id
+        AND ai.ai_generated = TRUE
+
+        WHERE a.student_id = #{studentId}
+
+        AND a.attempt_type = 'EXAM'
+
+        AND a.status = 'GRADED'
+
+        AND ea.is_correct = FALSE
+
+        AND e.exam_type != 'WORD'
+
+        AND e.exam_date BETWEEN
+        DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+        AND CURDATE()
+
+        AND original.ai_generated = FALSE
+
+        ) review
+
+    </select>
+
     <!-- 오늘 진행 중인 복습 찾기 -->
     <select id="findTodayInProgressReview"
             resultType="com.example.EduPOP.domain.exam.DailyReviewAttempt">
@@ -1099,6 +1324,56 @@
           AND status = 'GRADED'
 
         ORDER BY submitted_at DESC
+
+    </select>
+
+    <select id="findTodayOriginalWrongQuestions"
+            resultType="com.example.EduPOP.domain.exam.ExamQuestion">
+
+        SELECT DISTINCT
+            q.question_id AS questionId,
+            q.exam_id AS examId,
+            q.section_id AS sectionId,
+            q.question_number AS questionNumber,
+            q.question_type AS questionType,
+            q.small_category AS smallCategory,
+            q.large_category AS largeCategory,
+            q.score,
+            q.correct_answer AS correctAnswer,
+            q.question_text AS questionText,
+            q.passage,
+            q.sort_order AS sortOrder,
+            q.source_question_id AS sourceQuestionId,
+            q.ai_generated AS aiGenerated
+
+        FROM exam_answers ea
+
+                 JOIN exam_attempts a
+                      ON ea.attempt_id = a.attempt_id
+
+                 JOIN exams e
+                      ON a.exam_id = e.exam_id
+
+                 JOIN exam_questions q
+                      ON ea.question_id = q.question_id
+
+        WHERE a.student_id = #{studentId}
+
+          AND a.attempt_type = 'EXAM'
+
+          AND a.status = 'GRADED'
+
+          AND ea.is_correct = FALSE
+
+          AND e.exam_type != 'WORD'
+
+          AND e.exam_date BETWEEN
+            DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+            AND CURDATE()
+
+          AND q.ai_generated = FALSE
+
+        ORDER BY q.question_id
 
     </select>
 </mapper>

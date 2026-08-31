@@ -107,6 +107,10 @@ public interface StudentExamMapper {
             @Param("periodStart") LocalDate periodStart,
             @Param("periodEnd") LocalDate periodEnd
     );
+
+    List<ExamQuestion> findTodayOriginalWrongQuestions(
+            Long studentId
+    );
     // =========================================================
     // 기존 팀원이 만들어놓은 학습 참여 날짜 조회
     //

@@ -1,0 +1,828 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f5f6fa;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.word-game-page {
+    margin-left: 240px;
+    padding: 90px 30px 50px;
+}
+
+.game-wrapper {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+
+/* =========================
+   HUD
+========================= */
+
+.game-hud {
+    display: grid;
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 10px;
+
+    margin-bottom: 12px;
+}
+
+.game-hud > div {
+    padding: 12px 15px;
+
+    background: white;
+
+    border: 1px solid #e6e8ec;
+
+    border-radius: 12px;
+
+    text-align: center;
+}
+
+.hud-label {
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    color: #9297a5;
+
+    letter-spacing: 1px;
+}
+
+.game-hud strong {
+    font-size: 18px;
+}
+
+
+/* =========================
+   Game
+========================= */
+
+.game-field {
+    position: relative;
+
+    width: 100%;
+    height: 610px;
+
+    overflow: hidden;
+
+    outline: none;
+
+    border-radius: 24px;
+
+    border: 3px solid #456b41;
+
+    background:
+            linear-gradient(
+                    to bottom,
+                    #9ed9f7 0%,
+                    #ccebf8 38%,
+                    #dceec5 69%,
+                    #8abd69 70%,
+                    #53773f 100%
+            );
+
+    box-shadow:
+            0 15px 40px
+            rgba(40, 70, 35, 0.15);
+
+    user-select: none;
+}
+
+
+/* =========================
+   Clouds
+========================= */
+
+.background-cloud {
+    position: absolute;
+
+    color: rgba(
+            255,
+            255,
+            255,
+            0.75
+    );
+
+    font-size: 90px;
+
+    pointer-events: none;
+}
+
+.cloud-1 {
+    top: 60px;
+    left: 8%;
+}
+
+.cloud-2 {
+    top: 130px;
+    right: 10%;
+
+    font-size: 65px;
+}
+
+
+/* =========================
+   Forest
+========================= */
+
+.forest-back {
+    position: absolute;
+
+    left: 0;
+    bottom: 57px;
+
+    width: 100%;
+
+    text-align: center;
+
+    font-size: 85px;
+
+    opacity: 0.82;
+
+    white-space: nowrap;
+
+    pointer-events: none;
+}
+
+
+/* =========================
+   Target
+========================= */
+
+.target-panel {
+    position: absolute;
+
+    z-index: 10;
+
+    top: 22px;
+    left: 50%;
+
+    transform:
+            translateX(-50%);
+
+    min-width: 250px;
+
+    padding: 11px 28px 14px;
+
+    background:
+            rgba(
+                    255,
+                    255,
+                    255,
+                    0.92
+            );
+
+    border: 2px solid white;
+
+    border-radius: 18px;
+
+    text-align: center;
+
+    box-shadow:
+            0 5px 15px
+            rgba(0, 0, 0, 0.08);
+}
+
+.target-label {
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #71806c;
+
+    font-size: 12px;
+
+    font-weight: 800;
+}
+
+#targetWord {
+    font-size: 30px;
+
+    color: #253525;
+
+    letter-spacing: 1px;
+}
+
+
+/* =========================
+   Falling object
+========================= */
+
+.falling-object-layer {
+    position: absolute;
+
+    inset: 0;
+}
+
+.falling-word {
+    position: absolute;
+
+    z-index: 20;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    width: 150px;
+    min-height: 54px;
+
+    padding: 8px 12px;
+
+    background:
+            rgba(
+                    255,
+                    255,
+                    255,
+                    0.96
+            );
+
+    border:
+            3px solid #e4c76b;
+
+    border-radius: 17px;
+
+    color: #34341f;
+
+    font-size: 16px;
+
+    font-weight: 800;
+
+    text-align: center;
+
+    box-shadow:
+            0 6px 0 #b89f50,
+            0 10px 20px
+            rgba(0, 0, 0, 0.12);
+
+    will-change:
+            transform;
+}
+
+.falling-word::before {
+    content: "🍃";
+
+    position: absolute;
+
+    top: -18px;
+
+    font-size: 20px;
+}
+
+
+/* =========================
+   Player
+========================= */
+
+.player {
+    position: absolute;
+
+    z-index: 50;
+
+    left: 50%;
+    bottom: 48px;
+
+    width: 78px;
+    height: 88px;
+
+    transform:
+            translateX(-50%);
+
+    transition:
+            left 0.06s linear;
+
+    will-change: left;
+}
+
+.player-character {
+    width: 100%;
+
+    text-align: center;
+
+    font-size: 70px;
+
+    filter:
+            drop-shadow(
+                    0 6px 3px
+                    rgba(0, 0, 0, 0.17)
+            );
+}
+
+.player.caught .player-character {
+    animation:
+            playerCatch
+            0.45s ease;
+}
+
+.player.hit .player-character {
+    animation:
+            playerHit
+            0.4s ease;
+}
+
+
+@keyframes playerCatch {
+
+    0% {
+        transform:
+                translateY(0)
+                scale(1);
+    }
+
+    45% {
+        transform:
+                translateY(-30px)
+                scale(1.15);
+    }
+
+    100% {
+        transform:
+                translateY(0)
+                scale(1);
+    }
+}
+
+
+@keyframes playerHit {
+
+    0% {
+        transform:
+                translateX(0);
+    }
+
+    20% {
+        transform:
+                translateX(-12px);
+    }
+
+    40% {
+        transform:
+                translateX(12px);
+    }
+
+    60% {
+        transform:
+                translateX(-8px);
+    }
+
+    80% {
+        transform:
+                translateX(8px);
+    }
+
+    100% {
+        transform:
+                translateX(0);
+    }
+}
+
+
+/* =========================
+   Ground
+========================= */
+
+.ground {
+    position: absolute;
+
+    z-index: 5;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 60px;
+
+    background: #503b27;
+
+    border-top:
+            8px solid #70a14c;
+}
+
+.grass {
+    height: 8px;
+
+    background:
+            repeating-linear-gradient(
+                    90deg,
+                    #79ad51 0,
+                    #79ad51 9px,
+                    #5d923d 9px,
+                    #5d923d 18px
+            );
+}
+
+
+/* =========================
+   Message
+========================= */
+
+.game-message {
+    position: absolute;
+
+    z-index: 100;
+
+    left: 50%;
+    bottom: 105px;
+
+    transform:
+            translateX(-50%);
+
+    padding: 8px 18px;
+
+    border-radius: 100px;
+
+    background:
+            rgba(
+                    30,
+                    45,
+                    30,
+                    0.75
+            );
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transition:
+            opacity 0.2s ease;
+}
+
+.game-message.show {
+    opacity: 1;
+}
+
+
+/* =========================
+   Combo
+========================= */
+
+.combo-popup {
+    position: absolute;
+
+    z-index: 200;
+
+    top: 180px;
+    left: 50%;
+
+    transform:
+            translateX(-50%);
+
+    color: white;
+
+    font-size: 45px;
+
+    font-weight: 900;
+
+    text-shadow:
+            0 3px 6px
+            rgba(0, 0, 0, 0.3);
+
+    animation:
+            comboPop
+            0.65s ease;
+}
+
+@keyframes comboPop {
+
+    0% {
+        opacity: 0;
+
+        transform:
+                translateX(-50%)
+                scale(0.5);
+    }
+
+    50% {
+        opacity: 1;
+
+        transform:
+                translateX(-50%)
+                scale(1.2);
+    }
+
+    100% {
+        opacity: 0;
+
+        transform:
+                translateX(-50%)
+                scale(1);
+    }
+}
+
+
+/* =========================
+   Controls
+========================= */
+
+.game-controls {
+    display: grid;
+
+    grid-template-columns:
+        140px 1fr 140px;
+
+    gap: 12px;
+
+    margin-top: 15px;
+}
+
+.move-button {
+    min-height: 65px;
+
+    border: none;
+
+    border-radius: 15px;
+
+    background: #4e7350;
+
+    color: white;
+
+    font-size: 22px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+            0 5px 0 #355537;
+}
+
+.move-button:active {
+    transform:
+            translateY(4px);
+
+    box-shadow:
+            0 1px 0 #355537;
+}
+
+.move-button span {
+    display: block;
+
+    margin-top: 2px;
+
+    font-size: 10px;
+}
+
+.control-guide {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    color: #646a70;
+
+    font-size: 13px;
+}
+
+.control-guide strong {
+    margin-bottom: 3px;
+
+    color: #333;
+}
+
+
+/* =========================
+   progress
+========================= */
+
+.progress-track {
+    height: 8px;
+
+    margin-top: 15px;
+
+    overflow: hidden;
+
+    background: #e4e6ea;
+
+    border-radius: 100px;
+}
+
+.progress-value {
+    width: 0;
+    height: 100%;
+
+    background: #5b8454;
+
+    transition:
+            width 0.4s ease;
+}
+
+
+/* =========================
+   Overlay
+========================= */
+
+.game-overlay {
+    position: fixed;
+
+    z-index: 10000;
+
+    inset: 0;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    background:
+            rgba(
+                    15,
+                    25,
+                    16,
+                    0.68
+            );
+
+    backdrop-filter:
+            blur(6px);
+}
+
+.overlay-card {
+    width: 100%;
+
+    max-width: 480px;
+
+    padding: 42px;
+
+    background: white;
+
+    border-radius: 27px;
+
+    text-align: center;
+
+    box-shadow:
+            0 25px 70px
+            rgba(0, 0, 0, 0.25);
+}
+
+.overlay-character {
+    font-size: 85px;
+}
+
+.quest-label {
+    display: block;
+
+    margin-top: 10px;
+
+    color: #608056;
+
+    font-size: 12px;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+}
+
+.overlay-card h1 {
+    margin:
+            7px 0 10px;
+}
+
+.overlay-card p {
+    line-height: 1.7;
+
+    color: #777;
+}
+
+.game-rule {
+    display: grid;
+
+    gap: 7px;
+
+    margin: 25px 0;
+
+    padding: 18px;
+
+    border-radius: 15px;
+
+    background: #f5f7f2;
+
+    color: #50594c;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+.overlay-card button {
+    width: 100%;
+
+    padding: 16px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: #52774f;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   Result
+========================= */
+
+.final-result {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 8px;
+
+    margin: 28px 0;
+}
+
+.final-result > div {
+    padding: 15px 8px;
+
+    background: #f4f6f2;
+
+    border-radius: 13px;
+}
+
+.final-result span {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #888;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+.final-result strong {
+    font-size: 22px;
+}
+
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 900px) {
+
+    .word-game-page {
+        margin-left: 0;
+
+        padding:
+                80px 12px 30px;
+    }
+
+    .game-field {
+        height: 520px;
+    }
+
+    .game-hud {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .game-controls {
+        grid-template-columns:
+            100px 1fr 100px;
+    }
+
+    .forest-back {
+        font-size: 55px;
+    }
+
+    .falling-word {
+        width: 115px;
+
+        font-size: 13px;
+    }
+}

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="_csrf"
+          th:content="${_csrf != null ? _csrf.token : ''}">
+
+    <meta name="_csrf_header"
+          th:content="${_csrf != null ? _csrf.headerName : ''}">
+
+    <title>
+        EduPOP - 단어 짝 맞추기
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/common.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/game/word-matching.css}">
+
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+
+<main class="matching-container">
+
+    <!-- ================================ -->
+    <!-- 게임 데이터 -->
+    <!-- ================================ -->
+
+    <input type="hidden"
+           id="attemptId"
+           th:value="${attempt.attemptId}">
+
+    <!--
+    <div id="questionData"
+         class="hidden-question-data">
+
+        <div th:each="question : ${questions}"
+             class="question-data"
+
+             th:attr="
+                data-question-id=${question.questionId},
+                data-word=${question.questionText},
+                data-answer=${question.correctAnswer},
+                data-question-type=${question.questionType}
+             ">
+        </div>
+
+    </div>
+    -->
+
+    <!-- ================================ -->
+    <!-- 게임 헤더 -->
+    <!-- ================================ -->
+
+    <section class="matching-header">
+
+        <div>
+
+            <span class="game-label">
+                WORD MATCH
+            </span>
+
+            <h1>
+                🧩 단어 짝 맞추기
+            </h1>
+
+            <p th:text="${exam.title}">
+                단어 시험
+            </p>
+
+        </div>
+
+        <a th:href="@{/student/exams}"
+           class="exit-button">
+            나가기
+        </a>
+
+    </section>
+
+
+    <!-- ================================ -->
+    <!-- HUD -->
+    <!-- ================================ -->
+
+    <section class="game-hud">
+
+        <div class="hud-item">
+
+            <span>
+                ROUND
+            </span>
+
+            <strong id="roundDisplay">
+                1 / 1
+            </strong>
+
+        </div>
+
+
+        <div class="hud-item">
+
+            <span>
+                SCORE
+            </span>
+
+            <strong id="scoreDisplay">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="hud-item">
+
+            <span>
+                COMBO
+            </span>
+
+            <strong id="comboDisplay">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="hud-item">
+
+            <span>
+                MATCH
+            </span>
+
+            <strong id="matchDisplay">
+                0 / 0
+            </strong>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================================ -->
+    <!-- 진행바 -->
+    <!-- ================================ -->
+
+    <section class="progress-section">
+
+        <div class="progress-info">
+
+            <span>
+                전체 진행도
+            </span>
+
+            <strong id="progressText">
+                0%
+            </strong>
+
+        </div>
+
+        <div class="progress-track">
+
+            <div id="progressBar"
+                 class="progress-bar">
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================================ -->
+    <!-- 설명 -->
+    <!-- ================================ -->
+
+    <section class="matching-guide">
+
+        <strong>
+            영어 단어와 뜻을 하나씩 선택하세요!
+        </strong>
+
+        <span>
+            정답인 두 카드를 선택하면 카드가 사라집니다.
+        </span>
+
+    </section>
+
+
+    <!-- ================================ -->
+    <!-- 게임 영역 -->
+    <!-- ================================ -->
+
+    <section class="matching-board">
+
+        <!-- 영어 -->
+
+        <div class="card-column">
+
+            <div class="column-title">
+
+                <span>
+                    ENGLISH
+                </span>
+
+                <strong>
+                    영어 단어
+                </strong>
+
+            </div>
+
+            <div id="wordCards"
+                 class="card-list">
+            </div>
+
+        </div>
+
+
+        <div class="matching-center">
+
+            <div class="match-symbol">
+                ↔
+            </div>
+
+        </div>
+
+
+        <!-- 뜻 -->
+
+        <div class="card-column">
+
+            <div class="column-title">
+
+                <span>
+                    MEANING
+                </span>
+
+                <strong>
+                    단어 뜻
+                </strong>
+
+            </div>
+
+            <div id="meaningCards"
+                 class="card-list">
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================================ -->
+    <!-- 피드백 -->
+    <!-- ================================ -->
+
+    <div id="feedback"
+         class="feedback hidden">
+    </div>
+
+
+    <!-- ================================ -->
+    <!-- 시작 화면 -->
+    <!-- ================================ -->
+
+    <div id="startOverlay"
+         class="overlay">
+
+        <div class="overlay-card">
+
+            <div class="overlay-icon">
+                🧩
+            </div>
+
+            <h2>
+                단어 짝 맞추기
+            </h2>
+
+            <p>
+                영어 단어와 알맞은 뜻을
+                모두 연결하세요.
+            </p>
+
+            <ul>
+
+                <li>
+                    영어 단어를 먼저 선택합니다.
+                </li>
+
+                <li>
+                    알맞은 뜻 카드를 선택합니다.
+                </li>
+
+                <li>
+                    정답이면 두 카드가 사라집니다.
+                </li>
+
+                <li>
+                    4쌍을 모두 맞추면 다음 라운드로 이동합니다.
+                </li>
+
+            </ul>
+
+            <button type="button"
+                    id="startButton">
+
+                게임 시작
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================ -->
+    <!-- 라운드 완료 -->
+    <!-- ================================ -->
+
+    <div id="roundOverlay"
+         class="overlay hidden">
+
+        <div class="overlay-card small">
+
+            <div class="overlay-icon">
+                ✨
+            </div>
+
+            <h2>
+                ROUND CLEAR!
+            </h2>
+
+            <p>
+                모든 단어의 짝을 찾았어요.
+            </p>
+
+            <button type="button"
+                    id="nextRoundButton">
+
+                다음 라운드
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================ -->
+    <!-- 게임 완료 -->
+    <!-- ================================ -->
+
+    <div id="completeOverlay"
+         class="overlay hidden">
+
+        <div class="overlay-card">
+
+            <div class="overlay-icon">
+                🏆
+            </div>
+
+            <h2>
+                MATCH COMPLETE!
+            </h2>
+
+            <p>
+                모든 단어의 짝을 찾았습니다.
+            </p>
+
+            <div class="final-result">
+
+                <div>
+                    <span>최종 점수</span>
+                    <strong id="finalScore">
+                        0
+                    </strong>
+                </div>
+
+                <div>
+                    <span>최대 콤보</span>
+                    <strong id="finalCombo">
+                        0
+                    </strong>
+                </div>
+
+            </div>
+
+            <button type="button"
+                    id="submitButton">
+
+                시험 완료
+
+            </button>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script th:src="@{/js/game/word-matching.js}">
+</script>
+
+</body>
+</html>

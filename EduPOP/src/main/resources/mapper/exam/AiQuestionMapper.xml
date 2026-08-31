@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.EduPOP.repository.exam.AiQuestionMapper">
+
+
+    <!-- ================================================= -->
+    <!-- 이미 생성된 AI 문제 조회 -->
+    <!-- ================================================= -->
+
+    <select id="findExistingAiQuestion"
+            resultType="com.example.EduPOP.domain.exam.ExamQuestion">
+
+        SELECT
+        question_id AS questionId,
+        exam_id AS examId,
+        section_id AS sectionId,
+        question_number AS questionNumber,
+        question_type AS questionType,
+        large_category AS largeCategory,
+        small_category AS smallCategory,
+        score,
+        correct_answer AS correctAnswer,
+        question_text AS questionText,
+        sort_order AS sortOrder,
+        source_question_id AS sourceQuestionId,
+        ai_generated AS aiGenerated
+
+        FROM exam_questions
+
+        WHERE source_question_id = #{sourceQuestionId}
+        AND ai_generated = TRUE
+
+        ORDER BY question_id DESC
+
+        LIMIT 1
+
+    </select>
+
+
+    <!-- ================================================= -->
+    <!-- 다음 문항 번호 조회 -->
+    <!-- ================================================= -->
+
+    <select id="findNextQuestionNumber"
+            resultType="java.lang.Integer">
+
+        SELECT
+        COALESCE(MAX(question_number), 0) + 1
+
+        FROM exam_questions
+
+        WHERE exam_id = #{examId}
+
+    </select>
+
+
+    <!-- ================================================= -->
+    <!-- AI 문제 저장 -->
+    <!-- ================================================= -->
+
+    <insert id="insertAiQuestion"
+            parameterType="com.example.EduPOP.domain.exam.ExamQuestion"
+            useGeneratedKeys="true"
+            keyProperty="questionId"
+            keyColumn="question_id">
+
+        INSERT INTO exam_questions (
+        exam_id,
+        section_id,
+        question_number,
+        question_type,
+        large_category,
+        small_category,
+        score,
+        correct_answer,
+        question_text,
+        sort_order,
+        source_question_id,
+        ai_generated
+        )
+
+        VALUES (
+        #{examId},
+        #{sectionId},
+        #{questionNumber},
+        #{questionType},
+        #{largeCategory},
+        #{smallCategory},
+        #{score},
+        #{correctAnswer},
+        #{questionText},
+        #{sortOrder},
+        #{sourceQuestionId},
+        TRUE
+        )
+
+    </insert>
+
+
+    <!-- ================================================= -->
+    <!-- AI 객관식 선택지 저장 -->
+    <!-- ================================================= -->
+
+    <insert id="insertAiChoice">
+
+        INSERT INTO exam_question_choices (
+        question_id,
+        choice_number,
+        choice_text,
+        sort_order
+        )
+
+        VALUES (
+        #{questionId},
+        #{choiceNumber},
+        #{choiceText},
+        #{sortOrder}
+        )
+
+    </insert>
+
+</mapper>

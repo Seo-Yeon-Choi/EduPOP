@@ -8,8 +8,11 @@ import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.repository.user.AcademyMapper;
 import com.example.EduPOP.repository.user.UserMapper;
 import com.example.EduPOP.service.auth.AcademyService;
+import com.example.EduPOP.service.auth.SecurityLoginService;
 import com.example.EduPOP.service.business.BusinessVerificationService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -27,6 +30,7 @@ public class AcademyController {
 
     private final AcademyService academyService;
     private final BusinessVerificationService businessVerificationService;
+    private final SecurityLoginService securityLoginService;
 
     @GetMapping("/register-page")
     public String registerPage() {
@@ -45,6 +49,8 @@ public class AcademyController {
             @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate businessStartDate,
+            HttpServletRequest request,
+            HttpServletResponse response,
             HttpSession session,
             RedirectAttributes redirectAttributes
     ) {
@@ -159,10 +165,11 @@ public class AcademyController {
                         loginUser.getUserId()
                 );
 
-        // 세션 갱신
-        session.setAttribute(
-                "loginUser",
-                updatedUser
+        // Spring Security 인증/권한 정보까지 다시 갱신
+        securityLoginService.login(
+                updatedUser,
+                request,
+                response
         );
 
         redirectAttributes.addFlashAttribute(

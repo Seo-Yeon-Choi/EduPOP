@@ -1,0 +1,792 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+
+    background:
+            linear-gradient(
+                    180deg,
+                    #f8f7ff 0%,
+                    #f3f5fb 100%
+            );
+
+    color: #222;
+}
+
+
+.matching-container {
+    position: relative;
+
+    margin-left: 240px;
+
+    min-height: 100vh;
+
+    padding:
+            95px 40px 70px;
+}
+
+
+.matching-header {
+    width: 100%;
+    max-width: 1050px;
+
+    margin:
+            0 auto 22px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.game-label {
+    display: inline-block;
+
+    margin-bottom: 5px;
+
+    color: #7563cf;
+
+    font-size: 11px;
+    font-weight: 900;
+
+    letter-spacing: 2px;
+}
+
+
+.matching-header h1 {
+    margin:
+            0 0 6px;
+
+    font-size: 29px;
+}
+
+
+.matching-header p {
+    margin: 0;
+
+    color: #777;
+}
+
+
+.exit-button {
+    padding:
+            10px 16px;
+
+    border:
+            1px solid #dddfe7;
+
+    border-radius: 10px;
+
+    background: white;
+
+    color: #666;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================
+   HUD
+========================= */
+
+.game-hud {
+    width: 100%;
+    max-width: 1050px;
+
+    margin:
+            0 auto 16px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 10px;
+}
+
+
+.hud-item {
+    padding: 14px;
+
+    border:
+            1px solid #e7e7ef;
+
+    border-radius: 14px;
+
+    background: white;
+
+    text-align: center;
+}
+
+
+.hud-item span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #9a9aa6;
+
+    font-size: 10px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+}
+
+
+.hud-item strong {
+    font-size: 20px;
+}
+
+
+/* =========================
+   Progress
+========================= */
+
+.progress-section {
+    width: 100%;
+    max-width: 1050px;
+
+    margin:
+            0 auto 20px;
+}
+
+
+.progress-info {
+    margin-bottom: 7px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    color: #777;
+
+    font-size: 12px;
+}
+
+
+.progress-track {
+    height: 9px;
+
+    overflow: hidden;
+
+    border-radius: 100px;
+
+    background: #e7e8ee;
+}
+
+
+.progress-bar {
+    width: 0;
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+            linear-gradient(
+                    90deg,
+                    #7a69d7,
+                    #a18fed
+            );
+
+    transition:
+            width 0.35s ease;
+}
+
+
+/* =========================
+   Guide
+========================= */
+
+.matching-guide {
+    width: 100%;
+    max-width: 1050px;
+
+    margin:
+            0 auto 18px;
+
+    padding:
+            12px 16px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-radius: 12px;
+
+    background: #f0edff;
+
+    color: #6655b6;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   Board
+========================= */
+
+.matching-board {
+    width: 100%;
+    max-width: 1050px;
+
+    min-height: 475px;
+
+    margin: auto;
+
+    padding: 28px;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 70px 1fr;
+
+    align-items: start;
+
+    gap: 20px;
+
+    border:
+            1px solid #e5e5ee;
+
+    border-radius: 24px;
+
+    background: white;
+
+    box-shadow:
+            0 15px 35px
+            rgba(50, 45, 100, 0.06);
+}
+
+
+.card-column {
+    min-width: 0;
+}
+
+
+.column-title {
+    margin-bottom: 16px;
+
+    text-align: center;
+}
+
+
+.column-title span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #9b9ba8;
+
+    font-size: 10px;
+
+    font-weight: 900;
+
+    letter-spacing: 1.5px;
+}
+
+
+.column-title strong {
+    font-size: 17px;
+}
+
+
+.card-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 13px;
+}
+
+
+/* =========================
+   Cards
+========================= */
+
+.match-card {
+    width: 100%;
+    min-height: 75px;
+
+    padding:
+            14px 18px;
+
+    border:
+            2px solid #e9e9f0;
+
+    border-radius: 15px;
+
+    background: #fff;
+
+    color: #333;
+
+    cursor: pointer;
+
+    transition:
+            transform 0.15s ease,
+            border-color 0.15s ease,
+            background 0.15s ease,
+            opacity 0.3s ease;
+}
+
+
+.match-card:hover {
+    transform:
+            translateY(-2px);
+
+    border-color:
+            #aaa0df;
+}
+
+
+.match-card strong {
+    display: block;
+
+    font-size: 18px;
+
+    word-break: keep-all;
+}
+
+
+.card-small-label {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #aaa;
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    letter-spacing: 1px;
+}
+
+
+/* 선택 */
+
+.match-card.selected {
+    border-color:
+            #7563cf;
+
+    background:
+            #f1efff;
+
+    transform:
+            scale(1.02);
+}
+
+
+/* 정답 */
+
+.match-card.correct {
+    border-color:
+            #4fb77c;
+
+    background:
+            #ecfff4;
+}
+
+
+/* 오답 */
+
+.match-card.wrong {
+    border-color:
+            #e26464;
+
+    background:
+            #fff0f0;
+
+    animation:
+            shake 0.35s ease;
+}
+
+
+/* 매칭 완료 */
+
+.match-card.matched {
+    pointer-events: none;
+
+    opacity: 0;
+
+    transform:
+            scale(0.85);
+
+    visibility: hidden;
+}
+
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform:
+                translateX(0);
+    }
+
+    25% {
+        transform:
+                translateX(-7px);
+    }
+
+    75% {
+        transform:
+                translateX(7px);
+    }
+}
+
+
+/* =========================
+   중앙
+========================= */
+
+.matching-center {
+    min-height: 390px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+
+.match-symbol {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #f1efff;
+
+    color: #7462cd;
+
+    font-size: 24px;
+    font-weight: 900;
+}
+
+
+/* =========================
+   Feedback
+========================= */
+
+.feedback {
+    position: fixed;
+
+    left: calc(
+            50% + 120px
+    );
+
+    top: 50%;
+
+    z-index: 50;
+
+    transform:
+            translate(
+                    -50%,
+                    -50%
+            );
+
+    padding:
+            14px 22px;
+
+    border-radius: 14px;
+
+    font-size: 18px;
+    font-weight: 900;
+
+    box-shadow:
+            0 10px 30px
+            rgba(0, 0, 0, 0.12);
+
+    animation:
+            feedbackPop 0.3s ease;
+}
+
+
+.feedback.success {
+    background:
+            #eafff2;
+
+    color:
+            #278956;
+}
+
+
+.feedback.fail {
+    background:
+            #fff0f0;
+
+    color:
+            #d14d4d;
+}
+
+
+@keyframes feedbackPop {
+
+    from {
+        opacity: 0;
+
+        transform:
+                translate(
+                        -50%,
+                        -50%
+                )
+                scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+                translate(
+                        -50%,
+                        -50%
+                )
+                scale(1);
+    }
+}
+
+
+/* =========================
+   Overlay
+========================= */
+
+.overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 100;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+            rgba(25, 23, 45, 0.54);
+
+    backdrop-filter:
+            blur(5px);
+}
+
+
+.overlay-card {
+    width: min(
+            470px,
+            100%
+    );
+
+    padding: 38px;
+
+    border-radius: 24px;
+
+    background: white;
+
+    text-align: center;
+
+    box-shadow:
+            0 20px 60px
+            rgba(0, 0, 0, 0.2);
+}
+
+
+.overlay-card.small {
+    width: min(
+            380px,
+            100%
+    );
+}
+
+
+.overlay-icon {
+    margin-bottom: 13px;
+
+    font-size: 60px;
+}
+
+
+.overlay-card h2 {
+    margin:
+            0 0 12px;
+
+    font-size: 27px;
+}
+
+
+.overlay-card p {
+    color: #777;
+
+    line-height: 1.6;
+}
+
+
+.overlay-card ul {
+    margin:
+            22px 0;
+
+    padding:
+            18px 18px 18px 38px;
+
+    border-radius: 14px;
+
+    background: #f7f7fb;
+
+    text-align: left;
+
+    color: #666;
+
+    line-height: 1.9;
+
+    font-size: 13px;
+}
+
+
+.overlay-card button {
+    min-width: 180px;
+
+    padding:
+            13px 22px;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    background: #7160ca;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 15px;
+    font-weight: 900;
+}
+
+
+.overlay-card button:hover {
+    background: #6251bb;
+}
+
+
+/* =========================
+   Final result
+========================= */
+
+.final-result {
+    margin:
+            22px 0;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 10px;
+}
+
+
+.final-result div {
+    padding: 15px;
+
+    border-radius: 14px;
+
+    background: #f7f7fb;
+}
+
+
+.final-result span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #888;
+
+    font-size: 11px;
+}
+
+
+.final-result strong {
+    font-size: 22px;
+}
+
+
+/* =========================
+   Utility
+========================= */
+
+.hidden {
+    display: none !important;
+}
+
+
+.hidden-question-data {
+    display: none;
+}
+
+
+/* =========================
+   Responsive
+========================= */
+
+@media (
+max-width: 900px
+) {
+
+    .matching-container {
+        margin-left: 0;
+
+        padding:
+                85px 18px 50px;
+    }
+
+
+    .game-hud {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .matching-board {
+        padding: 18px;
+
+        grid-template-columns:
+            1fr;
+
+        gap: 18px;
+    }
+
+
+    .matching-center {
+        min-height: auto;
+
+        transform:
+                rotate(90deg);
+    }
+
+
+    .matching-guide {
+        flex-direction: column;
+
+        gap: 5px;
+    }
+
+
+    .feedback {
+        left: 50%;
+    }
+}

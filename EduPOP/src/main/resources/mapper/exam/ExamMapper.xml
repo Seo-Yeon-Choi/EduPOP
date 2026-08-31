@@ -12,7 +12,7 @@
         COALESCE(SUM(eq.score), 100.0) AS totalScore,
         COALESCE(COUNT(eq.question_id), 0) AS totalQuestions
         FROM exams e
-        LEFT JOIN exam_questions eq ON e.exam_id = eq.exam_id
+        LEFT JOIN exam_questions eq ON e.exam_id = eq.exam_id AND eq.ai_generated = FALSE
         WHERE (e.template_exam_id IS NULL OR e.class_id IS NULL)
         GROUP BY e.exam_id, e.title, e.exam_type
         ORDER BY e.exam_id ASC
@@ -113,7 +113,7 @@
         correct_answer,
         COALESCE(sort_order, question_number)
         FROM exam_questions
-        WHERE exam_id = #{templateExamId}
+        WHERE exam_id = #{templateExamId} AND ai_generated = FALSE
         ORDER BY question_number ASC
     </insert>
     <!-- 4. 전체 시험지 목록 조회 -->
@@ -125,7 +125,7 @@
         e.title AS title,
         COALESCE(c.name, '미배정') AS className,
         DATE_FORMAT(e.exam_date, '%Y-%m-%d') AS examDate,
-        (SELECT COUNT(*) FROM exam_questions eq WHERE eq.exam_id = e.exam_id) AS totalQuestions,
+        (SELECT COUNT(*) FROM exam_questions eq WHERE eq.exam_id = e.exam_id AND eq.ai_generated = FALSE) AS totalQuestions,
         (SELECT COUNT(DISTINCT ea.student_id) FROM exam_attempts ea WHERE ea.exam_id = e.exam_id) AS gradedStudentCount
         FROM exams e
         LEFT JOIN classes c ON c.class_id = e.class_id
@@ -182,7 +182,7 @@
         eq.score AS score,
         eq.correct_answer AS correctAnswer
         FROM exam_questions eq
-        WHERE eq.exam_id = #{examId}
+        WHERE eq.exam_id = #{examId} AND ai_generated = FALSE
         ORDER BY eq.question_number ASC
     </select>
 

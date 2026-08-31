@@ -28,7 +28,19 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<spring-ai.version>2.0.1</spring-ai.version>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<!-- JSON 데이터를 번역해 주는 Jackson 부품 -->
@@ -142,6 +154,12 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.openai</groupId>
+			<artifactId>openai-java</artifactId>
+			<version>4.54.0</version>
+		</dependency>
+
 
 	</dependencies>
 

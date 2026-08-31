@@ -45,8 +45,11 @@
         </div>
 
         <div class="today-review-action">
-            <a th:if="${todayReviewCount > 0}" th:href="@{/student/exams/today-review}">오늘의 복습 시작</a>
-
+            <a th:if="${todayReviewCount > 0}"
+               th:href="@{/student/exams/today-review}"
+               id="todayReviewStartBtn">
+                오늘의 복습 시작
+            </a>
             <span th:if="${todayReviewCount == 0}">오늘 복습할 문제가 없습니다.</span>
         </div>
     </section>
@@ -85,6 +88,7 @@
         </div>
         <div class="exam-action">
 
+            <!-- 단어 시험 일반 응시 -->
             <a th:if="${exam.examType == 'WORD'}"
                th:href="@{/student/exams/{id}/take(id=${exam.examId})}"
                class="exam-button">
@@ -93,9 +97,20 @@
 
             </a>
 
+            <!-- 단어 시험 게임형 응시 -->
+            <a th:if="${exam.examType == 'WORD'}"
+               th:href="@{/student/exams/{id}/word-game-take(id=${exam.examId})}"
+               class="game-review-button">
+
+                🎮 게임형 응시
+
+            </a>
+
+
+            <!-- 일반 시험은 기존 복습 기능 유지 -->
             <a th:if="${exam.examType != 'WORD'
-                       and exam.wrongCount != null
-                       and exam.wrongCount > 0}"
+               and exam.wrongCount != null
+               and exam.wrongCount > 0}"
                th:href="@{/student/exams/{id}/review(id=${exam.examId})}"
                class="review-button">
 
@@ -105,15 +120,14 @@
             </a>
 
             <span th:if="${exam.examType != 'WORD'
-                          and (exam.wrongCount == null
-                          or exam.wrongCount == 0)}">
+                  and (exam.wrongCount == null
+                  or exam.wrongCount == 0)}">
 
-                복습할 오답 없음
+        복습할 오답 없음
 
-            </span>
+    </span>
 
         </div>
-
     </div>
 
     <div class="pagination"
@@ -157,6 +171,51 @@
     </div>
 
 </main>
+
+<!-- 오늘의 복습 AI 문제 생성 로딩 화면 -->
+<div id="aiLoadingOverlay" class="ai-loading-overlay">
+
+    <div class="ai-loading-box">
+
+        <div class="ai-loading-spinner"></div>
+
+        <h3>복습 문제를 준비하고 있어요</h3>
+
+        <p>
+            틀린 문제를 분석해<br>
+            AI 유사 문제를 생성하고 있습니다.
+        </p>
+
+        <span>
+            잠시만 기다려주세요.
+        </span>
+
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const reviewButton =
+            document.getElementById("todayReviewStartBtn");
+
+        const loadingOverlay =
+            document.getElementById("aiLoadingOverlay");
+
+        if (reviewButton && loadingOverlay) {
+
+            reviewButton.addEventListener("click", function () {
+
+                // 로딩 화면 표시
+                loadingOverlay.classList.add("active");
+
+                // 중복 클릭 방지
+                reviewButton.style.pointerEvents = "none";
+            });
+        }
+    });
+</script>
 
 </body>
 </html>

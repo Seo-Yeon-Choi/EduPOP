@@ -35,7 +35,7 @@ public class ExamQuestion {
 
     private Long sourceQuestionId;
 
-
+    private Boolean aiGenerated;
     /*
      * exam_questions 컬럼은 아니지만
      * 객관식 문제의 선지를 같이 관리

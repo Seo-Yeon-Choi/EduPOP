@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="_csrf"
+          th:content="${_csrf.token}">
+
+    <meta name="_csrf_header"
+          th:content="${_csrf.headerName}">
+
+    <title>EduPOP - 단어 숲 탐험</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/common.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/game/word-game-falling.css}">
+
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+
+<main class="word-game-page">
+
+    <input type="hidden"
+           id="attemptId"
+           th:value="${attempt.attemptId}">
+
+
+    <!--
+        문제의 정답은 절대 HTML에 넣지 않는다.
+        questionId와 문제(영단어)만 전달한다.
+    -->
+    <div id="questionData"
+         class="hidden">
+
+        <div th:each="question : ${questions}"
+             class="question-data"
+
+             th:data-question-id="${question.questionId}"
+
+             th:data-word="${question.questionText}">
+        </div>
+
+    </div>
+
+
+    <section class="game-wrapper">
+
+        <!-- ============================== -->
+        <!-- 상단 HUD -->
+        <!-- ============================== -->
+
+        <header class="game-hud">
+
+            <div class="hud-left">
+
+                <div class="life-box">
+
+                    <span class="hud-label">
+                        LIFE
+                    </span>
+
+                    <strong id="lifeDisplay">
+                        ❤️❤️❤️
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="score-box">
+
+                <span class="hud-label">
+                    SCORE
+                </span>
+
+                <strong id="scoreDisplay">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="combo-box">
+
+                <span class="hud-label">
+                    COMBO
+                </span>
+
+                <strong>
+                    🔥
+                    <span id="comboDisplay">
+                        0
+                    </span>
+                </strong>
+
+            </div>
+
+
+            <div class="progress-box">
+
+                <span class="hud-label">
+                    WORD
+                </span>
+
+                <strong>
+
+                    <span id="currentQuestionDisplay">
+                        1
+                    </span>
+
+                    /
+
+                    <span id="totalQuestionDisplay">
+                        0
+                    </span>
+
+                </strong>
+
+            </div>
+
+        </header>
+
+
+        <!-- ============================== -->
+        <!-- 게임 필드 -->
+        <!-- ============================== -->
+
+        <section id="gameField"
+                 class="game-field"
+                 tabindex="0">
+
+
+            <!-- 배경 장식 -->
+
+            <div class="background-cloud cloud-1">
+                ☁
+            </div>
+
+            <div class="background-cloud cloud-2">
+                ☁
+            </div>
+
+
+            <div class="forest-back">
+                🌲　🌳　🌲　🌳　🌲
+            </div>
+
+
+            <!-- 현재 문제 -->
+
+            <div class="target-panel">
+
+                <span class="target-label">
+                    뜻을 찾아라!
+                </span>
+
+                <strong id="targetWord">
+                    READY
+                </strong>
+
+            </div>
+
+
+            <!-- 떨어지는 단어들 -->
+
+            <div id="fallingObjectLayer"
+                 class="falling-object-layer">
+            </div>
+
+
+            <!-- 캐릭터 -->
+
+            <div id="player"
+                 class="player">
+
+                <div class="player-character">
+                    🦊
+                </div>
+
+            </div>
+
+
+            <!-- 지면 -->
+
+            <div class="ground">
+
+                <div class="grass">
+                </div>
+
+            </div>
+
+
+            <!-- 피드백 -->
+
+            <div id="gameMessage"
+                 class="game-message">
+
+                준비되면 시작!
+
+            </div>
+
+
+            <!-- 콤보 표시 -->
+
+            <div id="comboPopup"
+                 class="combo-popup hidden">
+            </div>
+
+
+        </section>
+
+
+        <!-- ============================== -->
+        <!-- 조작 버튼 -->
+        <!-- ============================== -->
+
+        <section class="game-controls">
+
+            <button type="button"
+                    id="leftButton"
+                    class="move-button">
+
+                ◀
+
+                <span>
+                    LEFT
+                </span>
+
+            </button>
+
+
+            <div class="control-guide">
+
+                <strong>
+                    ← / → 키로 이동
+                </strong>
+
+                <span>
+                    정답 뜻을 캐릭터로 받아보세요!
+                </span>
+
+            </div>
+
+
+            <button type="button"
+                    id="rightButton"
+                    class="move-button">
+
+                ▶
+
+                <span>
+                    RIGHT
+                </span>
+
+            </button>
+
+        </section>
+
+
+        <div class="progress-track">
+
+            <div id="gameProgress"
+                 class="progress-value">
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ============================== -->
+<!-- 시작 화면 -->
+<!-- ============================== -->
+
+<div id="startOverlay"
+     class="game-overlay">
+
+    <div class="overlay-card">
+
+        <div class="overlay-character">
+            🦊
+        </div>
+
+        <span class="quest-label">
+            WORD QUEST
+        </span>
+
+        <h1>
+            단어 숲 탐험
+        </h1>
+
+        <p>
+            숲에서 떨어지는 뜻 중
+            정답을 찾아 캐릭터로 받아보세요.
+        </p>
+
+        <div class="game-rule">
+
+            <span>
+                ✅ 정답 +100
+            </span>
+
+            <span>
+                🔥 연속 정답 COMBO
+            </span>
+
+            <span>
+                ❤️ 오답 LIFE 감소
+            </span>
+
+        </div>
+
+        <button type="button"
+                id="startButton">
+
+            탐험 시작
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ============================== -->
+<!-- 게임 종료 -->
+<!-- ============================== -->
+
+<div id="completeOverlay"
+     class="game-overlay hidden">
+
+    <div class="overlay-card complete-card">
+
+        <div class="overlay-character">
+            🎉
+        </div>
+
+        <span class="quest-label">
+            QUEST CLEAR
+        </span>
+
+        <h1>
+            단어 숲 탐험 완료!
+        </h1>
+
+        <div class="final-result">
+
+            <div>
+
+                <span>
+                    GAME SCORE
+                </span>
+
+                <strong id="finalGameScore">
+                    0
+                </strong>
+
+            </div>
+
+            <div>
+
+                <span>
+                    정답
+                </span>
+
+                <strong id="finalCorrectCount">
+                    0
+                </strong>
+
+            </div>
+
+            <div>
+
+                <span>
+                    최고 COMBO
+                </span>
+
+                <strong id="finalMaxCombo">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+        <button type="button"
+                id="submitResultButton">
+
+            시험 완료
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script th:src="@{/js/game/word-game-falling.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="_csrf"
+          th:content="${_csrf != null ? _csrf.token : ''}">
+
+    <meta name="_csrf_header"
+          th:content="${_csrf != null ? _csrf.headerName : ''}">
+
+    <title>
+        EduPOP - 단어 미로 탈출
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/common.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/game/word-maze.css}">
+
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+
+<main class="maze-container">
+
+    <input type="hidden"
+           id="attemptId"
+           th:value="${attempt.attemptId}">
+
+
+    <!-- 문제 데이터 -->
+
+    <div class="hidden"
+         id="questionData">
+
+        <div th:each="question : ${questions}"
+             class="question-data"
+
+             th:attr="
+                 data-question-id=${question.questionId},
+                 data-question-text=${question.questionText}
+             ">
+        </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- Header -->
+    <!-- ============================= -->
+
+    <section class="maze-header">
+
+        <div>
+
+            <span class="game-label">
+                WORD MAZE
+            </span>
+
+            <h1>
+                🗺️ 단어 미로 탈출
+            </h1>
+
+            <p th:text="${exam.title}">
+                단어 시험
+            </p>
+
+        </div>
+
+        <a th:href="@{/student/exams}"
+           class="exit-button">
+
+            나가기
+
+        </a>
+
+    </section>
+
+
+    <!-- ============================= -->
+    <!-- HUD -->
+    <!-- ============================= -->
+
+    <section class="maze-hud">
+
+        <div class="hud-item">
+
+            <span>
+                LIFE
+            </span>
+
+            <strong id="lifeDisplay">
+                ❤️❤️❤️
+            </strong>
+
+        </div>
+
+        <div class="hud-item">
+
+            <span>
+                SCORE
+            </span>
+
+            <strong id="scoreDisplay">
+                0
+            </strong>
+
+        </div>
+
+        <div class="hud-item">
+
+            <span>
+                COMBO
+            </span>
+
+            <strong id="comboDisplay">
+                0
+            </strong>
+
+        </div>
+
+        <div class="hud-item">
+
+            <span>
+                ROOM
+            </span>
+
+            <strong id="roomDisplay">
+                1 / 1
+            </strong>
+
+        </div>
+
+    </section>
+
+
+    <!-- ============================= -->
+    <!-- Progress -->
+    <!-- ============================= -->
+
+    <section class="progress-section">
+
+        <div class="progress-info">
+
+            <span>
+                탈출 진행도
+            </span>
+
+            <strong id="progressText">
+                0%
+            </strong>
+
+        </div>
+
+        <div class="progress-track">
+
+            <div id="progressBar"
+                 class="progress-bar">
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ============================= -->
+    <!-- 문제 -->
+    <!-- ============================= -->
+
+    <section class="maze-question">
+
+        <span>
+            FIND THE RIGHT WAY
+        </span>
+
+        <strong id="questionText">
+            WORD
+        </strong>
+
+        <p>
+            정답이 적힌 길을 선택하세요!
+        </p>
+
+    </section>
+
+
+    <!-- ============================= -->
+    <!-- 미로 -->
+    <!-- ============================= -->
+
+    <section class="maze-game">
+
+        <div id="mazeField"
+             class="maze-field">
+
+
+            <!-- 출구 -->
+
+            <div class="maze-exit">
+
+                <div>
+                    🚪
+                </div>
+
+                <span>
+                    EXIT
+                </span>
+
+            </div>
+
+
+            <!-- 길 -->
+
+            <div class="maze-path vertical-path">
+            </div>
+
+            <div class="maze-path horizontal-path">
+            </div>
+
+
+            <!-- 선택지 -->
+
+            <button type="button"
+                    id="pathTop"
+                    class="path-option top-option">
+
+                <span class="direction-icon">
+                    ↑
+                </span>
+
+                <strong>
+                    ?
+                </strong>
+
+            </button>
+
+
+            <button type="button"
+                    id="pathLeft"
+                    class="path-option left-option">
+
+                <span class="direction-icon">
+                    ←
+                </span>
+
+                <strong>
+                    ?
+                </strong>
+
+            </button>
+
+
+            <button type="button"
+                    id="pathRight"
+                    class="path-option right-option">
+
+                <span class="direction-icon">
+                    →
+                </span>
+
+                <strong>
+                    ?
+                </strong>
+
+            </button>
+
+
+            <button type="button"
+                    id="pathBottom"
+                    class="path-option bottom-option">
+
+                <span class="direction-icon">
+                    ↓
+                </span>
+
+                <strong>
+                    ?
+                </strong>
+
+            </button>
+
+
+            <!-- 플레이어 -->
+
+            <div id="mazePlayer"
+                 class="maze-player">
+
+                🦊
+
+            </div>
+
+
+            <!-- 막힌 길 효과 -->
+
+            <div id="blockedEffect"
+                 class="blocked-effect hidden">
+
+                💥 막힌 길!
+
+            </div>
+
+        </div>
+
+
+        <div id="mazeMessage"
+             class="maze-message">
+
+            정답 길을 찾아보세요!
+
+        </div>
+
+    </section>
+
+
+    <!-- ============================= -->
+    <!-- 시작 화면 -->
+    <!-- ============================= -->
+
+    <div id="startOverlay"
+         class="overlay">
+
+        <div class="overlay-card">
+
+            <div class="overlay-icon">
+                🗺️
+            </div>
+
+            <h2>
+                단어 미로 탈출
+            </h2>
+
+            <p>
+                단어 문제를 풀면서
+                미로의 출구를 찾아보세요.
+            </p>
+
+            <ul>
+
+                <li>
+                    갈림길마다 정답이 적힌 길을 고릅니다.
+                </li>
+
+                <li>
+                    정답이면 다음 방으로 이동합니다.
+                </li>
+
+                <li>
+                    오답 길은 막혀 있으며 생명이 감소합니다.
+                </li>
+
+                <li>
+                    모든 방을 통과하면 미로 탈출 성공입니다.
+                </li>
+
+            </ul>
+
+            <button type="button"
+                    id="startButton">
+
+                탐험 시작
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- 완료 -->
+    <!-- ============================= -->
+
+    <div id="completeOverlay"
+         class="overlay hidden">
+
+        <div class="overlay-card">
+
+            <div class="overlay-icon">
+                🏆
+            </div>
+
+            <h2>
+                MAZE ESCAPE!
+            </h2>
+
+            <p>
+                단어 미로를 탈출했습니다!
+            </p>
+
+
+            <div class="final-result">
+
+                <div>
+                    <span>
+                        최종 점수
+                    </span>
+
+                    <strong id="finalScore">
+                        0
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>
+                        최대 콤보
+                    </span>
+
+                    <strong id="finalCombo">
+                        0
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>
+                        통과한 방
+                    </span>
+
+                    <strong id="finalRooms">
+                        0
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <button type="button"
+                    id="submitButton">
+
+                시험 완료
+
+            </button>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script th:src="@{/js/game/word-maze.js}">
+</script>
+
+</body>
+
+</html>
