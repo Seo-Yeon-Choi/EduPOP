@@ -1,221 +1,148 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>시험 목록</title>
-
-    <link rel="stylesheet"
-          th:href="@{/css/common.css}">
-
-    <link rel="stylesheet"
-          th:href="@{/css/student-exam.css}">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시험 · 복습 | EduPOP</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/student-exam.css}">
 </head>
 
 <body>
-
-<div th:replace="~{layout/header :: header}"></div>
 <div th:replace="~{layout/sidebar-student :: sidebar}"></div>
 
 <main class="exam-list-container">
-    <section class="today-review-card">
+    <div class="exam-page-shell">
+        <header class="exam-page-heading">
+            <div>
+                <span class="exam-heading-chip">LEARNING QUEST</span>
+                <h1>시험 · 복습</h1>
+                <p>오늘의 미션을 완료하고 팝이와 함께 한 단계 더 성장해요.</p>
+            </div>
+        </header>
 
-        <div class="today-review-info">
+        <section class="today-review-card" aria-labelledby="todayReviewTitle">
+            <div class="today-review-info">
+                <span class="today-review-label">🔄 오늘의 복습</span>
+                <h2 id="todayReviewTitle">틀렸던 문제를 다시 만나볼 시간이야!</h2>
+                <p>최근 3일 오답과 AI가 준비한 비슷한 문제로 실력을 단단하게 만들어요.</p>
 
-        <span class="today-review-label">
-            TODAY
-        </span>
+                <div class="today-review-stats">
+                    <span><small>복습 문제</small><b><em th:text="${todayReviewCount}">0</em>문제</b></span>
+                    <span><small>예상 시간</small><b th:text="${todayReviewCount > 0 ? '약 ' + todayReviewCount + '분' : '-'}">약 5분</b></span>
+                </div>
 
-            <h2>오늘의 복습</h2>
+                <a th:if="${todayReviewCount > 0}"
+                   th:href="@{/student/exams/today-review}"
+                   id="todayReviewStartBtn"
+                   class="today-review-start">복습 시작하기 →</a>
 
-            <p>최근 3일 동안 틀린 문제를
-                다시 풀어보세요.
-            </p>
+                <span th:if="${todayReviewCount == 0}" class="today-review-empty">오늘 복습할 문제를 모두 완료했어요! 🎉</span>
+            </div>
 
-            <strong>
-                총
-                <span th:text="${todayReviewCount}">
-                0
-            </span>
-                문제
-            </strong>
+            <div class="today-review-character">
+                <div class="character-bubble">최근에 틀렸던 문제를<br>같이 정복해보자!</div>
+                <img th:src="@{/images/exp/character.png}" alt="복습을 응원하는 EduPOP 캐릭터" class="student-character-float">
+            </div>
+        </section>
 
-        </div>
+        <section class="exam-list-section" aria-labelledby="examListTitle">
+            <div class="exam-list-toolbar">
+                <div>
+                    <h2 id="examListTitle">시험 목록</h2>
+                    <p>단어 시험은 게임형으로도 즐길 수 있어요.</p>
+                </div>
 
-        <div class="today-review-action">
-            <a th:if="${todayReviewCount > 0}"
-               th:href="@{/student/exams/today-review}"
-               id="todayReviewStartBtn">
-                오늘의 복습 시작
-            </a>
-            <span th:if="${todayReviewCount == 0}">오늘 복습할 문제가 없습니다.</span>
-        </div>
-    </section>
+                <form class="exam-filter" th:action="@{/student/exams}" method="get">
+                    <label for="examDate">날짜 선택</label>
+                    <input id="examDate" type="date" name="date" th:value="${selectedDate}">
+                    <button type="submit">조회</button>
+                    <a th:href="@{/student/exams}">전체</a>
+                </form>
+            </div>
 
-    <div class="exam-filter">
+            <div class="exam-empty" th:if="${#lists.isEmpty(exams)}">
+                <span>📝</span>
+                <strong>해당 날짜에 등록된 시험이 없어요.</strong>
+                <p>다른 날짜를 선택하거나 전체 시험을 확인해 보세요.</p>
+            </div>
 
-        <form th:action="@{/student/exams}"
-              method="get">
+            <div class="exam-card-list" th:unless="${#lists.isEmpty(exams)}">
+                <article class="exam-card" th:each="exam : ${exams}">
+                    <div class="exam-type-icon" th:classappend="${exam.examType == 'WORD'} ? ' word' : ' general'">
+                        <span th:text="${exam.examType == 'WORD'} ? '🔤' : '📝'">📝</span>
+                    </div>
 
-            <input type="date"
-                   name="date"
-                   th:value="${selectedDate}">
+                    <div class="exam-info">
+                        <div class="exam-title-row">
+                            <h3 th:text="${exam.title}">시험 제목</h3>
+                            <span class="exam-badge word" th:if="${exam.examType == 'WORD'}">단어시험</span>
+                            <span class="exam-badge general" th:unless="${exam.examType == 'WORD'}">일반시험</span>
+                            <span class="exam-badge review"
+                                  th:if="${exam.examType != 'WORD' and exam.wrongCount != null and exam.wrongCount > 0}">복습 가능</span>
+                        </div>
 
-            <button type="submit">
-                조회
-            </button>
+                        <div class="exam-meta">
+                            <span th:if="${exam.examDate != null}">📅 <b th:text="${exam.examDate}">2026-09-01</b></span>
+                            <span th:if="${exam.examType == 'WORD'}">🎮 게임형 가능</span>
+                            <span th:if="${exam.wrongCount != null and exam.wrongCount > 0}">✅ 오답 <b th:text="${exam.wrongCount}">0</b>문제</span>
+                        </div>
+                    </div>
 
-            <a th:href="@{/student/exams}">
-                전체 보기
-            </a>
+                    <div class="exam-action">
+                        <a th:if="${exam.examType == 'WORD'}"
+                           th:href="@{/student/exams/{id}/word-game-take(id=${exam.examId})}"
+                           class="exam-button game-review-button">🎮 게임형</a>
 
-        </form>
+                        <a th:if="${exam.examType == 'WORD'}"
+                           th:href="@{/student/exams/{id}/take(id=${exam.examId})}"
+                           class="exam-button primary">시험 응시</a>
 
+                        <a th:if="${exam.examType != 'WORD' and exam.wrongCount != null and exam.wrongCount > 0}"
+                           th:href="@{/student/exams/{id}/review(id=${exam.examId})}"
+                           class="exam-button review-button">오답 복습</a>
+
+                        <span class="no-review"
+                              th:if="${exam.examType != 'WORD' and (exam.wrongCount == null or exam.wrongCount == 0)}">복습할 오답 없음</span>
+                    </div>
+                </article>
+            </div>
+
+            <nav class="pagination" th:if="${paging.totalCount > 0}" aria-label="시험 목록 페이지">
+                <a th:if="${paging.hasPrevious}"
+                   th:href="@{/student/exams(page=${paging.currentPage - 1},date=${selectedDate})}">이전</a>
+                <a th:each="pageNum : ${#numbers.sequence(paging.startPage,paging.endPage)}"
+                   th:href="@{/student/exams(page=${pageNum},date=${selectedDate})}"
+                   th:text="${pageNum}"
+                   th:classappend="${pageNum == paging.currentPage} ? 'active'">1</a>
+                <a th:if="${paging.hasNext}"
+                   th:href="@{/student/exams(page=${paging.currentPage + 1},date=${selectedDate})}">다음</a>
+            </nav>
+        </section>
     </div>
-
-    <h1>시험 / 복습</h1>
-
-    <div class="exam-card" th:each="exam : ${exams}">
-        <div class="exam-info">
-
-            <h2 th:text="${exam.title}">시험 제목</h2>
-
-            <span th:text="${exam.examType}">WORD</span>
-            <span th:if="${exam.examDate != null}" th:text="${exam.examDate}"></span>
-
-        </div>
-        <div class="exam-action">
-
-            <!-- 단어 시험 일반 응시 -->
-            <a th:if="${exam.examType == 'WORD'}"
-               th:href="@{/student/exams/{id}/take(id=${exam.examId})}"
-               class="exam-button">
-
-                시험 응시
-
-            </a>
-
-            <!-- 단어 시험 게임형 응시 -->
-            <a th:if="${exam.examType == 'WORD'}"
-               th:href="@{/student/exams/{id}/word-game-take(id=${exam.examId})}"
-               class="game-review-button">
-
-                🎮 게임형 응시
-
-            </a>
-
-
-            <!-- 일반 시험은 기존 복습 기능 유지 -->
-            <a th:if="${exam.examType != 'WORD'
-               and exam.wrongCount != null
-               and exam.wrongCount > 0}"
-               th:href="@{/student/exams/{id}/review(id=${exam.examId})}"
-               class="review-button">
-
-                복습하기
-                (<span th:text="${exam.wrongCount}"></span>)
-
-            </a>
-
-            <span th:if="${exam.examType != 'WORD'
-                  and (exam.wrongCount == null
-                  or exam.wrongCount == 0)}">
-
-        복습할 오답 없음
-
-    </span>
-
-        </div>
-    </div>
-
-    <div class="pagination"
-         th:if="${paging.totalCount > 0}">
-
-        <a th:if="${paging.hasPrevious}"
-           th:href="@{/student/exams(
-            page=${paging.currentPage - 1},
-            date=${selectedDate}
-       )}">
-            이전
-        </a>
-
-
-        <a th:each="pageNum :
-            ${#numbers.sequence(
-                paging.startPage,
-                paging.endPage
-            )}"
-
-           th:href="@{/student/exams(
-            page=${pageNum},
-            date=${selectedDate}
-       )}"
-
-           th:text="${pageNum}"
-
-           th:classappend="${pageNum == paging.currentPage}
-            ? 'active'">
-        </a>
-
-
-        <a th:if="${paging.hasNext}"
-           th:href="@{/student/exams(
-            page=${paging.currentPage + 1},
-            date=${selectedDate}
-       )}">
-            다음
-        </a>
-
-    </div>
-
 </main>
 
-<!-- 오늘의 복습 AI 문제 생성 로딩 화면 -->
-<div id="aiLoadingOverlay" class="ai-loading-overlay">
-
+<div id="aiLoadingOverlay" class="ai-loading-overlay" role="status" aria-live="polite">
     <div class="ai-loading-box">
-
-        <div class="ai-loading-spinner"></div>
-
-        <h3>복습 문제를 준비하고 있어요</h3>
-
-        <p>
-            틀린 문제를 분석해<br>
-            AI 유사 문제를 생성하고 있습니다.
-        </p>
-
-        <span>
-            잠시만 기다려주세요.
-        </span>
-
+        <img th:src="@{/images/exp/character.png}" alt="문제를 준비하는 EduPOP 캐릭터">
+        <div class="ai-loading-stars" aria-hidden="true">✦ ✧ ✦</div>
+        <h3>팝이가 복습 문제를 준비하고 있어요!</h3>
+        <p>틀린 문제를 살펴보고 비슷한 문제를 찾는 중이에요.</p>
+        <div class="ai-loading-bar"><span></span></div>
     </div>
-
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-
-        const reviewButton =
-            document.getElementById("todayReviewStartBtn");
-
-        const loadingOverlay =
-            document.getElementById("aiLoadingOverlay");
-
+        const reviewButton = document.getElementById("todayReviewStartBtn");
+        const loadingOverlay = document.getElementById("aiLoadingOverlay");
         if (reviewButton && loadingOverlay) {
-
             reviewButton.addEventListener("click", function () {
-
-                // 로딩 화면 표시
                 loadingOverlay.classList.add("active");
-
-                // 중복 클릭 방지
                 reviewButton.style.pointerEvents = "none";
             });
         }
     });
 </script>
-
 </body>
 </html>

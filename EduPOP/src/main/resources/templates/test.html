@@ -6,7 +6,7 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>EduPOP - 자아성찰 리포트</title>
+    <title>EduPOP - 이번 달 나의 성장 일기</title>
 
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/self-reflection.css}">
@@ -20,9 +20,16 @@
 <main class="main-content">
 
     <header class="page-header">
-        <h1 class="page-title">자아성찰</h1>
+        <span class="report-month-chip"
+              th:text="|${#temporals.format(report.periodStart, 'yyyy년 M월')} 성장 일기|">
+            이번 달 성장 일기
+        </span>
+        <h1 class="page-title"
+            th:text="|${#temporals.format(report.periodStart, 'M월')}의 나 🌟|">
+            이번 달의 나
+        </h1>
         <p class="page-description">
-            나를 돌아보고 더 나은 내일을 준비해요.
+            이번 달에 잘한 일과 새롭게 도전하고 싶은 일을 팝이와 함께 기록해요.
         </p>
     </header>
 
@@ -37,7 +44,7 @@
                 <article class="box box-past">
 
                     <h2 class="box-title title-past">
-                        1. 과거의 목표 (Past)
+                        지난달의 목표
                     </h2>
 
                     <p class="box-description">
@@ -54,7 +61,7 @@
                 <article class="box box-keep">
 
                     <h2 class="box-title title-keep">
-                        2. 가장 칭찬하고 싶은 점 (Keep)
+                        잘한 점 🌟
                     </h2>
 
                     <p class="box-description">
@@ -82,7 +89,7 @@
                 <article class="box box-problem">
 
                     <h2 class="box-title title-problem">
-                        3. 고치고 싶은 점 (Problem)
+                        아쉬웠던 점 😅
                     </h2>
 
                     <p class="box-description">
@@ -110,7 +117,7 @@
                 <article class="box box-feedback">
 
                     <h2 class="box-title title-feedback">
-                        4. 나의 셀프 피드백 (Feedback)
+                        나에게 보내는 한마디 💬
                     </h2>
 
                     <p class="box-description">
@@ -138,7 +145,7 @@
                 <article class="box box-try kpt-full">
 
                     <h2 class="box-title title-try">
-                        5. 다음 달 목표 (Try)
+                        다음 달 도전 🎯
                     </h2>
 
                     <p class="box-description">
@@ -171,7 +178,7 @@
                 <div class="mood-section">
 
                     <h2 class="box-title">
-                        이번 달 나의 성실 만족도
+                        이번 달 만족도
                     </h2>
 
                     <div class="mood-description-row">
@@ -234,7 +241,7 @@
             <section class="box box-concept">
 
                 <h2 class="box-title">
-                    모르는 개념과 아는 개념 구별
+                    내가 알게 된 것과 아직 어려운 것
                 </h2>
 
                 <p class="box-description">
@@ -295,7 +302,7 @@
         <aside class="right-panel">
 
             <h2 class="right-title">
-                이번 달 행동 지표
+                이번 달 성장
             </h2>
 
             <!-- 읽은 책 -->
