@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 복습 결과 | EduPOP</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/student-exam-result.css}">
+</head>
+
+<body>
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="result-container">
+    <section class="result-summary review-summary">
+        <div class="result-hero-copy">
+            <span class="result-label">🔄 오늘의 복습 완료</span>
+            <h1>틀린 문제를 다시 이겨냈어요!</h1>
+            <p th:if="${attempt.reviewDate != null}" th:text="|${attempt.reviewDate} 복습 기록|">복습 기록</p>
+            <div class="score">
+                <strong th:text="${attempt.totalScore}">0</strong>
+                <span>/ <em th:text="${attempt.maxScore}">0</em>점</span>
+            </div>
+        </div>
+
+        <div class="result-character-area">
+            <div class="result-bubble">오답을 다시 풀면 실력이 쑥쑥 자라요! 🌱</div>
+            <img th:src="@{/images/exp/character.png}" alt="복습 완료를 축하하는 팝이" class="student-character-float">
+        </div>
+    </section>
+
+    <section class="result-stat-grid" aria-label="오늘의 복습 결과 요약">
+        <article><span>✅</span><small>정답</small><strong><b th:text="${attempt.correctCount}">0</b>문제</strong></article>
+        <article><span>🔍</span><small>다시 볼 문제</small><strong><b th:text="${attempt.totalQuestionCount - attempt.correctCount}">0</b>문제</strong></article>
+        <article><span>🎯</span><small>정답률</small><strong><b th:text="${attempt.totalQuestionCount > 0 ? #numbers.formatDecimal(attempt.correctCount * 100 / attempt.totalQuestionCount, 0, 0) : 0}">0</b>%</strong></article>
+        <article><span>🌱</span><small>도전한 문제</small><strong><b th:text="${attempt.totalQuestionCount}">0</b>문제</strong></article>
+    </section>
+
+    <section class="answer-section">
+        <div class="answer-section-heading">
+            <div><h2>문제별 결과</h2><p>오늘 다시 어려웠던 문제를 한 번 더 살펴봐요.</p></div>
+        </div>
+
+        <div class="answer-result-list">
+            <article th:each="answer, stat : ${answers}"
+                     class="answer-result-card"
+                     th:classappend="${answer.isCorrect} ? ' is-correct' : ' is-wrong'">
+                <div class="result-question">
+                    <strong>문제 <span th:text="${stat.count}">1</span></strong>
+                    <span th:if="${answer.isCorrect}" class="correct">✓ 정답</span>
+                    <span th:unless="${answer.isCorrect}" class="wrong">다시 보기</span>
+                </div>
+                <h3 th:text="${answer.question.questionText}">문제 내용</h3>
+                <div class="answer-info">
+                    <p><span>내 답</span><strong th:text="${answer.studentAnswer}">답</strong></p>
+                    <p th:unless="${answer.isCorrect}"><span>정답</span><strong th:text="${answer.question.correctAnswer}">정답</strong></p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <div class="result-buttons">
+        <a th:if="${from == 'submit'}" th:href="@{/student/exams}" class="result-primary-button">시험 목록으로</a>
+        <a th:if="${from == 'list'}" th:href="@{/student/exams/results}" class="result-primary-button">결과 목록으로</a>
+    </div>
+</main>
+</body>
+</html>

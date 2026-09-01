@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>오늘의 복습 | EduPOP</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/student-exam-take.css}">
+</head>
+
+<body>
+<div th:replace="~{layout/sidebar-student :: sidebar}"></div>
+
+<main class="main-content exam-take-container">
+    <header class="exam-header">
+        <div class="exam-header-title">
+            <span class="exam-mode-chip">오늘의 복습</span>
+            <div>
+                <h1>틀린 문제를 다시 정복해볼까요?</h1>
+                <p>최근 3일 오답과 AI 유사문제를 천천히 풀어보세요.</p>
+            </div>
+        </div>
+        <div class="exam-header-status">
+            <span class="question-total">총 <b th:text="${#lists.size(questions)}">0</b>문제</span>
+            <div class="exam-mini-character">
+                <span>이번엔 맞힐 수 있어!</span>
+                <img th:src="@{/images/exp/character.png}" alt="복습을 응원하는 팝이">
+            </div>
+        </div>
+    </header>
+
+    <input type="hidden" id="dailyReviewAttemptId" th:value="${attempt.dailyReviewAttemptId}">
+
+    <div class="exam-workspace">
+        <aside class="question-navigation" aria-label="문제 바로가기">
+            <strong>복습 문제</strong>
+            <div>
+                <a th:each="question, stat : ${questions}"
+                   th:href="|#question-${stat.count}|"
+                   th:text="${stat.count}">1</a>
+            </div>
+            <p>답을 입력한 문제는 민트색으로 표시돼요.</p>
+        </aside>
+
+        <section class="question-list">
+            <article class="question-card"
+                     th:each="question, questionStat : ${questions}"
+                     th:id="|question-${questionStat.count}|"
+                     th:data-question-id="${question.questionId}">
+                <div class="question-number">
+                    <span>REVIEW</span>
+                    <strong th:text="${questionStat.count}">1</strong>
+                    <small th:text="|/ ${questionStat.size}|">/ 5</small>
+                </div>
+
+                <div th:if="${question.passage != null and !question.passage.isEmpty()}"
+                     class="question-passage"
+                     th:text="${question.passage}">지문</div>
+
+                <h2 class="question-text" th:text="${question.questionText}">문제 내용</h2>
+
+                <div th:if="${question.questionType == 'MULTIPLE_CHOICE'}" class="choice-list">
+                    <label th:each="choice : ${question.choices}" class="choice-item">
+                        <input type="radio"
+                               th:name="'question-' + ${question.questionId}"
+                               th:value="${choice.choiceNumber}">
+                        <span class="choice-number" th:text="${choice.choiceNumber}">1</span>
+                        <span class="choice-text" th:text="${choice.choiceText}">선지 내용</span>
+                    </label>
+                </div>
+
+                <div th:if="${question.questionType == 'SHORT_ANSWER'}" class="short-answer">
+                    <label th:for="|daily-answer-${question.questionId}|">내 답을 입력해 주세요</label>
+                    <input th:id="|daily-answer-${question.questionId}|"
+                           type="text"
+                           class="student-answer"
+                           placeholder="정답을 입력하세요">
+                </div>
+            </article>
+        </section>
+    </div>
+
+    <div class="submit-area">
+        <div><span>✓</span> 답안을 모두 확인했나요?</div>
+        <button type="button" id="submitTodayReviewButton">복습 제출하기 →</button>
+    </div>
+</main>
+
+<script>
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+    let isSubmitting = false;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const submitButton = document.getElementById("submitTodayReviewButton");
+        if (submitButton) submitButton.addEventListener("click", submitTodayReview);
+    });
+
+    document.addEventListener("change", function (event) {
+        const card = event.target.closest(".question-card");
+        if (!card) return;
+        const number = card.id.replace("question-", "");
+        const nav = document.querySelector('.question-navigation a[href="#question-' + number + '"]');
+        if (nav) nav.classList.add("answered");
+    });
+
+    async function submitTodayReview() {
+        if (isSubmitting) return;
+
+        const questionCards = document.querySelectorAll(".question-card");
+        const answers = [];
+
+        for (const card of questionCards) {
+            const questionId = Number(card.dataset.questionId);
+            const checkedRadio = card.querySelector("input[type='radio']:checked");
+            const textInput = card.querySelector(".student-answer");
+            let studentAnswer = "";
+
+            if (checkedRadio) studentAnswer = checkedRadio.value;
+            if (textInput) studentAnswer = textInput.value.trim();
+
+            if (!studentAnswer) {
+                alert("모든 문제에 답을 입력해주세요.");
+                card.scrollIntoView({ behavior: "smooth", block: "center" });
+                return;
+            }
+
+            answers.push({ questionId, studentAnswer });
+        }
+
+        if (!confirm("오늘의 복습을 제출하시겠습니까?\n제출 후에는 답안을 수정할 수 없습니다.")) return;
+
+        const dailyReviewAttemptId = Number(document.getElementById("dailyReviewAttemptId").value);
+        const submitButton = document.getElementById("submitTodayReviewButton");
+        isSubmitting = true;
+        submitButton.disabled = true;
+        submitButton.textContent = "제출 중...";
+
+        try {
+            const response = await fetch("/student/exams/today-review/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", [csrfHeader]: csrfToken },
+                body: JSON.stringify({ dailyReviewAttemptId, answers })
+            });
+
+            if (!response.ok) throw new Error("오늘의 복습 제출에 실패했습니다.");
+            const result = await response.json();
+            location.href = `/student/exams/today-review/${result.attemptId}/result?from=submit`;
+        } catch (error) {
+            console.error(error);
+            isSubmitting = false;
+            submitButton.disabled = false;
+            submitButton.textContent = "복습 제출하기 →";
+            alert("오늘의 복습 제출 중 오류가 발생했습니다.");
+        }
+    }
+</script>
+</body>
+</html>

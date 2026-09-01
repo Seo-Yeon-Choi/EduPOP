@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="sidebar">
+    <link rel="stylesheet" th:href="@{/css/student-theme.css}">
+
+    <aside class="sidebar student-sidebar" aria-label="학생 메뉴">
+        <a class="student-brand" th:href="@{/main/studentMain}" aria-label="EduPOP 학생 홈">
+            <span class="student-brand-mark">EP</span>
+            <span class="student-brand-name">EduPOP</span>
+        </a>
+
+        <nav class="sidebar-nav">
+            <a th:href="@{/main/studentMain}" class="nav-item">
+                <span class="nav-icon" aria-hidden="true">⌂</span>
+                <span class="nav-label">홈</span>
+            </a>
+
+            <a th:href="@{/student/exams}" class="nav-item">
+                <span class="nav-icon" aria-hidden="true">📝</span>
+                <span class="nav-label">시험 · 복습</span>
+            </a>
+
+            <a th:href="@{/student/exams/results}" class="nav-item">
+                <span class="nav-icon" aria-hidden="true">🌱</span>
+                <span class="nav-label">성장 기록</span>
+            </a>
+
+            <a th:href="@{/student/reading}"
+               class="nav-item"
+               th:classappend="${activeMenu == 'reading' || activeMenu == 'reading-create'} ? ' active' : ''">
+                <span class="nav-icon" aria-hidden="true">📚</span>
+                <span class="nav-label">독서</span>
+            </a>
+
+            <a th:href="@{/student/report}" class="nav-item">
+                <span class="nav-icon" aria-hidden="true">🗒️</span>
+                <span class="nav-label">나의 리포트</span>
+            </a>
+
+            <a th:href="@{/account}" class="nav-item">
+                <span class="nav-icon" aria-hidden="true">👤</span>
+                <span class="nav-label">계정 관리</span>
+            </a>
+        </nav>
+
+        <div class="student-sidebar-profile">
+            <img th:src="@{/images/exp/character.png}" alt="EduPOP 캐릭터 팝이">
+            <div class="student-profile-copy">
+                <strong th:text="${session.loginUser != null ? session.loginUser.name : '학생'}">학생</strong>
+                <span th:text="${session.loginUser != null and session.loginUser.schoolGrade != null ? session.loginUser.schoolGrade : '오늘도 파이팅!'}">오늘도 파이팅!</span>
+            </div>
+            <a class="student-profile-logout" th:href="@{/logout}" title="로그아웃" aria-label="로그아웃">↗</a>
+        </div>
+    </aside>
+</th:block>
+
+</body>
+</html>
