@@ -6,6 +6,8 @@
     <title>EduPOP - 선생님 워크스페이스</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/teacher-main.css}">
+
+    <script th:src="@{/js/teacher-main.js}" defer></script>
 </head>
 <body>
 
@@ -79,6 +81,89 @@
                     <b>독서록 보기 →</b>
                 </a>
             </div>
+        </section>
+        <section class="teacher-home-bottom-briefing"
+                 aria-labelledby="homeBriefingTitle">
+
+            <!-- 왼쪽: 나의 클래스 룸 -->
+            <aside class="home-briefing-class-card">
+                <h2 id="homeBriefingTitle">
+                    📚 나의 클래스 룸
+                </h2>
+
+                <div th:if="${teacherClasses == null or teacherClasses.isEmpty()}"
+                     class="home-briefing-empty">
+                    배정된 반이 없습니다.
+                </div>
+
+                <div class="home-briefing-class-list"
+                     th:if="${teacherClasses != null and !teacherClasses.isEmpty()}">
+
+                    <button th:each="cls, iter : ${teacherClasses}"
+                            type="button"
+                            class="home-briefing-class-item"
+                            th:classappend="${iter.first} ? 'active'"
+                            th:data-class-id="${cls.classId}"
+                            th:data-class-name="${cls.name}">
+
+                <span th:text="${cls.name}">
+                    반 이름
+                </span>
+
+                        <span class="home-class-signal is-loading">
+                    현황 확인
+                </span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- 오른쪽: 선택한 반 보완 신호 -->
+            <section class="home-briefing-summary-card">
+
+                <div th:if="${teacherClasses == null or teacherClasses.isEmpty()}"
+                     class="home-briefing-empty">
+                    담당 반이 배정되면 수업 전 보완 신호가 표시됩니다.
+                </div>
+
+                <div th:if="${teacherClasses != null and !teacherClasses.isEmpty()}">
+
+                    <div class="home-briefing-summary-top">
+
+                        <div class="home-briefing-class-copy">
+
+                            <h2 id="homeSelectedClassName">
+                                클래스 선택
+                            </h2>
+
+                            <p>
+                                수업 전 3분 보완 브리핑
+                            </p>
+                        </div>
+
+                        <div class="home-briefing-actions">
+
+                            <button id="homeParentReportButton"
+                                    type="button"
+                                    class="home-parent-report-button">
+                                🔗 학부모 리포트 배포
+                                <small>단톡방 공유용</small>
+                            </button>
+
+                            <a id="homeClassSignalLink"
+                               th:href="@{/analytics/class-trend}"
+                               class="home-class-signal-button is-loading">
+                                분석 중
+                            </a>
+                        </div>
+                    </div>
+
+                    <div id="homeWarningReason"
+                         class="home-briefing-warning is-loading">
+                        클래스별 종합 성취도 분석 결과를 불러오고 있습니다.
+                    </div>
+
+                </div>
+            </section>
         </section>
     </div>
 </main>

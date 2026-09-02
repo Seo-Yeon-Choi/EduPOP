@@ -8,6 +8,8 @@ import com.example.EduPOP.domain.user.UserStatus;
 import com.example.EduPOP.service.auth.AcademyService;
 import com.example.EduPOP.service.auth.SecurityLoginService;
 import com.example.EduPOP.service.auth.UserService;
+import com.example.EduPOP.domain.user.AcademyClass;
+import com.example.EduPOP.service.classroom.ClassService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -26,6 +28,7 @@ public class AuthController {
     private  final AcademyService academyService;
     private final UserService userService;
     private final SecurityLoginService securityLoginService;
+    private final ClassService classService;
 
     // 기본 도메인 요청 시 로그인 페이지로 이동
     @GetMapping("/")
@@ -309,7 +312,31 @@ public class AuthController {
     }
 
     @GetMapping("/main/teacherMain")
-    public String teacherMain(){
+    public String teacherMain(
+            HttpSession session,
+            Model model
+    ) {
+        User loginUser =
+                (User) session.getAttribute(SessionConst.LOGIN_USER);
+
+        if (loginUser == null) {
+            return "redirect:/LocalLogin";
+        }
+
+        if (loginUser.getRole() != UserRole.TEACHER) {
+            return "redirect:/";
+        }
+
+        List<AcademyClass> teacherClasses =
+                classService.getClassesByTeacher(
+                        loginUser.getUserId()
+                );
+
+        model.addAttribute(
+                "teacherClasses",
+                teacherClasses
+        );
+
         return "main/teacherMain";
     }
 
