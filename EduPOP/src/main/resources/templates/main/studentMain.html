@@ -6,7 +6,6 @@
     <title>EduPOP - 나의 학습 공간</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/student-main.css}">
-    <link rel="stylesheet" th:href="@{/css/exp.css}">
 </head>
 
 <body>
@@ -29,65 +28,20 @@
                 </div>
             </div>
 
-            <section class="exp-card"
-                     id="expCard"
-                     data-stage="1"
-                     aria-labelledby="expCardTitle"
-                     aria-busy="true">
-                <div class="exp-loading" id="expLoading">
-                    <span class="exp-loading-dot" aria-hidden="true"></span>
-                    팝이가 성장 정보를 찾고 있어요!
-                </div>
-
-                <div class="exp-error" id="expError" role="alert" hidden>
-                    <p id="expErrorMessage">성장 정보를 불러오지 못했습니다.</p>
-                    <button class="exp-retry-button" id="expRetryButton" type="button">다시 불러오기</button>
-                </div>
-
-                <div class="exp-content" id="expContent" hidden>
-                    <div class="exp-character-wrap">
-                        <div class="student-speech-bubble">오늘도 같이 공부해볼까?</div>
-                        <div class="exp-character-area">
-                            <div class="exp-character-background" id="expCharacterBackground" aria-hidden="true"></div>
-                            <img class="exp-character-image student-character-float"
-                                 id="expCharacterImage"
-                                 alt="현재 성장 단계의 EduPOP 캐릭터"
-                                 hidden>
-                            <div class="exp-character-placeholder" id="expCharacterPlaceholder">
-                                <span>팝이 준비 중</span>
-                            </div>
-                            <div class="exp-character-foreground" aria-hidden="true"></div>
-                        </div>
-                    </div>
-
-                    <div class="exp-info-area">
-                        <div class="exp-title-row">
-                            <div>
-                                <p class="exp-label">MY GROWTH</p>
-                                <h2 id="expCardTitle">나의 성장</h2>
-                            </div>
-                            <span class="exp-stage-badge" id="expStageBadge">1단계</span>
-                        </div>
-
+            <div class="student-hero-character" aria-label="EduPOP 캐릭터 팝이">
+                <div class="student-speech-bubble">오늘도 같이 공부해볼까?</div>
+                <div class="exp-character-area" data-stage="1">
+                    <div class="student-character-growth" aria-label="현재 성장 단계">
+                        <span class="student-character-growth-label">MY GROWTH</span>
                         <strong class="exp-stage-name" id="expStageName">G</strong>
-                        <div class="exp-score-row">
-                            <strong class="exp-total" id="expTotal">0 EXP</strong>
-                            <span class="exp-next" id="expNext">다음 단계까지 100 EXP</span>
-                        </div>
-                        <div class="exp-progress"
-                             id="expProgress"
-                             role="progressbar"
-                             aria-label="다음 캐릭터 단계까지의 경험치 진행률"
-                             aria-valuemin="0"
-                             aria-valuemax="100"
-                             aria-valuenow="0">
-                            <div class="exp-progress-bar" id="expProgressBar"></div>
-                        </div>
-                        <p class="exp-progress-text" id="expProgressText">현재 단계 진행률 0%</p>
-                        <p class="exp-guide" id="expGuide">학습 활동으로 경험치를 모아 성장 공간을 완성해 보세요.</p>
                     </div>
+                    <div class="exp-character-background" aria-hidden="true"></div>
+                    <img class="exp-character-image"
+                         src="/images/exp/character.png"
+                         alt="EduPOP 캐릭터 팝이">
+                    <div class="exp-character-foreground" aria-hidden="true"></div>
                 </div>
-            </section>
+            </div>
         </section>
 
         <section class="student-home-section" aria-labelledby="missionTitle">
@@ -163,5 +117,6 @@
 </main>
 
 <script th:src="@{/js/exp.js}" defer></script>
+
 </body>
 </html>

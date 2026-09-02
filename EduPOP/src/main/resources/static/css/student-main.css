@@ -12,7 +12,7 @@
     min-height: 410px;
     padding: 40px;
     display: grid;
-    grid-template-columns: minmax(340px, .88fr) minmax(440px, 1.12fr);
+    grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
     align-items: center;
     gap: 34px;
     overflow: hidden;
@@ -46,9 +46,243 @@
 }
 
 .student-hero-copy,
-.student-home-hero .exp-card {
+.student-hero-character {
     position: relative;
     z-index: 1;
+}
+
+.student-hero-character {
+    min-height: 330px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.student-hero-character .exp-character-area {
+    width: 100%;
+    height: 330px;
+    min-height: 0;
+    position: relative;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 22px;
+    background: #ffe5d4;
+}
+
+.student-hero-character .exp-character-area::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+        radial-gradient(circle at 22% 30%, rgba(255, 255, 255, .82) 0 2px, transparent 3px),
+        radial-gradient(circle at 78% 24%, rgba(255, 255, 255, .7) 0 1.5px, transparent 3px),
+        radial-gradient(circle at 84% 64%, rgba(255, 240, 190, .72) 0 2px, transparent 4px),
+        linear-gradient(180deg, rgba(255, 255, 255, .06) 42%, rgba(30, 35, 55, .12) 100%);
+    pointer-events: none;
+    animation: expCharacterSparkle 2.4s ease-in-out infinite;
+}
+
+.student-hero-character .exp-character-area::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: 8px;
+    z-index: 1;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(103, 74, 61, .16);
+    filter: blur(7px);
+    pointer-events: none;
+}
+
+.student-hero-character .exp-character-background,
+.student-hero-character .exp-character-foreground {
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    pointer-events: none;
+}
+
+.student-hero-character .exp-character-background {
+    z-index: 0;
+}
+
+.student-hero-character .exp-character-foreground {
+    z-index: 3;
+}
+
+.student-hero-character .exp-character-image {
+    position: relative;
+    z-index: 2;
+    width: min(92%, 360px);
+    height: 330px;
+    object-fit: contain;
+    object-position: center bottom;
+    filter: drop-shadow(0 14px 12px rgba(103, 74, 61, .16));
+    animation: expCharacterMove 3s ease-in-out infinite;
+    transform-origin: center bottom;
+}
+
+@keyframes expCharacterMove {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-7px) scale(1.01);
+    }
+}
+
+@keyframes expCharacterSparkle {
+    0%,
+    100% {
+        opacity: .55;
+    }
+
+    50% {
+        opacity: .95;
+    }
+}
+
+.student-character-growth {
+    position: absolute;
+    left: 18px;
+    bottom: 22px;
+    z-index: 4;
+    width: 124px;
+    padding: 10px 9px 12px;
+    border: 1px solid rgba(255, 255, 255, .72);
+    border-radius: 14px;
+    background: rgba(255, 248, 239, .82);
+    box-shadow: 0 6px 16px rgba(103, 74, 61, .12);
+    text-align: center;
+}
+
+.student-character-growth::before,
+.student-character-growth::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff9d6;
+    box-shadow: 0 0 8px 2px rgba(255, 238, 145, .8);
+    pointer-events: none;
+    animation: expGrowthSparkle 1.9s ease-in-out infinite;
+}
+
+.student-character-growth::before {
+    top: -14px;
+    right: 10px;
+}
+
+.student-character-growth::after {
+    bottom: 8px;
+    left: -12px;
+    animation-delay: -.85s;
+}
+
+@keyframes expGrowthSparkle {
+    0%,
+    100% {
+        opacity: .2;
+        transform: scale(.7);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.student-character-growth-label {
+    display: block;
+    color: var(--student-muted);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+}
+
+.student-character-growth .exp-stage-name {
+    display: block;
+    margin-top: 5px;
+    color: #6f6557;
+    font-size: clamp(25px, 3vw, 34px);
+    font-weight: 900;
+    letter-spacing: 1px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.student-character-growth .exp-stage-letter {
+    display: inline-block;
+}
+
+.student-character-growth .exp-stage-letter-g { color: #6f6557; }
+.student-character-growth .exp-stage-letter-r { color: #b95a45; }
+.student-character-growth .exp-stage-letter-o { color: #3f876f; }
+.student-character-growth .exp-stage-letter-w { color: #76518e; }
+.student-character-growth .exp-stage-letter-u { color: #294c7b; }
+.student-character-growth .exp-stage-letter-p { color: #9b7114; }
+
+.student-character-growth .exp-stage-letter {
+    display: inline-block;
+    text-shadow: 0 1px 0 currentColor, 0 0 8px currentColor;
+    animation: expGrowthLetterNeon 1.9s ease-in-out infinite;
+}
+
+.student-character-growth .exp-stage-letter-r { animation-delay: -.24s; }
+.student-character-growth .exp-stage-letter-o { animation-delay: -.48s; }
+.student-character-growth .exp-stage-letter-w { animation-delay: -.72s; }
+.student-character-growth .exp-stage-letter-u { animation-delay: -.96s; }
+.student-character-growth .exp-stage-letter-p { animation-delay: -1.2s; }
+
+@keyframes expGrowthLetterNeon {
+    0%,
+    100% {
+        opacity: .78;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.03);
+    }
+}
+
+.student-hero-character .exp-character-area[data-stage="5"] .exp-stage-name {
+    font-size: 25px;
+    letter-spacing: .3px;
+}
+
+.student-hero-character .exp-character-area[data-stage="6"] .exp-stage-name {
+    font-size: 22px;
+    letter-spacing: .2px;
+}
+
+.student-speech-bubble {
+    position: absolute;
+    z-index: 2;
+    top: 12px;
+    left: 50%;
+    padding: 11px 14px;
+    border-radius: 16px;
+    color: var(--student-ink);
+    background: #fff;
+    box-shadow: var(--student-shadow-soft);
+    font-size: 12px;
+    font-weight: 750;
+    white-space: nowrap;
 }
 
 .student-hero-chip {
@@ -257,10 +491,6 @@
 }
 
 @media (max-width: 1120px) {
-    .student-home-hero {
-        grid-template-columns: 1fr;
-    }
-
     .student-activity-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -275,12 +505,63 @@
         padding: 28px;
     }
 
+    .student-hero-character {
+        min-height: 260px;
+    }
+
+    .student-hero-character .exp-character-area,
+    .student-hero-character .exp-character-image {
+        height: 260px;
+    }
+
+    .student-character-growth {
+        left: 12px;
+        bottom: 16px;
+    }
+
+    .student-speech-bubble {
+        top: 0;
+    }
+
     .student-mission-grid {
         grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 600px) {
+    .student-home-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .student-hero-character {
+        min-height: 240px;
+    }
+
+    .student-hero-character .exp-character-area,
+    .student-hero-character .exp-character-image {
+        height: 240px;
+    }
+
+    .student-character-growth {
+        left: 8px;
+        bottom: 12px;
+        width: 100px;
+        padding: 8px 6px 10px;
+    }
+
+    .student-character-growth .exp-stage-name {
+        font-size: 24px;
+        letter-spacing: .5px;
+    }
+
+    .student-hero-character .exp-character-area[data-stage="5"] .exp-stage-name {
+        font-size: 19px;
+    }
+
+    .student-hero-character .exp-character-area[data-stage="6"] .exp-stage-name {
+        font-size: 18px;
+    }
+
     .student-activity-grid {
         grid-template-columns: 1fr;
     }
@@ -288,5 +569,15 @@
     .student-home-footer-card {
         align-items: flex-start;
         flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .student-hero-character .exp-character-image,
+    .student-hero-character .exp-character-area::before,
+    .student-character-growth::before,
+    .student-character-growth::after,
+    .student-character-growth .exp-stage-letter {
+        animation: none;
     }
 }

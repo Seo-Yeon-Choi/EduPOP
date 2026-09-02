@@ -129,11 +129,36 @@ body.student-focus-page .top-header {
     margin-top: 18px;
     padding: 12px;
     display: grid;
-    grid-template-columns: 42px minmax(0, 1fr) 24px;
+    grid-template-columns: 42px minmax(0, 1fr);
     align-items: center;
     gap: 9px;
     background: var(--student-bg);
     border-radius: 18px;
+}
+
+.student-logout-form {
+    grid-column: 1 / -1;
+    margin-top: 3px;
+}
+
+.student-logout-button {
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 10px;
+    border: 1px solid rgba(255, 114, 96, .28);
+    border-radius: 11px;
+    color: var(--student-primary-dark);
+    background: #fff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background .18s ease, transform .18s ease;
+}
+
+.student-logout-button:hover {
+    background: #fff0ec;
+    transform: translateY(-1px);
 }
 
 .student-sidebar-profile img {
@@ -165,20 +190,6 @@ body.student-focus-page .top-header {
     font-size: 11px;
 }
 
-.student-profile-logout {
-    width: 24px;
-    height: 24px;
-    display: grid;
-    place-items: center;
-    border-radius: 9px;
-    color: var(--student-muted);
-    font-size: 14px;
-}
-
-.student-profile-logout:hover {
-    color: var(--student-primary-dark);
-    background: #fff;
-}
 
 body:has(.student-sidebar) .main-content,
 body:has(.student-sidebar) .student-main-container,
@@ -994,8 +1005,7 @@ body:has(.student-sidebar) .account-info-grid dd { margin: 5px 0 0; overflow-wra
 
     .student-brand-name,
     .student-sidebar .nav-label,
-    .student-profile-copy,
-    .student-profile-logout {
+    .student-profile-copy {
         display: none;
     }
 
@@ -1007,7 +1017,12 @@ body:has(.student-sidebar) .account-info-grid dd { margin: 5px 0 0; overflow-wra
     .student-sidebar-profile {
         display: flex;
         justify-content: center;
+        flex-wrap: wrap;
         padding: 8px;
+    }
+
+    .student-logout-form {
+        width: 100%;
     }
 
     body:has(.student-sidebar) .main-content,
@@ -1074,12 +1089,16 @@ body:has(.student-sidebar) .account-info-grid dd { margin: 5px 0 0; overflow-wra
     }
 }
 
-/* Keep centered student content inside the space remaining beside the sidebar. */
+/* Keep page-specific content spacing independent from the shared sidebar reset. */
 body:has(.student-sidebar) .result-list-container,
-body:has(.student-sidebar) .main-content:has(.layout-wrapper),
+body:has(.student-sidebar) .main-content:has(.layout-wrapper) {
+    padding-top: 36px;
+}
+
 body:has(.student-sidebar) .reading-page {
-    margin-left: max(248px, calc((100vw - 220px - 1000px) / 2 + 220px));
-    margin-right: 0;
+    width: min(calc(100% - 56px), 1000px);
+    margin-right: auto;
+    margin-left: auto;
 }
 
 body:has(.student-sidebar) .result-container {
@@ -1099,8 +1118,10 @@ body:has(.student-sidebar) .account-page-container {
 
 @media (max-width: 980px) {
     body:has(.student-sidebar) .result-list-container,
-    body:has(.student-sidebar) .main-content:has(.layout-wrapper),
-    body:has(.student-sidebar) .reading-page,
+    body:has(.student-sidebar) .main-content:has(.layout-wrapper) {
+        padding-top: 32px;
+    }
+
     body:has(.student-sidebar) .result-container,
     body:has(.student-sidebar) .main-content.exam-take-container,
     body:has(.student-sidebar) .account-page-container {
@@ -1110,7 +1131,11 @@ body:has(.student-sidebar) .account-page-container {
 
 @media (max-width: 720px) {
     body:has(.student-sidebar) .result-list-container,
-    body:has(.student-sidebar) .main-content:has(.layout-wrapper),
+    body:has(.student-sidebar) .main-content:has(.layout-wrapper) {
+        padding-top: 22px;
+    }
+
+    body:has(.student-sidebar) .result-list-container,
     body:has(.student-sidebar) .reading-page,
     body:has(.student-sidebar) .result-container,
     body:has(.student-sidebar) .main-content.exam-take-container,

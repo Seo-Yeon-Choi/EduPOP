@@ -1,6 +1,7 @@
 /* 독서 기능 페이지 전체 크기와 가운데 정렬 */
 .reading-page {
-    max-width: 1120px;
+    width: min(100% - 56px, 1000px);
+    min-width: 0;
     margin: 0 auto;
 }
 
@@ -292,6 +293,7 @@
 }
 
 .report-card {
+    min-width: 0;
     padding: 20px;
     border: 1px solid #e5e7eb;
     border-radius: 10px;
@@ -322,6 +324,7 @@
 
 .report-summary {
     min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .report-summary h2 {
@@ -334,12 +337,14 @@
     margin: 0 0 5px;
     font-size: 14px;
     font-weight: 700;
+    overflow-wrap: anywhere;
 }
 
 .book-author {
     margin: 0;
     color: #6b7280;
     font-size: 13px;
+    overflow-wrap: anywhere;
 }
 
 /* 독서 횟수와 첨삭 상태 표시 */
@@ -385,6 +390,7 @@
     line-height: 1.6;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    overflow-wrap: anywhere;
 }
 
 /* 조회 결과가 없을 때 표시 */

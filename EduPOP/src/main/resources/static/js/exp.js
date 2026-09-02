@@ -6,7 +6,69 @@ document.addEventListener("DOMContentLoaded", function () {
     const card = document.getElementById("expCard");
 
     if (card === null) {
-        return; // 현재 화면에 경험치 카드가 없으면 실행 종료
+        loadCharacterStage();
+        return; // 성장 카드가 없어도 메인 캐릭터 단계는 조회
+    }
+
+    async function loadCharacterStage() {
+        const characterArea = document.querySelector(".exp-character-area");
+        const characterBackground = characterArea === null
+            ? null
+            : characterArea.querySelector(".exp-character-background");
+        const characterImage = characterArea === null
+            ? null
+            : characterArea.querySelector(".exp-character-image");
+        const characterForeground = characterArea === null
+            ? null
+            : characterArea.querySelector(".exp-character-foreground");
+        const characterStageName = characterArea === null
+            ? null
+            : characterArea.querySelector("#expStageName");
+
+        if (characterArea === null
+            || characterBackground === null
+            || characterImage === null
+            || characterForeground === null
+            || characterStageName === null) {
+            return;
+        }
+
+        const fallbackStage = 1;
+        const applyStage = function (stage, backgroundUrl, characterUrl, stageName) {
+            characterArea.dataset.stage = String(stage);
+            changeStageName(stageName, characterStageName);
+            characterBackground.style.backgroundImage =
+                "url('" + readImageUrl(
+                    backgroundUrl,
+                    "/images/exp/stage1-background.png"
+                ) + "')";
+            characterForeground.style.backgroundImage = stage > 1
+                ? "url('/images/exp/stage" + stage + "-foreground.png')"
+                : "none";
+            characterImage.src = readImageUrl(
+                characterUrl,
+                "/images/exp/character.png"
+            );
+        };
+
+        try {
+            const response = await fetch("/api/exp/me", {
+                method: "GET",
+                credentials: "same-origin",
+                headers: {"Accept": "application/json"}
+            });
+
+            if (!response.ok) {
+                throw new Error("경험치 정보를 조회할 수 없습니다.");
+            }
+
+            const expInfo = await response.json();
+            const stage = readStage(expInfo.characterStage);
+            const stageName = readStageName(expInfo.stageName, stage);
+            applyStage(stage, expInfo.backgroundImageUrl, expInfo.characterImageUrl, stageName);
+        } catch (error) {
+            applyStage(fallbackStage, "/images/exp/stage1-background.png", "/images/exp/character.png", "G");
+        }
     }
 
     const loading = document.getElementById("expLoading");
@@ -218,7 +280,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function changeStageName(
-        currentStageName
+        currentStageName,
+        targetStageName = stageName
     ) {
         // changeStageName(체인지 스테이지 네임): 단계 이름을 글자별 색상 요소로 분리
 
@@ -232,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
         // letterClassNames(레터 클래스 네임즈): 성장 글자와 CSS 클래스 이름 연결
 
-        stageName.textContent = "";
+        targetStageName.textContent = "";
         // 기존 단계 이름을 지우고 현재 단계 글자로 다시 구성
 
         Array.from(
@@ -245,7 +308,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // className(클래스 네임): 현재 글자에 사용할 고정 색상 클래스 이름
 
             if (className === undefined) {
-                stageName.appendChild(
+                targetStageName.appendChild(
                     document.createTextNode(
                         letter
                     )
@@ -271,7 +334,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 letter;
             // span 요소에 현재 성장 글자 저장
 
-            stageName.appendChild(
+            targetStageName.appendChild(
                 letterElement
             );
             // 완성한 글자 요소를 단계 이름 영역에 순서대로 추가

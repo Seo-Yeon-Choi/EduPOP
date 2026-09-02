@@ -1,11 +1,22 @@
 .main-content {
+    width: calc(100% - 220px);
     min-height: 100vh;
+    margin-left: 220px;
+    padding: 36px 0 56px;
+    box-sizing: border-box;
 }
 
 body:has(.student-sidebar) .main-content {
+    width: calc(100% - 220px);
+    margin-left: 220px;
+    padding-top: 36px;
+}
+
+.page-header,
+.layout-wrapper {
     width: min(calc(100% - 56px), 1000px);
-    margin-left: max(248px, calc((100vw - 220px - 1000px) / 2 + 220px));
-    padding: 32px 0 56px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .page-header {
@@ -386,15 +397,22 @@ body:has(.student-sidebar) .main-content {
 
 @media (max-width: 980px) {
     body:has(.student-sidebar) .main-content {
+        width: calc(100% - 78px);
+        margin-left: 78px;
+    }
+
+    .page-header,
+    .layout-wrapper {
         width: min(calc(100% - 44px), 1000px);
-        margin-left: max(98px, calc((100vw - 78px - 1000px) / 2 + 78px));
     }
 
     .right-panel { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 720px) {
-    body:has(.student-sidebar) .main-content { width: min(100% - 28px, 1000px); margin: 0 auto; padding-top: 18px; }
+    body:has(.student-sidebar) .main-content { width: 100%; margin: 0; padding-top: 18px; }
+    .page-header,
+    .layout-wrapper { width: min(calc(100% - 28px), 1000px); }
     .page-header { min-height: 225px; padding: 28px; }
     .page-header::before,
     .page-header::after { display: none; }
