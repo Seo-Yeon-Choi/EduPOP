@@ -77,6 +77,18 @@
     transform: translateY(-1px);
 }
 
+/* 공통 디자인 시스템 연결 */
+.login-main-container { background: var(--color-page); }
+.login-main-card { max-width: 480px; border-color: var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.login-main-header h1 { color: var(--color-title); }
+.login-description, .signup-divider { color: var(--color-muted); }
+.login-option-button, .kakao-login-button, .naver-login-button, .google-login-button, .signup-button { min-height: var(--button-height); height: var(--button-height); border-radius: var(--radius-sm); }
+.local-login-button { background: var(--color-coral); }
+.local-login-button:hover { background: var(--color-coral-hover); }
+.signup-button { border-color: var(--color-border); color: var(--color-title); }
+.signup-button:hover { background: var(--color-coral-soft); border-color: var(--color-coral); }
+.login-error-message { background: var(--color-danger-soft); color: var(--color-danger); border-radius: var(--radius-sm); }
+
 .login-option-button:focus-visible,
 .kakao-login-button:focus-visible,
 .naver-login-button:focus-visible,
@@ -316,3 +328,37 @@
 .kakao-login-text {
     line-height: 1;
 }
+
+/* 공통 디자인 시스템 보정 */
+.login-main-container {
+    min-height: calc(100vh - 64px);
+    padding: clamp(32px, 7vw, 76px) 20px;
+    background: var(--color-page);
+}
+
+.login-main-card {
+    width: min(100%, 480px);
+    padding: clamp(32px, 5vw, 48px);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    background: var(--color-surface);
+}
+
+.login-label { color: var(--color-coral); font-size: 13px; letter-spacing: .12em; }
+.login-main-header h1 { color: var(--color-title); font-size: clamp(24px, 3vw, 30px); }
+.login-description { color: var(--color-muted); }
+.login-option-button,
+.google-login-button,
+.kakao-login-button,
+.naver-login-button,
+.signup-button {
+    min-height: var(--button-height);
+    border-radius: var(--radius-sm);
+}
+.google-login-button:focus-visible,
+.kakao-login-button:focus-visible,
+.naver-login-button:focus-visible,
+.login-option-button:focus-visible { box-shadow: var(--focus-ring); }
+.signup-button { background: var(--color-coral); }
+.signup-button:hover { background: var(--color-coral-hover); }

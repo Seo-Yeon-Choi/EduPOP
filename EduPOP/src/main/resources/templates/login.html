@@ -16,7 +16,7 @@
 
 <main class="login-main-container">
 
-    <section class="login-main-card">
+    <section class="login-main-card ui-card">
 
         <div class="login-main-header">
             <p class="login-label">EDUPOP</p>
@@ -31,7 +31,7 @@
         <div class="login-option-area">
 
             <a href="/LocalLogin"
-               class="login-option-button local-login-button">
+               class="login-option-button local-login-button ui-button ui-button-primary">
 
                 <span class="button-icon">👤</span>
 
@@ -41,21 +41,21 @@
 
             </a>
 
-            <a href="/kakao/login" class="kakao-login-button">
+            <a href="/kakao/login" class="login-option-button kakao-login-button ui-button">
 
-                <span class="naver-login-logo"></span>
-                <span class="naver-login-text">카카오로 로그인</span>
+                <span class="kakao-login-logo" aria-hidden="true"></span>
+                <span class="kakao-login-text">카카오로 로그인</span>
 
             </a>
 
-            <a href="/naver/login" class="naver-login-button">
+            <a href="/naver/login" class="login-option-button naver-login-button ui-button">
 
                 <span class="naver-login-logo">N</span>
                 <span class="naver-login-text">네이버로 로그인</span>
 
             </a>
 
-            <a href="/google/login" class="google-login-button">
+            <a href="/google/login" class="login-option-button google-login-button ui-button">
 
                 <span class="google-login-logo">G</span>
                 <span class="google-login-text">구글로 로그인</span>
@@ -74,7 +74,7 @@
         </div>
 
         <a href="/signUp"
-           class="signup-button">
+           class="signup-button ui-button ui-button-secondary">
 
             일반 회원가입
 

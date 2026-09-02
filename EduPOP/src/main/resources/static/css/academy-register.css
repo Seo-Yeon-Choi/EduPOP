@@ -217,3 +217,15 @@ body {
         font-size: 24px;
     }
 }
+
+/* 공통 디자인 시스템 보정 */
+.academy-register-page { min-height: 100vh; background: var(--color-page); }
+.register-container { width: min(100%, 560px); border-color: var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.register-header h1 { color: var(--color-title); font-size: clamp(24px, 3vw, 30px); }
+.form-group label { color: var(--color-title); }
+.form-group input { height: var(--control-height); border-color: var(--color-border); border-radius: var(--radius-sm); }
+.form-group input:focus { border-color: var(--color-coral); box-shadow: var(--focus-ring); }
+.form-notice { background: var(--color-yellow-soft); border-color: #f3df9b; }
+.notice-icon { color: var(--color-warning); }
+.submit-btn { height: var(--button-height); border-radius: var(--radius-sm); background: var(--color-coral); }
+.submit-btn:hover { background: var(--color-coral-hover); }

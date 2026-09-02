@@ -350,3 +350,13 @@ input.readonly-input {
         width: 100%;
     }
 }
+
+/* 공통 디자인 시스템 보정 */
+.academy-container { background: var(--color-page); color: var(--color-text); }
+.academy-card, .delete-card { border-color: var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.academy-card h1, .academy-card h2, .delete-card h2 { color: var(--color-title); }
+.academy-form .form-group input, .academy-form .form-group textarea { min-height: var(--control-height); border-color: var(--color-border); border-radius: var(--radius-sm); }
+.academy-form .form-group input:focus, .academy-form .form-group textarea:focus { border-color: var(--color-coral); box-shadow: var(--focus-ring); }
+.update-button { background: var(--color-coral); border-color: var(--color-coral); border-radius: var(--radius-sm); }
+.update-button:hover { background: var(--color-coral-hover); }
+.delete-button { color: var(--color-danger); background: var(--color-danger-soft); border-color: #f2c4c4; border-radius: var(--radius-sm); }

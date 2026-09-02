@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/admin-main.css}">
+    <link rel="stylesheet" th:href="@{/css/pending.css}">
 </head>
 
 <body>
@@ -17,16 +18,17 @@
 <!--
 <div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
 -->
-<main class="admin-container">
+<main class="admin-container pending-container">
 
     <div class="admin-page-header">
+        <p class="pending-label">ADMIN SETUP</p>
         <h1>관리자 페이지</h1>
-        <p>학원 및 서비스 정보를 관리할 수 있습니다.</p>
+        <p>학원 등록을 완료하면 EduPOP 관리를 시작할 수 있습니다.</p>
     </div>
 
     <section class="admin-menu-grid">
 
-        <a href="/register-page" class="admin-menu-card">
+        <a th:href="@{/register-page}" class="admin-menu-card ui-card">
 
             <div class="menu-icon">
                 🏫
@@ -45,8 +47,8 @@
 
     </section>
 
-    <div class="logout-area">
-        <a href="/logout" class="logout-button">
+    <div class="logout-area account-buttons">
+        <a th:href="@{/logout}" class="logout-button">
             로그아웃
         </a>
     </div>

@@ -10,6 +10,21 @@
     box-sizing: border-box;
 }
 
+/* 공통 디자인 시스템 보정 */
+.admin-container { background: var(--color-page); color: var(--color-text); }
+.admin-page-header h1 { color: var(--color-title); font-size: clamp(24px, 3vw, 30px); }
+.admin-page-header p { color: var(--color-muted); }
+.admin-menu-card { border-color: var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.admin-menu-card:hover { border-color: var(--color-coral); background: var(--color-coral-soft); box-shadow: var(--shadow-card); }
+.menu-icon { background: var(--color-coral-soft); }
+.logout-area .logout-button { min-height: var(--button-height); border-radius: var(--radius-sm); background: var(--color-coral); border-color: var(--color-coral); }
+.logout-area .logout-button:hover { background: var(--color-coral-hover); }
+
+@media (max-width: 700px) {
+    .admin-container { margin-left: 0; padding: 88px 20px 32px; }
+    .admin-menu-grid { grid-template-columns: 1fr; }
+}
+
 
 /* 관리자 페이지 제목 */
 

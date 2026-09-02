@@ -38,7 +38,7 @@
 
     <section class="admin-dashboard">
 
-        <div class="dashboard-card">
+        <div class="dashboard-card ui-card">
             <div class="dashboard-icon">🏫</div>
 
             <div class="dashboard-content">
@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <div class="dashboard-card">
+        <div class="dashboard-card ui-card">
             <div class="dashboard-icon">👥</div>
 
             <div class="dashboard-content">
@@ -60,7 +60,7 @@
             </div>
         </div>
 
-        <div class="dashboard-card">
+        <div class="dashboard-card ui-card">
             <div class="dashboard-icon">📊</div>
 
             <div class="dashboard-content">
@@ -84,11 +84,11 @@
 
         <div class="account-buttons">
 
-            <a th:href="@{/logout}" class="logout-button">
+            <a th:href="@{/logout}" class="logout-button ui-button ui-button-primary">
                 로그아웃
             </a>
 
-            <a th:href="@{/account}" class="logout-button">
+            <a th:href="@{/account}" class="logout-button ui-button ui-button-secondary">
                 계정정보 조회
             </a>
 
@@ -96,7 +96,7 @@
                   method="post"
                   onsubmit="return confirm('정말 탈퇴하시겠습니까? 데이터는 1년간 안전하게 보관된 후 완전히 삭제됩니다.');">
 
-                <button type="submit" class="withdraw-button">
+                <button type="submit" class="withdraw-button ui-button ui-button-danger">
                     회원 탈퇴하기
                 </button>
 

@@ -223,6 +223,18 @@
     text-decoration: underline;
 }
 
+/* 공통 디자인 시스템 보정 */
+.signup-container { min-height: 100vh; padding: clamp(32px, 6vw, 72px) 20px; background: var(--color-page); }
+.signup-card { width: min(100%, 640px); padding: clamp(32px, 5vw, 48px); border-color: var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.signup-header h1 { color: var(--color-title); font-size: clamp(24px, 3vw, 30px); }
+.signup-header p, .login-area, .academy-search-guide { color: var(--color-muted); }
+.form-group label { color: var(--color-title); }
+.form-group input, .form-group select { min-height: var(--control-height); border-color: var(--color-border); border-radius: var(--radius-sm); }
+.form-group input:focus, .form-group select:focus { border-color: var(--color-coral); box-shadow: var(--focus-ring); }
+.signup-button { min-height: var(--button-height); border-radius: var(--radius-sm); background: var(--color-coral); }
+.signup-button:hover { background: var(--color-coral-hover); }
+.login-link { color: var(--color-coral-hover); }
+
 
 /* ==============================
    반응형

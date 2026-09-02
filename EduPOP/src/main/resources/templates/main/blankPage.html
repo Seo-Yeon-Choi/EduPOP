@@ -16,7 +16,7 @@
 
 <main class="pending-container">
 
-    <section class="pending-card">
+    <section class="pending-card ui-card">
 
         <div class="pending-icon">
             ⏳
@@ -56,7 +56,7 @@
 
         <div class="account-buttons">
 
-            <a href="/logout" class="logout-button">
+            <a th:href="@{/logout}" class="logout-button ui-button ui-button-primary">
                 로그아웃
             </a>
 
@@ -64,7 +64,7 @@
                   method="post"
                   onsubmit="return confirm('정말 탈퇴하시겠습니까? 데이터는 1년간 안전하게 보관된 후 완전히 삭제됩니다.');">
 
-                <button type="submit" class="withdraw-button">
+                <button type="submit" class="withdraw-button ui-button ui-button-danger">
                     회원 탈퇴하기
                 </button>
 

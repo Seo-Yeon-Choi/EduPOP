@@ -299,3 +299,14 @@
         width: 100%;
     }
 }
+
+/* 공통 디자인 시스템 보정 */
+.pending-container { min-height: calc(100vh - 64px); padding: clamp(32px, 7vw, 76px) 20px; background: var(--color-page); }
+.pending-card { max-width: 560px; padding: clamp(32px, 5vw, 48px); border-color: var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.pending-label { color: var(--color-warning); font-size: 12px; }
+.pending-card h1 { color: var(--color-title); font-size: clamp(24px, 3vw, 30px); }
+.pending-info { background: var(--color-yellow-soft); border-color: #f3df9b; }
+.status-badge { background: var(--color-yellow-soft); color: var(--color-warning); }
+.logout-button { min-height: var(--button-height); height: var(--button-height); border-radius: var(--radius-sm); background: var(--color-coral); border-color: var(--color-coral); }
+.logout-button:hover { background: var(--color-coral-hover); }
+.withdraw-button { min-height: var(--button-height); height: var(--button-height); border-radius: var(--radius-sm); color: var(--color-danger); border-color: #f2c4c4; background: var(--color-danger-soft); }

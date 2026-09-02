@@ -446,3 +446,11 @@
         font-size: 24px;
     }
 }
+
+/* 공통 디자인 시스템 보정 */
+.academy-select-container { min-height: 100vh; background: var(--color-page); }
+.academy-select-card { border-color: var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.academy-select-card input, .academy-select-card select { min-height: var(--control-height); border-color: var(--color-border); border-radius: var(--radius-sm); }
+.academy-select-card input:focus, .academy-select-card select:focus { border-color: var(--color-coral); box-shadow: var(--focus-ring); }
+.submit-button { min-height: var(--button-height); border-radius: var(--radius-sm); background: var(--color-coral); }
+.submit-button:hover { background: var(--color-coral-hover); }

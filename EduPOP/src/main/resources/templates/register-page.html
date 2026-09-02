@@ -18,7 +18,7 @@
 
 <main class="academy-register-page">
 
-    <div class="register-container">
+    <div class="register-container ui-card">
 
         <div class="register-header">
             <div class="register-icon">🏫</div>
@@ -118,7 +118,7 @@
             </div>
 
             <div th:if="${error}"
-                 class="error-message"
+                 class="error-message ui-alert ui-alert-error"
                  th:text="${error}">
             </div>
 
@@ -132,7 +132,7 @@
             </div>
 
             <button type="submit"
-                    class="submit-btn">
+                    class="submit-btn ui-button ui-button-primary">
                 학원 등록하기
             </button>
 
