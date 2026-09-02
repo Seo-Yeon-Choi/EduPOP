@@ -1,53 +1,122 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<!--
-    관리자 Sidebar
+<aside th:fragment="sidebar" class="admin-sidebar" aria-label="관리자 메뉴">
+    <a class="admin-brand" th:href="@{/main/adminMain}">
+        <span class="admin-brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2 2 7l10 5 10-5-10-5Z"></path>
+                <path d="m2 12 10 5 10-5"></path>
+                <path d="m2 17 10 5 10-5"></path>
+            </svg>
+        </span>
+        <span class="admin-brand-copy">
+            <strong>EduPOP</strong>
+            <small>관리자 운영 센터</small>
+        </span>
+    </a>
 
-    사용 방법
-    <div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
--->
-<aside th:fragment="sidebar" class="sidebar">
+    <nav class="admin-nav">
+        <section class="admin-nav-section" aria-labelledby="admin-nav-overview">
+            <p class="admin-nav-label" id="admin-nav-overview">Overview</p>
+            <a class="admin-nav-item" th:href="@{/main/adminMain}"
+               data-paths="/main/adminMain,/adminMain">
+                <span class="admin-nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="2"></rect>
+                        <rect x="14" y="3" width="7" height="7" rx="2"></rect>
+                        <rect x="3" y="14" width="7" height="7" rx="2"></rect>
+                        <rect x="14" y="14" width="7" height="7" rx="2"></rect>
+                    </svg>
+                </span>
+                <span class="admin-nav-text">대시보드</span>
+            </a>
+        </section>
 
-    <div class="sidebar-title">
-        관리자
-    </div>
+        <section class="admin-nav-section" aria-labelledby="admin-nav-management">
+            <p class="admin-nav-label" id="admin-nav-management">Management</p>
 
-    <nav class="sidebar-nav">
+            <a class="admin-nav-item" th:href="@{/admin/users}" data-paths="/admin/users">
+                <span class="admin-nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </span>
+                <span class="admin-nav-text">회원 관리</span>
+                <span class="admin-nav-badge" th:if="${pendingCount != null and pendingCount > 0}"
+                      th:text="${pendingCount}">0</span>
+            </a>
 
-        <!-- 대시보드 -->
-        <a th:href="@{/adminMain}"
-           class="nav-item">
-            <span class="nav-icon">⌂</span>
-            <span>대시보드</span>
-        </a>
+            <a class="admin-nav-item" th:href="@{/admin/academies}" data-paths="/admin/academies">
+                <span class="admin-nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"></path>
+                        <path d="M5 21V7l7-4 7 4v14"></path>
+                        <path d="M9 21v-6h6v6"></path>
+                        <path d="M9 9h.01"></path><path d="M15 9h.01"></path>
+                    </svg>
+                </span>
+                <span class="admin-nav-text">학원 관리</span>
+            </a>
 
-        <!-- 회원 관리 -->
-        <a th:href="@{/admin/users}"
-           class="nav-item">
-            <span class="nav-icon">♙</span>
-            <span>회원 관리</span>
-        </a>
+            <a class="admin-nav-item" th:href="@{/classroom/list}" data-paths="/classroom">
+                <span class="admin-nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                        <path d="M3 10h18"></path><path d="M9 20V10"></path>
+                    </svg>
+                </span>
+                <span class="admin-nav-text">학급 관리</span>
+            </a>
+        </section>
 
-        <!-- 학원 관리 -->
-        <a th:href="@{/admin/academies}"
-           class="nav-item">
-            <span class="nav-icon">▣</span>
-            <span>학원 관리</span>
-        </a>
-
-        <!-- 반 관리 -->
-        <a th:href="@{/classroom/list}"
-           class="nav-item">
-            <span class="nav-icon">▤</span>
-            <span>학급 관리</span>
-        </a>
-
+        <section class="admin-nav-section" aria-labelledby="admin-nav-account">
+            <p class="admin-nav-label" id="admin-nav-account">Account</p>
+            <a class="admin-nav-item" th:href="@{/account}" data-paths="/account">
+                <span class="admin-nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="4"></circle>
+                        <path d="M4 21a8 8 0 0 1 16 0"></path>
+                    </svg>
+                </span>
+                <span class="admin-nav-text">계정 정보</span>
+            </a>
+        </section>
     </nav>
 
+    <div class="admin-sidebar-user" th:if="${session.loginUser != null}">
+        <div class="admin-user-card">
+            <span class="admin-user-avatar"
+                  th:text="${#strings.substring(session.loginUser.name, 0, 1)}">관</span>
+            <span class="admin-user-meta">
+                <strong th:text="${session.loginUser.name}">관리자</strong>
+                <small th:text="${session.loginUser.email != null ? session.loginUser.email : 'EduPOP 관리자'}">
+                    EduPOP 관리자
+                </small>
+            </span>
+            <form class="admin-logout-form" th:action="@{/logout}" method="post">
+                <button class="admin-icon-button" type="submit" title="로그아웃" aria-label="로그아웃">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <path d="m16 17 5-5-5-5"></path><path d="M21 12H9"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script th:src="@{/js/admin-ui.js}" defer></script>
 </aside>
 
 </body>

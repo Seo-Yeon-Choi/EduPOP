@@ -5,307 +5,303 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
-    <title th:text="|EduPOP - ${classroom.name} 상세 관리|">EduPOP - 반 상세 관리</title>
-    <!-- 부트스트랩 5 & 아이콘 CDN -->
+    <title th:text="|EduPOP - ${classroom.name} 상세 관리|">EduPOP - 학급 상세 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- SweetAlert2 (위험 액션 Confirm 전용) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <!-- 공통 스타일 -->
     <link rel="stylesheet" th:href="@{/css/common.css}">
-    <link rel="stylesheet" th:href="@{/css/admin-classroom-detail.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
 </head>
-<body class="bg-light">
+<body class="admin-page admin-classroom-detail-page">
 
-<!-- 공통 상단 헤더 -->
-<div th:replace="~{layout/header}"></div>
+<div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
 
-<!-- 💡 [최신 트렌드] 논블로킹 토스트 알림 컨테이너 (우측 상단) -->
-<div class="toast-container position-fixed top-0 end-0 p-3 pt-5 mt-3">
-    <div id="actionToast" class="toast align-items-center text-bg-dark border-0 shadow rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body d-flex align-items-center gap-2">
-                <i id="toastIcon" class="bi bi-check-circle-fill text-success fs-5"></i>
-                <span id="toastMessage" class="fw-medium">성공적으로 반영되었습니다.</span>
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div class="toast admin-toast" id="actionToast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex align-items-center p-3">
+            <i id="toastIcon" class="bi bi-check-circle-fill text-success fs-5 me-2" aria-hidden="true"></i>
+            <span id="toastMessage" style="flex:1;font-size:12px;font-weight:700;">성공적으로 반영되었습니다.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="닫기"></button>
         </div>
     </div>
 </div>
 
-<div class="container-fluid p-0">
-    <div class="d-flex">
-        <!-- 관리자 사이드바 -->
-        <nav class="sidebar">
-            <div th:replace="~{layout/sidebar-admin}"></div>
-        </nav>
+<main class="admin-shell">
+    <div class="admin-content">
+        <a class="admin-back-link" th:href="@{/classroom/list}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m15 18-6-6 6-6"></path>
+            </svg>
+            학급 목록으로
+        </a>
 
-        <!-- 본문 컨텐츠 영역 -->
-        <main class="main-content flex-grow-1">
-            <!-- 페이지 상단 헤더 -->
-            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <h2 class="h3 fw-bold mb-0" th:text="${classroom.name}">수학 심화반</h2>
-                        <span th:if="${classroom.status != null and classroom.status.name() == 'ACTIVE'}"
-                              class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">운영중</span>
-                        <span th:if="${classroom.status != null and classroom.status.name() == 'CLOSED'}"
-                              class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">종강</span>
-                    </div>
-                    <p class="text-muted mb-0">반 기본 정보 수정, 강사진 배정 및 수강생 배정/전반 관리를 수행합니다.</p>
+        <header class="class-detail-heading">
+            <div>
+                <div class="class-detail-title-row">
+                    <h1 th:text="${classroom.name}">수학 심화반</h1>
+                    <span th:if="${classroom.status != null and classroom.status.name() == 'ACTIVE'}"
+                          class="admin-status admin-status-active">운영 중</span>
+                    <span th:if="${classroom.status != null and classroom.status.name() == 'CLOSED'}"
+                          class="admin-status admin-status-closed">종강</span>
                 </div>
-                <div class="d-flex gap-2">
-                    <a th:href="@{/classroom/list}" class="btn btn-outline-secondary btn-sm px-3 d-flex align-items-center">
-                        <i class="bi bi-arrow-left me-1"></i> 목록으로
-                    </a>
-                </div>
+                <p>학급의 기본 정보, 담당 강사, 수강 학생을 한곳에서 관리합니다.</p>
             </div>
+        </header>
 
-            <!-- 탭 내비게이션 -->
-            <ul class="nav nav-tabs mb-4 bg-white px-3 pt-2 rounded-3 border" id="classTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab">
-                        <i class="bi bi-sliders me-1"></i> 기본 정보 수정
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="teacher-tab" data-bs-toggle="tab" data-bs-target="#teacher" type="button" role="tab">
-                        <i class="bi bi-person-badge me-1"></i> 강사 배정 관리
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab">
-                        <i class="bi bi-people me-1"></i> 수강생 배정 / 전반 관리
-                    </button>
-                </li>
-            </ul>
+        <section class="class-summary-grid" aria-label="학급 구성 요약">
+            <article class="class-summary-card">
+                <span class="class-summary-icon class-summary-purple" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    </svg>
+                </span>
+                <span>
+                    <strong th:text="${#lists.size(classroom.students)}">0</strong>
+                    <span>수강 학생</span>
+                </span>
+            </article>
+            <article class="class-summary-card">
+                <span class="class-summary-icon class-summary-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path>
+                    </svg>
+                </span>
+                <span>
+                    <strong th:text="${#lists.size(classroom.teachers)}">0</strong>
+                    <span>담당 강사</span>
+                </span>
+            </article>
+            <article class="class-summary-card">
+                <span class="class-summary-icon class-summary-green" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path>
+                    </svg>
+                </span>
+                <span>
+                    <strong th:text="${classroom.targetGrade}">중1</strong>
+                    <span>대상 학년</span>
+                </span>
+            </article>
+        </section>
 
-            <!-- 탭 컨텐츠 영역 -->
-            <div class="tab-content" id="classTabContent">
+        <ul class="nav nav-tabs class-detail-tabs" id="classTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic"
+                        type="button" role="tab">기본 정보</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="teacher-tab" data-bs-toggle="tab" data-bs-target="#teacher"
+                        type="button" role="tab">담당 강사</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="student-tab" data-bs-toggle="tab" data-bs-target="#student"
+                        type="button" role="tab">수강 학생</button>
+            </li>
+        </ul>
 
-                <!-- 💡 [탭 1] 기본 정보 수정 -->
-                <div class="tab-pane fade show active" id="basic" role="tabpanel">
-                    <div class="card shadow-sm border-0 bg-white">
-                        <div class="card-body p-4">
-                            <form id="basicInfoForm" onsubmit="handleUpdateBasic(event)">
-                                <input type="hidden" id="classId" th:value="${classroom.classId}">
-
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">반 명칭 <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="className" th:value="${classroom.name}" required>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label fw-bold">대상 학년 <span class="text-danger">*</span></label>
-                                        <select class="form-select" id="targetGrade">
-                                            <option value="초등" th:selected="${classroom.targetGrade == '초등'}">초등</option>
-                                            <option value="중1" th:selected="${classroom.targetGrade == '중1'}">중1</option>
-                                            <option value="중2" th:selected="${classroom.targetGrade == '중2'}">중2</option>
-                                            <option value="중3" th:selected="${classroom.targetGrade == '중3'}">중3</option>
-                                            <option value="고1" th:selected="${classroom.targetGrade == '고1'}">고1</option>
-                                            <option value="고2" th:selected="${classroom.targetGrade == '고2'}">고2</option>
-                                            <option value="고3" th:selected="${classroom.targetGrade == '고3'}">고3</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label fw-bold">수강 정원 (명) <span class="text-danger">*</span></label>
-                                        <input type="number" class="form-control" id="maxStudents" th:value="${classroom.maxStudents}" min="1" max="100" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">운영 상태</label>
-                                        <select class="form-select" id="classStatus">
-                                            <option value="ACTIVE" th:selected="${classroom.status != null and classroom.status.name() == 'ACTIVE'}">운영중 (ACTIVE)</option>
-                                            <option value="CLOSED" th:selected="${classroom.status != null and classroom.status.name() == 'CLOSED'}">종강 (CLOSED)</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label fw-bold">반 설명 및 메모</label>
-                                        <textarea class="form-control" id="description" rows="4" th:text="${classroom.description}"></textarea>
-                                    </div>
-                                </div>
-
-                                <div class="text-end mt-4">
-                                    <button type="submit" class="btn btn-primary px-4">
-                                        <i class="bi bi-check-lg me-1"></i> 기본 정보 저장
-                                    </button>
-                                </div>
-                            </form>
+        <div class="tab-content" id="classTabContent">
+            <section class="tab-pane fade show active" id="basic" role="tabpanel">
+                <div class="class-detail-panel">
+                    <header class="assignment-header">
+                        <div>
+                            <h3>학급 기본 정보</h3>
+                            <p>반 이름, 학년, 정원과 운영 상태를 수정합니다.</p>
                         </div>
+                    </header>
+                    <form id="basicInfoForm" onsubmit="handleUpdateBasic(event)">
+                        <input type="hidden" id="classId" th:value="${classroom.classId}">
+                        <section class="admin-form-section">
+                            <div class="admin-form-grid">
+                                <div class="admin-form-field full-width">
+                                    <label for="className">반 이름 <span class="required-mark">*</span></label>
+                                    <input class="admin-input" id="className" type="text" th:value="${classroom.name}" required>
+                                </div>
+                                <div class="admin-form-field">
+                                    <label for="targetGrade">대상 학년 <span class="required-mark">*</span></label>
+                                    <select class="admin-select" id="targetGrade" style="width:100%;">
+                                        <option value="초등" th:selected="${classroom.targetGrade == '초등'}">초등</option>
+                                        <option value="중1" th:selected="${classroom.targetGrade == '중1'}">중1</option>
+                                        <option value="중2" th:selected="${classroom.targetGrade == '중2'}">중2</option>
+                                        <option value="중3" th:selected="${classroom.targetGrade == '중3'}">중3</option>
+                                        <option value="고1" th:selected="${classroom.targetGrade == '고1'}">고1</option>
+                                        <option value="고2" th:selected="${classroom.targetGrade == '고2'}">고2</option>
+                                        <option value="고3" th:selected="${classroom.targetGrade == '고3'}">고3</option>
+                                    </select>
+                                </div>
+                                <div class="admin-form-field">
+                                    <label for="maxStudents">수강 정원 <span class="required-mark">*</span></label>
+                                    <input class="admin-input" id="maxStudents" type="number" th:value="${classroom.maxStudents}"
+                                           min="1" max="100" required>
+                                </div>
+                                <div class="admin-form-field">
+                                    <label for="classStatus">운영 상태</label>
+                                    <select class="admin-select" id="classStatus" style="width:100%;">
+                                        <option value="ACTIVE"
+                                                th:selected="${classroom.status != null and classroom.status.name() == 'ACTIVE'}">운영 중</option>
+                                        <option value="CLOSED"
+                                                th:selected="${classroom.status != null and classroom.status.name() == 'CLOSED'}">종강</option>
+                                    </select>
+                                </div>
+                                <div class="admin-form-field full-width">
+                                    <label for="description">학급 설명과 메모</label>
+                                    <textarea class="admin-textarea" id="description" th:text="${classroom.description}"></textarea>
+                                </div>
+                            </div>
+                        </section>
+                        <div class="admin-form-actions">
+                            <button class="ui-button ui-button-primary" type="submit">기본 정보 저장</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="tab-pane fade" id="teacher" role="tabpanel">
+                <div class="class-detail-panel">
+                    <header class="assignment-header">
+                        <div>
+                            <h3>담당 강사</h3>
+                            <p>현재 학급에 배정된 담임과 부담임을 관리합니다.</p>
+                        </div>
+                        <button class="ui-button ui-button-primary ui-button-small" type="button"
+                                data-bs-toggle="modal" data-bs-target="#assignTeacherModal">강사 추가 배정</button>
+                    </header>
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center align-middle">
+                            <thead>
+                            <tr><th>강사 ID</th><th>강사명</th><th>역할</th><th>관리</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(classroom.teachers)}">
+                                <td colspan="4" class="admin-empty-state">현재 배정된 강사가 없습니다.</td>
+                            </tr>
+                            <tr th:each="teacher : ${classroom.teachers}">
+                                <td th:text="${teacher.teacherId}">1</td>
+                                <td style="font-weight:750;color:var(--admin-text);" th:text="${teacher.name}">홍길동</td>
+                                <td>
+                                    <span th:if="${teacher.roleType == 'MAIN'}" class="admin-role-badge admin-role-teacher">대표 담임</span>
+                                    <span th:if="${teacher.roleType == 'SUB'}" class="admin-grade-badge">부담임</span>
+                                </td>
+                                <td>
+                                    <button class="ui-button ui-button-danger-outline ui-button-small" type="button"
+                                            th:onclick="|handleRemoveTeacher(this, ${teacher.teacherId})|">배정 해제</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </section>
 
-                <!-- 💡 [탭 2] 강사 배정 관리 -->
-                <div class="tab-pane fade" id="teacher" role="tabpanel">
-                    <div class="card shadow-sm border-0 bg-white">
-                        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-                            <h5 class="card-title fw-bold mb-0">배정된 강사진</h5>
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#assignTeacherModal">
-                                <i class="bi bi-plus-circle me-1"></i> 강사 추가 배정
-                            </button>
+            <section class="tab-pane fade" id="student" role="tabpanel">
+                <div class="class-detail-panel">
+                    <header class="assignment-header">
+                        <div>
+                            <h3>수강 학생 배정</h3>
+                            <p>왼쪽의 학생을 선택해 현재 반 명단으로 이동한 뒤 저장하세요.</p>
                         </div>
-                        <div class="card-body p-0">
-                            <table class="table table-hover mb-0 text-center">
-                                <thead class="table-light">
-                                <tr>
-                                    <th>강사 ID</th>
-                                    <th>강사명</th>
-                                    <th>역할 구분</th>
-                                    <th>관리</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:if="${#lists.isEmpty(classroom.teachers)}">
-                                    <td colspan="4" class="py-4 text-muted">현재 배정된 강사가 없습니다.</td>
-                                </tr>
-                                <tr th:each="teacher : ${classroom.teachers}">
-                                    <td th:text="${teacher.teacherId}">1</td>
-                                    <td class="fw-bold" th:text="${teacher.name}">홍길동</td>
-                                    <td>
-                                        <span th:if="${teacher.roleType == 'MAIN'}" class="badge bg-danger-subtle text-danger border px-2 py-1">
-                                            <i class="bi bi-star-fill me-1"></i>대표 담임
-                                        </span>
-                                        <span th:if="${teacher.roleType == 'SUB'}" class="badge bg-info-subtle text-info border px-2 py-1">부담임</span>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-danger" th:onclick="|handleRemoveTeacher(this, ${teacher.teacherId})|">
-                                            배정 해제
-                                        </button>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <span class="assignment-count">
+                            현재 <span id="currentCount" th:text="${#lists.size(classroom.students)}">0</span> /
+                            <span id="maxCapacityText" th:text="${classroom.maxStudents}">30</span>명
+                        </span>
+                    </header>
+
+                    <div class="student-assignment-grid">
+                        <section class="student-list-panel">
+                            <div class="student-list-toolbar">
+                                <div class="student-list-toolbar-top">
+                                    <label for="checkAllLeft">배정 가능한 학생</label>
+                                    <input class="admin-checkbox" id="checkAllLeft" type="checkbox"
+                                           onchange="toggleCheckAll('leftList', this.checked)">
+                                </div>
+                                <input class="admin-input" type="search" placeholder="이름 검색"
+                                       oninput="filterCheckList('leftList', this.value)">
+                            </div>
+                            <div class="student-check-list" id="leftList">
+                                <label class="student-item" th:each="std : ${studentPool}"
+                                       th:attr="data-student-id=${std.studentId},
+                                                data-current-class=${std.currentClassName != null ? std.currentClassName : 'NONE'},
+                                                data-display-label=${std.displayLabel}">
+                                    <input class="admin-checkbox" type="checkbox" th:value="${std.studentId}">
+                                    <span th:text="${std.displayLabel}">[중1] 김민수 (0001 | 미배정)</span>
+                                </label>
+                            </div>
+                        </section>
+
+                        <div class="assignment-move-buttons">
+                            <button class="ui-button ui-button-secondary ui-button-small" type="button" onclick="moveToRight()">배정 ›</button>
+                            <button class="ui-button ui-button-primary ui-button-small" type="button" onclick="moveAllToRight()">전체 ››</button>
+                            <button class="ui-button ui-button-secondary ui-button-small" type="button" onclick="moveToLeft()">‹ 제외</button>
+                            <button class="ui-button ui-button-danger-outline ui-button-small" type="button" onclick="moveAllToLeft()">‹‹ 전체</button>
                         </div>
+
+                        <section class="student-list-panel">
+                            <div class="student-list-toolbar">
+                                <div class="student-list-toolbar-top">
+                                    <label for="checkAllRight" style="color:var(--admin-primary);">현재 반 학생</label>
+                                    <input class="admin-checkbox" id="checkAllRight" type="checkbox"
+                                           onchange="toggleCheckAll('rightList', this.checked)">
+                                </div>
+                                <input class="admin-input" type="search" placeholder="이름 검색"
+                                       oninput="filterCheckList('rightList', this.value)">
+                            </div>
+                            <div class="student-check-list" id="rightList">
+                                <label class="student-item" th:each="std : ${classroom.students}"
+                                       th:attr="data-student-id=${std.studentId},
+                                                data-current-class=${classroom.name},
+                                                data-display-label=${std.displayLabel}">
+                                    <input class="admin-checkbox" type="checkbox" th:value="${std.studentId}">
+                                    <span th:text="${std.displayLabel}">[중3] 고유나 (0024)</span>
+                                </label>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="assignment-footer">
+                        <button class="ui-button ui-button-primary" type="button" onclick="saveClassroomStudents()">
+                            학생 배정 저장
+                        </button>
                     </div>
                 </div>
-
-                <!-- 💡 [탭 3] 체크박스 기반 수강생 배정 / 전반 관리 -->
-                <div class="tab-pane fade" id="student" role="tabpanel">
-                    <div class="card shadow-sm border-0 bg-white p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <h5 class="fw-bold mb-1">수강생 배정 / 전반 관리</h5>
-                                <p class="text-muted small mb-0">학생 체크박스를 선택한 후 [배정] 또는 [제외] 버튼을 눌러 이동하세요.</p>
-                            </div>
-                            <span class="badge bg-primary fs-6 px-3 py-2">
-                                현재 수강 인원: <span id="currentCount" th:text="${#lists.size(classroom.students)}">0</span> / <span id="maxCapacityText" th:text="${classroom.maxStudents}">30</span>명
-                            </span>
-                        </div>
-
-                        <!-- 체크박스 리스트 레이아웃 -->
-                        <div class="row align-items-center g-3">
-                            <!-- 좌측: 학원 전체 학생 풀 -->
-                            <div class="col-md-5">
-                                <div class="card border rounded-3 overflow-hidden">
-                                    <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
-                                        <div class="form-check mb-0">
-                                            <input class="form-check-input" type="checkbox" id="checkAllLeft" onchange="toggleCheckAll('leftList', this.checked)">
-                                            <label class="form-check-label fw-semibold" for="checkAllLeft">전체 학생 풀</label>
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm w-50" placeholder="이름 검색..." onkeyup="filterCheckList('leftList', this.value)">
-                                    </div>
-                                    <div class="list-group list-group-flush student-check-list" id="leftList">
-                                        <label class="list-group-item student-item d-flex align-items-center gap-2 py-2"
-                                               th:each="std : ${studentPool}"
-                                               th:attr="data-student-id=${std.studentId}, data-current-class=${std.currentClassName != null ? std.currentClassName : 'NONE'}, data-display-label=${std.displayLabel}">
-                                            <input class="form-check-input flex-shrink-0" type="checkbox" th:value="${std.studentId}">
-                                            <span class="small" th:text="${std.displayLabel}">[중1] 김민수 (0001 | 미배정)</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 중앙: 이동 버튼부 -->
-                            <div class="col-md-2 d-flex flex-column align-items-center justify-content-center gap-2">
-                                <button type="button" class="btn btn-outline-primary btn-sm w-75 fw-bold py-1 shadow-sm" onclick="moveToRight()" title="선택 배정">
-                                    배정 <i class="bi bi-chevron-right"></i>
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm w-75 fw-bold py-1 shadow-sm" onclick="moveAllToRight()" title="전체 배정">
-                                    전체 <i class="bi bi-chevron-double-right"></i>
-                                </button>
-
-                                <hr class="w-75 my-1 text-muted">
-
-                                <button type="button" class="btn btn-outline-danger btn-sm w-75 fw-bold py-1 shadow-sm" onclick="moveToLeft()" title="선택 제외">
-                                    <i class="bi bi-chevron-left"></i> 제외
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm w-75 fw-bold py-1 shadow-sm" onclick="moveAllToLeft()" title="전체 제외">
-                                    <i class="bi bi-chevron-double-left"></i> 전체
-                                </button>
-                            </div>
-
-                            <!-- 우측: 현재 반 배정 명단 -->
-                            <div class="col-md-5">
-                                <div class="card border rounded-3 overflow-hidden">
-                                    <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
-                                        <div class="form-check mb-0">
-                                            <input class="form-check-input" type="checkbox" id="checkAllRight" onchange="toggleCheckAll('rightList', this.checked)">
-                                            <label class="form-check-label fw-semibold text-primary" for="checkAllRight">현재 반 배정 명단</label>
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm w-50" placeholder="이름 검색..." onkeyup="filterCheckList('rightList', this.value)">
-                                    </div>
-                                    <div class="list-group list-group-flush student-check-list" id="rightList">
-                                        <label class="list-group-item student-item d-flex align-items-center gap-2 py-2"
-                                               th:each="std : ${classroom.students}"
-                                               th:attr="data-student-id=${std.studentId}, data-current-class=${classroom.name}, data-display-label=${std.displayLabel}">
-                                            <input class="form-check-input flex-shrink-0" type="checkbox" th:value="${std.studentId}">
-
-                                            <!-- 💡 [수정] std.name 대신 std.displayLabel 로 출력 -->
-                                            <span class="small fw-semibold" th:text="${std.displayLabel}">[중3] 고유나 (0024)</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 최종 저장 버튼 -->
-                        <div class="text-end mt-4">
-                            <button type="button" class="btn btn-primary px-4 shadow-sm" onclick="saveClassroomStudents()">
-                                <i class="bi bi-save me-1"></i> 수강생 배정 상태 최종 저장
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </main>
+            </section>
+        </div>
     </div>
-</div>
+</main>
 
-<!-- 💡 강사 추가 배정 모달 -->
 <div class="modal fade" id="assignTeacherModal" tabindex="-1" aria-labelledby="assignTeacherModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow rounded-4">
-            <div class="modal-header border-bottom">
-                <h5 class="modal-title fw-bold" id="assignTeacherModalLabel">
-                    <i class="bi bi-person-plus text-primary me-2"></i>강사 추가 배정
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title" id="assignTeacherModalLabel">강사 추가 배정</h2>
+                    <p style="margin:4px 0 0;color:var(--admin-text-muted);font-size:11px;">강사와 학급 내 역할을 선택해주세요.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
             </div>
             <div class="modal-body p-4">
                 <form id="assignTeacherForm" onsubmit="submitTeacherAssign(event)">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">담당 강사 선택 <span class="text-danger">*</span></label>
-                        <select class="form-select" id="modalTeacherId" required>
-                            <option value="" selected disabled>강사를 선택해 주세요</option>
-                            <option th:each="teacher : ${teacherList}"
-                                    th:value="${teacher.teacherId}"
-                                    th:text="${teacher.name}">
-                                홍길동
-                            </option>
+                    <div class="admin-form-field" style="margin-bottom:15px;">
+                        <label for="modalTeacherId">담당 강사 <span class="required-mark">*</span></label>
+                        <select class="admin-select" id="modalTeacherId" style="width:100%;" required>
+                            <option value="" selected disabled>강사를 선택해주세요</option>
+                            <option th:each="teacher : ${teacherList}" th:value="${teacher.teacherId}"
+                                    th:text="${teacher.name}">홍길동</option>
                         </select>
                     </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">역할 구분 <span class="text-danger">*</span></label>
-                        <select class="form-select" id="modalRoleType">
-                            <option value="SUB">부담임 (SUB)</option>
-                            <option value="MAIN">대표 담임 (MAIN)</option>
+                    <div class="admin-form-field">
+                        <label for="modalRoleType">역할 <span class="required-mark">*</span></label>
+                        <select class="admin-select" id="modalRoleType" style="width:100%;">
+                            <option value="SUB">부담임</option>
+                            <option value="MAIN">대표 담임</option>
                         </select>
                     </div>
-
-                    <div class="modal-footer border-top px-0 pb-0 mt-4">
-                        <button type="button" class="btn btn-light btn-sm px-3 border rounded-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-primary btn-sm px-3 rounded-2">배정하기</button>
+                    <div class="modal-footer px-0 pb-0 mt-4">
+                        <button class="ui-button ui-button-outline" type="button" data-bs-dismiss="modal">취소</button>
+                        <button class="ui-button ui-button-primary" type="submit">배정하기</button>
                     </div>
                 </form>
             </div>
@@ -313,13 +309,8 @@
     </div>
 </div>
 
-<!-- 공통 푸터 -->
-<div th:replace="~{layout/footer}"></div>
-
-<!-- 스크립트 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
     const csrfToken = document.querySelector('meta[name="_csrf"]').content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;

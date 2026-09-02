@@ -6,8 +6,9 @@
     <title>EduPOP - 계정 정보</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/account.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
 </head>
-<body>
+<body th:classappend="${accountUser.role.name() == 'ADMIN'} ? ' admin-page account-admin-page' : ''">
 
 <div th:replace="~{layout/header :: header}"></div>
 
@@ -98,3 +99,4 @@
 
 </body>
 </html>
+

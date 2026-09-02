@@ -156,7 +156,8 @@ public class AuthController {
             } else if (latestUser.getRole() == UserRole.TEACHER) {
                 return "/main/teacherMain";
             } else if (latestUser.getRole() == UserRole.ADMIN) {
-                return "main/adminMain";
+                // 대시보드 통계 모델을 구성하는 관리자 컨트롤러를 거치도록 이동합니다.
+                return "redirect:/main/adminMain";
             }
         }
 

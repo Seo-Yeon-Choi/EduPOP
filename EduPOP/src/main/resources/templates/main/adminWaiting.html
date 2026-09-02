@@ -1,56 +1,59 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>EduPOP - 관리자</title>
-
+    <title>EduPOP - 관리자 시작하기</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
-    <link rel="stylesheet" th:href="@{/css/admin-main.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
 </head>
+<body class="admin-onboarding">
 
-<body>
-
-<div th:replace="~{layout/header :: header}"></div>
-
-<!--
-<div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
--->
-<main class="admin-container">
-
-    <div class="admin-page-header">
-        <h1>관리자 페이지</h1>
-        <p>학원 및 서비스 정보를 관리할 수 있습니다.</p>
+<main class="admin-onboarding-shell" style="max-width:700px;padding-top:8vh;">
+    <div class="onboarding-brand">
+        <span class="admin-brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2 2 7l10 5 10-5-10-5Z"></path><path d="m2 12 10 5 10-5"></path>
+            </svg>
+        </span>
+        EduPOP 관리자
     </div>
 
-    <section class="admin-menu-grid">
+    <section class="onboarding-card">
+        <header class="onboarding-card-header">
+            <div>
+                <span class="admin-eyebrow">Welcome to EduPOP</span>
+                <h1 th:text="|${session.loginUser.name}님, 학원 등록을 시작할까요?|">관리자님, 학원 등록을 시작할까요?</h1>
+                <p>관리자 운영 센터를 사용하려면 먼저 운영 중인 학원의 정보를 등록해야 합니다.</p>
+            </div>
+            <span class="onboarding-header-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path>
+                </svg>
+            </span>
+        </header>
 
-        <a href="/register-page" class="admin-menu-card">
-
-            <div class="menu-icon">
-                🏫
+        <div style="padding:26px 28px 28px;">
+            <div class="setup-review-list" style="margin-bottom:22px;">
+                <div class="setup-review-item"><span>1단계</span><strong>학원 기본 정보 입력</strong></div>
+                <div class="setup-review-item"><span>2단계</span><strong>사업자등록정보 확인</strong></div>
+                <div class="setup-review-item"><span>3단계</span><strong>관리자 운영 센터 시작</strong></div>
             </div>
 
-            <div class="menu-content">
-                <h2>학원 등록</h2>
-                <p>
-                    새로운 학원 정보를 등록하고 관리합니다.
-                </p>
+            <div class="onboarding-note">
+                사업자등록번호, 대표자명, 개업일자를 기준으로 국세청 진위확인을 진행합니다. 사업자등록증을 준비해주세요.
             </div>
 
-            <span class="menu-arrow">›</span>
-
-        </a>
-
+            <a class="ui-button ui-button-primary" th:href="@{/register-page}" style="width:100%;min-height:46px;">
+                학원 등록 시작하기
+            </a>
+            <form th:action="@{/logout}" method="post" style="margin-top:10px;">
+                <button class="ui-button ui-button-outline" type="submit" style="width:100%;">로그아웃</button>
+            </form>
+        </div>
     </section>
-
-    <div class="logout-area">
-        <a href="/logout" class="logout-button">
-            로그아웃
-        </a>
-    </div>
-
 </main>
 
 </body>

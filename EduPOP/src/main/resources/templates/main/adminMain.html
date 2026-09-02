@@ -1,116 +1,188 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>EduPOP - 관리자 메인</title>
-
+    <title>EduPOP - 관리자 대시보드</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
-    <link rel="stylesheet" th:href="@{/css/admin-home.css}">
-
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
 </head>
-
-<body>
-
-<div th:replace="~{layout/header :: header}"></div>
+<body class="admin-page admin-dashboard-page">
 
 <div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
 
-<main class="admin-home-container">
-
-    <section class="admin-welcome">
-
-        <div>
-            <p class="admin-user"
-               th:text="${session.loginUser.name} + '님의 관리자 페이지'">
-                관리자님의 관리자 페이지
-            </p>
-
-            <h1>관리자 메인 페이지에 오신 것을 환영합니다!</h1>
-
-            <p class="admin-description">
-                EduPOP의 학원 및 사용자 정보를 관리할 수 있습니다.
-            </p>
-        </div>
-
-    </section>
-
-    <section class="admin-dashboard">
-
-        <div class="dashboard-card">
-            <div class="dashboard-icon">🏫</div>
-
-            <div class="dashboard-content">
-                <h2>학원 관리</h2>
-                <p>
-                    등록된 학원 정보를 확인하고 관리할 수 있습니다.
-                </p>
+<main class="admin-shell">
+    <div class="admin-content">
+        <header class="admin-page-header">
+            <div>
+                <span class="admin-eyebrow">Admin Control Center</span>
+                <h1 th:text="|${session.loginUser.name}님, 오늘도 반가워요|">관리자님, 오늘도 반가워요</h1>
+                <p>EduPOP 운영 상태와 확인이 필요한 항목을 한눈에 살펴보세요.</p>
             </div>
-        </div>
-
-        <div class="dashboard-card">
-            <div class="dashboard-icon">👥</div>
-
-            <div class="dashboard-content">
-                <h2>사용자 관리</h2>
-                <p>
-                    학생과 교사 등 사용자 정보를 관리합니다.
-                </p>
+            <div class="admin-header-actions">
+                <a class="ui-button ui-button-primary" th:href="@{/classroom/create}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    새 학급 만들기
+                </a>
             </div>
-        </div>
+        </header>
 
-        <div class="dashboard-card">
-            <div class="dashboard-icon">📊</div>
+        <section class="dashboard-kpi-grid" aria-label="운영 현황 요약">
+            <article class="dashboard-kpi dashboard-kpi-primary">
+                <div class="dashboard-kpi-label">전체 회원</div>
+                <div class="dashboard-kpi-value" th:text="${totalUsers != null ? totalUsers : 0}">0</div>
+                <div class="dashboard-kpi-note">현재 학원에 등록된 사용자</div>
+                <div class="dashboard-kpi-split">
+                    <div>
+                        <span>학생</span>
+                        <strong th:text="${studentCount != null ? studentCount : 0}">0</strong>
+                    </div>
+                    <div>
+                        <span>교사</span>
+                        <strong th:text="${teacherCount != null ? teacherCount : 0}">0</strong>
+                    </div>
+                </div>
+            </article>
 
-            <div class="dashboard-content">
-                <h2>서비스 현황</h2>
-                <p>
-                    학원 및 사용자 현황을 확인할 수 있습니다.
-                </p>
+            <article class="dashboard-kpi">
+                <div class="dashboard-kpi-label" style="color: var(--admin-yellow);">승인 대기</div>
+                <div class="dashboard-kpi-value" th:text="${pendingCount != null ? pendingCount : 0}">0</div>
+                <div class="dashboard-kpi-note">가입 승인을 기다리는 회원</div>
+                <a class="dashboard-kpi-link" th:href="@{/admin/users(status='PENDING')}">바로 확인하기 →</a>
+            </article>
+
+            <article class="dashboard-kpi">
+                <div class="dashboard-kpi-label" style="color: var(--admin-blue);">전체 학급</div>
+                <div class="dashboard-kpi-value" th:text="${totalClasses != null ? totalClasses : 0}">0</div>
+                <div class="dashboard-kpi-note">등록된 운영·종강 학급</div>
+                <a class="dashboard-kpi-link" th:href="@{/classroom/list}">학급 살펴보기 →</a>
+            </article>
+
+            <article class="dashboard-kpi">
+                <div class="dashboard-kpi-label" style="color: var(--admin-green);">운영 학원</div>
+                <div class="dashboard-kpi-value">1</div>
+                <div class="dashboard-kpi-note" th:text="${academy != null ? academy.name : '등록된 학원'}">등록된 학원</div>
+                <a class="dashboard-kpi-link" th:href="@{/admin/academies}">학원 정보 보기 →</a>
+            </article>
+        </section>
+
+        <section class="dashboard-main-grid">
+            <div class="dashboard-stack">
+                <article class="admin-panel">
+                    <header class="admin-panel-header">
+                        <div class="attention-title">
+                            <span class="attention-icon" aria-hidden="true">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.3 2.9 1.8 17a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 2.9a2 2 0 0 0-3.4 0Z"></path>
+                                    <path d="M12 9v4"></path><path d="M12 17h.01"></path>
+                                </svg>
+                            </span>
+                            <h2>확인이 필요해요</h2>
+                        </div>
+                    </header>
+                    <div class="attention-list">
+                        <a class="attention-item" th:href="@{/admin/users(status='PENDING')}">
+                            <span class="attention-copy">
+                                <strong>승인 대기 회원</strong>
+                                <span>신규 가입자의 계정 상태를 확인해주세요.</span>
+                            </span>
+                            <span class="attention-count" th:text="|${pendingCount != null ? pendingCount : 0}명|">0명</span>
+                        </a>
+                        <a class="attention-item" th:href="@{/admin/users(status='INACTIVE')}">
+                            <span class="attention-copy">
+                                <strong>비활성 계정</strong>
+                                <span>사용이 중지된 계정을 검토할 수 있어요.</span>
+                            </span>
+                            <span class="attention-count" style="background:#f0ede8;color:#78746e;"
+                                  th:text="|${inactiveCount != null ? inactiveCount : 0}명|">0명</span>
+                        </a>
+                        <a class="attention-item" th:href="@{/classroom/list}">
+                            <span class="attention-copy">
+                                <strong>학급 운영 상태</strong>
+                                <span>담임 배정과 종강 여부를 점검해주세요.</span>
+                            </span>
+                            <span aria-hidden="true" style="color:var(--admin-text-muted);">›</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="admin-panel">
+                    <header class="admin-panel-header">
+                        <div>
+                            <h2>빠른 작업</h2>
+                            <p>자주 사용하는 관리 기능으로 바로 이동합니다.</p>
+                        </div>
+                    </header>
+                    <div class="quick-action-list">
+                        <a class="quick-action-item" th:href="@{/admin/users}">
+                            <span class="quick-action-copy">
+                                <strong>회원 상태 관리</strong>
+                                <span>승인·활성·비활성 상태를 변경합니다.</span>
+                            </span>
+                            <span aria-hidden="true">›</span>
+                        </a>
+                        <a class="quick-action-item" th:href="@{/account}">
+                            <span class="quick-action-copy">
+                                <strong>내 계정 정보</strong>
+                                <span>관리자 개인정보와 로그인 정보를 확인합니다.</span>
+                            </span>
+                            <span aria-hidden="true">›</span>
+                        </a>
+                    </div>
+                </article>
             </div>
-        </div>
 
-    </section>
+            <div class="dashboard-stack">
+                <article class="admin-panel academy-overview-card">
+                    <div>
+                        <span class="admin-eyebrow">Academy Overview</span>
+                        <h3 th:text="${academy != null ? academy.name : '학원 정보'}">학원 정보</h3>
+                        <p th:text="${academy != null ? academy.address : '학원 주소를 확인해주세요.'}">
+                            학원 주소를 확인해주세요.
+                        </p>
+                        <div class="admin-button-row" style="margin-top:18px;">
+                            <span class="admin-status admin-status-active">운영 중</span>
+                            <a class="admin-inline-link" th:href="@{/admin/academies}">정보 수정하기 →</a>
+                        </div>
+                    </div>
+                    <span class="academy-overview-mark" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path>
+                            <path d="M9 21v-6h6v6"></path><path d="M9 9h.01"></path><path d="M15 9h.01"></path>
+                        </svg>
+                    </span>
+                </article>
 
-    <section class="account-area">
-
-        <div class="account-header">
-            <h2>계정 관리</h2>
-            <p>
-                계정 정보를 확인하거나 로그아웃 및 회원 탈퇴를 할 수 있습니다.
-            </p>
-        </div>
-
-        <div class="account-buttons">
-
-            <a th:href="@{/logout}" class="logout-button">
-                로그아웃
-            </a>
-
-            <a th:href="@{/account}" class="logout-button">
-                계정정보 조회
-            </a>
-
-            <form th:action="@{/user/withdraw}"
-                  method="post"
-                  onsubmit="return confirm('정말 탈퇴하시겠습니까? 데이터는 1년간 안전하게 보관된 후 완전히 삭제됩니다.');">
-
-                <button type="submit" class="withdraw-button">
-                    회원 탈퇴하기
-                </button>
-
-            </form>
-
-        </div>
-
-        <p class="withdraw-warning">
-            회원 탈퇴 시 계정 사용이 중지되며,
-            관련 데이터는 정책에 따라 보관 후 삭제됩니다.
-        </p>
-
-    </section>
-
+                <article class="admin-panel">
+                    <header class="admin-panel-header">
+                        <div>
+                            <h2>서비스 구성</h2>
+                            <p>EduPOP을 이루는 주요 운영 영역입니다.</p>
+                        </div>
+                    </header>
+                    <div class="admin-panel-body" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+                        <a th:href="@{/admin/users}" style="padding:18px;border-radius:14px;background:var(--admin-purple-soft);">
+                            <strong style="display:block;color:var(--admin-purple);font-size:14px;">회원</strong>
+                            <span style="display:block;margin-top:5px;color:var(--admin-text-muted);font-size:11px;">학생과 교사 관리</span>
+                        </a>
+                        <a th:href="@{/classroom/list}" style="padding:18px;border-radius:14px;background:var(--admin-blue-soft);">
+                            <strong style="display:block;color:var(--admin-blue);font-size:14px;">학급</strong>
+                            <span style="display:block;margin-top:5px;color:var(--admin-text-muted);font-size:11px;">운영 반 구성 관리</span>
+                        </a>
+                        <a th:href="@{/admin/academies}" style="padding:18px;border-radius:14px;background:var(--admin-green-soft);">
+                            <strong style="display:block;color:var(--admin-green);font-size:14px;">학원</strong>
+                            <span style="display:block;margin-top:5px;color:var(--admin-text-muted);font-size:11px;">기본 정보 관리</span>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
 </main>
 
 </body>

@@ -1,134 +1,140 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>EduPOP - 학원 관리</title>
-
     <link rel="stylesheet" th:href="@{/css/common.css}">
-    <link rel="stylesheet" th:href="@{/css/admin-academy.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
 </head>
-
-<body>
-
-<div th:replace="~{layout/header :: header}"></div>
+<body class="admin-page admin-academy-page">
 
 <div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
 
-<main class="academy-container">
+<main class="admin-shell">
+    <div class="admin-content">
+        <header class="admin-page-header">
+            <div>
+                <span class="admin-eyebrow">Academy Management</span>
+                <h1>학원 관리</h1>
+                <p>학원의 기본 정보와 운영에 필요한 연락처를 확인하고 수정합니다.</p>
+            </div>
+        </header>
 
-    <div class="academy-page-header">
-        <h1>학원 정보 관리</h1>
-        <p>등록된 학원 정보를 수정하거나 삭제할 수 있습니다.</p>
+        <div class="academy-management-grid">
+            <aside class="admin-panel academy-summary">
+                <span class="academy-summary-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path>
+                        <path d="M9 21v-6h6v6"></path><path d="M9 9h.01"></path><path d="M15 9h.01"></path>
+                    </svg>
+                </span>
+                <h2 th:text="${academy.name}">EduPOP 학원</h2>
+                <p class="academy-summary-address" th:text="${academy.address}">서울시 관악구 봉천로</p>
+                <span class="admin-status admin-status-active">운영 중</span>
+
+                <dl class="academy-summary-list">
+                    <div>
+                        <dt>대표 연락처</dt>
+                        <dd th:text="${academy.phone}">02-0000-0000</dd>
+                    </div>
+                    <div>
+                        <dt>사업자번호</dt>
+                        <dd th:text="${academy.businessNumber}">000-00-00000</dd>
+                    </div>
+                    <div>
+                        <dt>관리자</dt>
+                        <dd th:text="${session.loginUser.name}">관리자</dd>
+                    </div>
+                </dl>
+
+                <a class="ui-button ui-button-secondary" th:href="@{/classroom/list}" style="width:100%;margin-top:22px;">
+                    운영 학급 보기
+                </a>
+            </aside>
+
+            <div>
+                <section class="admin-panel">
+                    <header class="admin-panel-header">
+                        <div>
+                            <h2>학원 정보 수정</h2>
+                            <p>사업자등록번호는 확인용이며 이 화면에서 변경할 수 없습니다.</p>
+                        </div>
+                    </header>
+
+                    <form th:action="@{/admin/updateAcademy}" method="post">
+                        <section class="admin-form-section">
+                            <h3 class="form-section-title">
+                                <span class="admin-section-number">1</span>
+                                기본 정보
+                            </h3>
+                            <div class="admin-form-grid">
+                                <div class="admin-form-field full-width">
+                                    <label for="academyName">학원명 <span class="required-mark">*</span></label>
+                                    <input class="admin-input" id="academyName" name="name" type="text"
+                                           th:value="${academy.name}" placeholder="학원명을 입력해주세요." required>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="admin-form-section">
+                            <h3 class="form-section-title">
+                                <span class="admin-section-number" style="background:var(--admin-blue);">2</span>
+                                연락처와 주소
+                            </h3>
+                            <div class="admin-form-grid">
+                                <div class="admin-form-field">
+                                    <label for="phone">대표 전화번호 <span class="required-mark">*</span></label>
+                                    <input class="admin-input" id="phone" name="phone" type="text"
+                                           th:value="${academy.phone}" placeholder="02-0000-0000" required>
+                                </div>
+                                <div class="admin-form-field">
+                                    <label for="business">사업자등록번호</label>
+                                    <input class="admin-input" id="business" type="text"
+                                           th:value="${academy.businessNumber}" readonly>
+                                    <small>등록 당시 검증된 정보입니다.</small>
+                                </div>
+                                <div class="admin-form-field full-width">
+                                    <label for="address">학원 주소 <span class="required-mark">*</span></label>
+                                    <input class="admin-input" id="address" name="address" type="text"
+                                           th:value="${academy.address}" placeholder="학원 주소를 입력해주세요." required>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="admin-form-actions">
+                            <a class="ui-button ui-button-outline" th:href="@{/main/adminMain}">취소</a>
+                            <button class="ui-button ui-button-primary" type="submit">변경사항 저장</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="admin-panel admin-danger-zone">
+                    <header class="admin-panel-header">
+                        <div>
+                            <h3>위험 작업</h3>
+                            <p>학원 삭제는 일반 정보 수정과 분리된 작업입니다.</p>
+                        </div>
+                    </header>
+                    <div class="admin-danger-content">
+                        <p>
+                            학원을 삭제하면 관련 데이터와 계정 이용에 영향을 줄 수 있으며 복구할 수 없습니다.<br>
+                            반드시 필요한 경우에만 진행해주세요.
+                        </p>
+                        <form th:action="@{/admin/deleteAcademy}" method="post" onsubmit="return confirmDelete()">
+                            <button class="ui-button ui-button-danger-outline" type="submit">학원 삭제</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
     </div>
-
-    <section class="academy-card">
-
-        <div class="card-header">
-            <h2>학원 기본 정보</h2>
-            <p>변경할 정보를 입력한 뒤 수정 버튼을 눌러주세요.</p>
-        </div>
-
-        <form th:action="@{/admin/updateAcademy}"
-              method="post"
-              class="academy-form">
-
-            <div class="form-group">
-                <label for="academyName">학원명</label>
-
-                <input
-                        type="text"
-                        id="academyName"
-                        name="name"
-                        th:value="${academy.name}"
-                        placeholder="학원명을 입력해주세요."
-                        required>
-            </div>
-
-            <div class="form-group">
-                <label for="address">주소</label>
-
-                <input
-                        type="text"
-                        id="address"
-                        name="address"
-                        th:value="${academy.address}"
-                        placeholder="학원 주소를 입력해주세요."
-                        required>
-            </div>
-
-            <div class="form-group">
-                <label for="phone">전화번호</label>
-
-                <input
-                        type="text"
-                        id="phone"
-                        name="phone"
-                        th:value="${academy.phone}"
-                        placeholder="02-0000-0000"
-                        required>
-            </div>
-
-            <div class="form-group">
-                <label for="business">사업자 등록번호</label>
-
-                <input
-                        type="text"
-                        id="business"
-                        th:value="${academy.businessNumber}"
-                        class="readonly-input"
-                        readonly>
-            </div>
-
-            <div class="form-button-area">
-                <button type="submit" class="update-button">
-                    정보 수정하기
-                </button>
-            </div>
-
-        </form>
-
-    </section>
-
-    <section class="delete-card">
-
-        <div class="delete-card-header">
-            <h2>학원 삭제</h2>
-
-            <p>
-                학원을 삭제하면 관련 데이터가 함께 삭제될 수 있습니다.
-            </p>
-        </div>
-
-        <div class="delete-warning">
-            <strong>주의</strong>
-
-            <span>
-                삭제된 학원 정보는 다시 복구할 수 없습니다.
-                반드시 확인 후 삭제해주세요.
-            </span>
-        </div>
-
-        <form th:action="@{/admin/deleteAcademy}"
-              method="post"
-              onsubmit="return confirmDelete();">
-
-            <button type="submit" class="delete-button">
-                학원 삭제하기
-            </button>
-
-        </form>
-
-    </section>
-
 </main>
 
 <script>
     function confirmDelete() {
-        return confirm(
-            "정말로 학원을 삭제하시겠습니까?\n삭제 후에는 되돌릴 수 없습니다."
-        );
+        return window.confirm("정말로 학원을 삭제하시겠습니까?\n삭제 후에는 되돌릴 수 없습니다.");
     }
 </script>
 

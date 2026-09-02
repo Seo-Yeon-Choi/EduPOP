@@ -1,405 +1,228 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-  <title>EduPOP - 신규 반 개설</title>
-
-  <!-- 공통 CSS -->
-  <link rel="stylesheet"
-        th:href="@{/css/common.css}">
-
-  <!-- 반 개설 페이지 CSS -->
-  <link rel="stylesheet"
-        th:href="@{/css/classroom-create.css}">
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPOP - 새 학급 만들기</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
 </head>
-
-<body>
-
-<!-- =========================================
-     공통 헤더
-========================================= -->
-
-<div th:replace="~{layout/header :: header}"></div>
-
-
-<!-- =========================================
-     관리자 사이드바
-========================================= -->
+<body class="admin-page admin-modal-page">
 
 <div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
 
-
-<!-- =========================================
-     반 개설 본문
-========================================= -->
-
-<main class="classroom-create-container">
-
-  <div class="classroom-form-card">
-
-    <!-- 페이지 제목 -->
-    <div class="form-header">
-
-      <h2>
-        신규 반 개설
-      </h2>
-
-      <p>
-        학원 내 신규 클래스를 등록하고
-        기본 운영 정보를 설정합니다.
-      </p>
-
+<main class="admin-modal-scene" aria-hidden="true">
+    <div class="admin-modal-ghost">
+        <span class="admin-eyebrow">Class Management</span>
+        <h1 class="admin-page-title">학급 관리</h1>
+        <p class="admin-page-subtitle">학원에 개설된 반의 담당 교사와 운영 상태를 관리합니다.</p>
+        <div class="admin-modal-ghost-cards">
+            <span class="admin-modal-ghost-card"></span>
+            <span class="admin-modal-ghost-card"></span>
+            <span class="admin-modal-ghost-card"></span>
+        </div>
     </div>
-
-
-    <!-- =================================
-         반 개설 Form
-    ================================== -->
-
-    <form th:action="@{/classroom/create}"
-          th:object="${request}"
-          method="post">
-
-      <!-- 학원 식별자 -->
-      <input type="hidden"
-             th:field="*{academyId}">
-
-      <span th:if="${#fields.hasErrors('academyId')}"
-            th:errors="*{academyId}"
-            class="error-message">
-            </span>
-
-
-      <div class="form-grid">
-
-        <!-- =============================
-             반 명칭
-        ============================== -->
-
-        <div class="form-group full-width">
-
-          <label for="name">
-            반 명칭
-            <span class="required-star">*</span>
-          </label>
-
-          <input type="text"
-                 id="name"
-                 th:field="*{name}"
-                 th:classappend="${#fields.hasErrors('name')} ? 'field-error-input' : ''"
-                 class="form-input"
-                 placeholder="예: 중등 수학 심화 A반">
-
-          <span th:if="${#fields.hasErrors('name')}"
-                th:errors="*{name}"
-                class="error-message">
-                    </span>
-
-        </div>
-
-
-        <!-- =============================
-             대상 학년
-        ============================== -->
-
-        <div class="form-group">
-
-          <label for="targetGrade">
-            대상 학년
-            <span class="required-star">*</span>
-          </label>
-
-          <input type="text"
-                 id="targetGrade"
-                 th:field="*{targetGrade}"
-                 th:classappend="${#fields.hasErrors('targetGrade')} ? 'field-error-input' : ''"
-                 class="form-input"
-                 placeholder="예: 중2, 중3, 고1">
-
-          <span th:if="${#fields.hasErrors('targetGrade')}"
-                th:errors="*{targetGrade}"
-                class="error-message">
-                    </span>
-
-        </div>
-
-
-        <!-- =============================
-             수강 정원
-        ============================== -->
-
-        <div class="form-group">
-
-          <label for="maxStudents">
-            수강 정원 (명)
-            <span class="required-star">*</span>
-          </label>
-
-          <input type="number"
-                 id="maxStudents"
-                 th:field="*{maxStudents}"
-                 th:classappend="${#fields.hasErrors('maxStudents')} ? 'field-error-input' : ''"
-                 class="form-input"
-                 min="1"
-                 placeholder="정원 (예: 20)">
-
-          <span th:if="${#fields.hasErrors('maxStudents')}"
-                th:errors="*{maxStudents}"
-                class="error-message">
-                    </span>
-
-        </div>
-
-
-        <!-- =============================
-             반 상세 설명
-        ============================== -->
-
-        <div class="form-group full-width">
-
-          <label for="description">
-            반 상세 설명
-          </label>
-
-          <textarea id="description"
-                    th:field="*{description}"
-                    class="form-textarea"
-                    rows="3"
-                    placeholder="수업 목표, 진도 및 커리큘럼 특징을 입력해 주세요."></textarea>
-
-          <span th:if="${#fields.hasErrors('description')}"
-                th:errors="*{description}"
-                class="error-message">
-                    </span>
-
-        </div>
-
-
-        <!-- =============================
-             담당 강사진
-        ============================== -->
-
-        <div class="form-group full-width">
-
-          <div class="teacher-title-row">
-
-            <label>
-              담당 강사진 배정
-              <span class="required-star">*</span>
-            </label>
-
-            <button type="button"
-                    class="teacher-add-button"
-                    onclick="addTeacherRow()">
-
-              <i class="fa-solid fa-plus"></i>
-              강사 추가
-
-            </button>
-
-          </div>
-
-
-          <!-- 강사 목록 -->
-          <div id="teacher-list-container"
-               class="teacher-section">
-
-
-            <!-- =========================
-                 최초 강사
-            ========================== -->
-
-            <div class="teacher-row">
-
-                            <span class="teacher-badge">
-
-                                <i class="fa-solid fa-user-tie"></i>
-
-                                강사
-
-                            </span>
-
-
-              <!-- 강사 선택 -->
-              <select name="teachers[0].teacherId"
-                      class="form-select teacher-select-name">
-
-                <option value="1" selected>
-                  김수학 강사 (ID: 1)
-                </option>
-
-                <option value="2">
-                  이영어 강사 (ID: 2)
-                </option>
-
-                <option value="3">
-                  박과학 강사 (ID: 3)
-                </option>
-
-              </select>
-
-
-              <!-- 담당 역할 -->
-              <select name="teachers[0].roleType"
-                      class="form-select teacher-select-role">
-
-                <option value="MAIN" selected>
-                  대표/담임 (MAIN)
-                </option>
-
-                <option value="SUB">
-                  부담임/과목 (SUB)
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- =================================
-           하단 버튼
-      ================================== -->
-
-      <div class="btn-group">
-
-        <a th:href="@{/classroom/list}"
-           class="btn btn-cancel">
-
-          취소
-
-        </a>
-
-        <button type="submit"
-                class="btn btn-primary">
-
-          개설 완료
-
-        </button>
-
-      </div>
-
-    </form>
-
-  </div>
-
 </main>
 
+<div class="admin-modal-backdrop" aria-hidden="true"></div>
 
-<!-- =========================================
-     Footer
-========================================= -->
+<section class="setup-modal" role="dialog" aria-modal="true" aria-labelledby="setupModalTitle">
+    <header class="setup-modal-header">
+        <div>
+            <span class="admin-eyebrow">New Class Setup</span>
+            <h1 id="setupModalTitle">새 학급 만들기</h1>
+            <p>학급 기본 정보와 담당 강사를 단계별로 설정합니다.</p>
+        </div>
+        <a class="admin-icon-button" th:href="@{/classroom/list}" aria-label="학급 생성 닫기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12"></path>
+            </svg>
+        </a>
+    </header>
 
-<div th:replace="~{layout/footer}"></div>
+    <div class="setup-stepper" aria-label="학급 생성 단계">
+        <div class="setup-step active" data-step-indicator="1">
+            <span class="setup-step-number">1</span><span>기본 정보</span>
+        </div>
+        <div class="setup-step" data-step-indicator="2">
+            <span class="setup-step-number">2</span><span>담당 강사</span>
+        </div>
+        <div class="setup-step" data-step-indicator="3">
+            <span class="setup-step-number">3</span><span>확인</span>
+        </div>
+    </div>
 
+    <form id="classroomCreateForm" th:action="@{/classroom/create}" th:object="${request}" method="post">
+        <input type="hidden" th:field="*{academyId}">
+        <span class="error-message" th:if="${#fields.hasErrors('academyId')}" th:errors="*{academyId}"></span>
 
-<!-- =========================================
-     강사 추가 JavaScript
-========================================= -->
+        <section class="setup-step-content active" data-step-content="1">
+            <h2>반 기본 정보</h2>
+            <p>학생과 교사가 쉽게 구분할 수 있도록 반 정보를 입력해주세요.</p>
+
+            <div class="admin-form-grid">
+                <div class="admin-form-field full-width">
+                    <label for="name">반 이름 <span class="required-mark">*</span></label>
+                    <input class="admin-input" id="name" type="text" th:field="*{name}"
+                           th:classappend="${#fields.hasErrors('name')} ? ' field-error-input' : ''"
+                           placeholder="예: 중등 수학 심화 A반" required>
+                    <span class="error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                </div>
+                <div class="admin-form-field">
+                    <label for="targetGrade">대상 학년 <span class="required-mark">*</span></label>
+                    <input class="admin-input" id="targetGrade" type="text" th:field="*{targetGrade}"
+                           th:classappend="${#fields.hasErrors('targetGrade')} ? ' field-error-input' : ''"
+                           placeholder="예: 중2" required>
+                    <span class="error-message" th:if="${#fields.hasErrors('targetGrade')}" th:errors="*{targetGrade}"></span>
+                </div>
+                <div class="admin-form-field">
+                    <label for="maxStudents">수강 정원 <span class="required-mark">*</span></label>
+                    <input class="admin-input" id="maxStudents" type="number" th:field="*{maxStudents}"
+                           th:classappend="${#fields.hasErrors('maxStudents')} ? ' field-error-input' : ''"
+                           min="1" placeholder="예: 20" required>
+                    <span class="error-message" th:if="${#fields.hasErrors('maxStudents')}" th:errors="*{maxStudents}"></span>
+                </div>
+                <div class="admin-form-field full-width">
+                    <label for="description">반 설명과 메모</label>
+                    <textarea class="admin-textarea" id="description" th:field="*{description}"
+                              placeholder="수업 목표, 진도 또는 운영 메모를 입력해주세요."></textarea>
+                    <span class="error-message" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="setup-step-content" data-step-content="2">
+            <h2>담당 강사 배정</h2>
+            <p>대표 담임과 부담임을 선택할 수 있습니다. 개설 후에도 상세 화면에서 변경할 수 있어요.</p>
+
+            <div class="teacher-list" id="teacher-list-container">
+                <div class="teacher-row">
+                    <span class="teacher-badge">담당 강사</span>
+                    <select class="admin-select teacher-select-name" name="teachers[0].teacherId" aria-label="담당 강사">
+                        <option value="1" selected>김수학 강사 (ID: 1)</option>
+                        <option value="2">이영어 강사 (ID: 2)</option>
+                        <option value="3">박과학 강사 (ID: 3)</option>
+                    </select>
+                    <select class="admin-select teacher-select-role" name="teachers[0].roleType" aria-label="강사 역할">
+                        <option value="MAIN" selected>대표 담임</option>
+                        <option value="SUB">부담임</option>
+                    </select>
+                    <span></span>
+                </div>
+            </div>
+
+            <button class="ui-button ui-button-secondary ui-button-small" type="button"
+                    onclick="addTeacherRow()" style="margin-top:12px;">+ 강사 추가</button>
+        </section>
+
+        <section class="setup-step-content" data-step-content="3">
+            <h2>입력 내용 확인</h2>
+            <p>아래 정보를 확인한 뒤 학급을 개설해주세요.</p>
+
+            <div class="setup-review-list">
+                <div class="setup-review-item"><span>반 이름</span><strong id="reviewName">-</strong></div>
+                <div class="setup-review-item"><span>대상 학년</span><strong id="reviewGrade">-</strong></div>
+                <div class="setup-review-item"><span>수강 정원</span><strong id="reviewCapacity">-</strong></div>
+                <div class="setup-review-item"><span>담당 강사</span><strong id="reviewTeachers">-</strong></div>
+            </div>
+
+            <div class="onboarding-note" style="margin-bottom:0;">
+                학급 개설 후 학생 배정과 담당 강사 변경은 학급 상세 화면에서 계속 관리할 수 있습니다.
+            </div>
+        </section>
+
+        <footer class="setup-modal-footer">
+            <a class="ui-button ui-button-outline" id="createCancelButton" th:href="@{/classroom/list}">취소</a>
+            <button class="ui-button ui-button-outline" id="createPrevButton" type="button"
+                    onclick="goToCreateStep(currentCreateStep - 1)" hidden>이전</button>
+            <div style="flex:1;"></div>
+            <button class="ui-button ui-button-primary" id="createNextButton" type="button"
+                    onclick="goToCreateStep(currentCreateStep + 1)">다음</button>
+            <button class="ui-button ui-button-primary" id="createSubmitButton" type="submit" hidden>학급 개설</button>
+        </footer>
+    </form>
+</section>
 
 <script>
+    let currentCreateStep = 1;
+    let teacherIndex = 1;
 
-  let teacherIndex = 1;
+    function validateBasicStep() {
+        const fields = [
+            document.getElementById('name'),
+            document.getElementById('targetGrade'),
+            document.getElementById('maxStudents')
+        ];
 
-  function addTeacherRow() {
-
-    const container =
-            document.getElementById('teacher-list-container');
-
-    const newRow =
-            document.createElement('div');
-
-    newRow.className = 'teacher-row';
-
-    newRow.innerHTML = `
-
-            <span class="teacher-badge">
-
-                <i class="fa-solid fa-user-tie"></i>
-
-                강사
-
-            </span>
-
-
-            <select
-                name="teachers[${teacherIndex}].teacherId"
-                class="form-select teacher-select-name">
-
-                <option value="1">
-                    김수학 강사 (ID: 1)
-                </option>
-
-                <option value="2" selected>
-                    이영어 강사 (ID: 2)
-                </option>
-
-                <option value="3">
-                    박과학 강사 (ID: 3)
-                </option>
-
-            </select>
-
-
-            <select
-                name="teachers[${teacherIndex}].roleType"
-                class="form-select teacher-select-role">
-
-                <option value="SUB" selected>
-                    부담임/과목 (SUB)
-                </option>
-
-                <option value="MAIN">
-                    대표/담임 (MAIN)
-                </option>
-
-            </select>
-
-
-            <button
-                type="button"
-                class="teacher-delete-button"
-                onclick="removeTeacherRow(this)">
-
-                삭제
-
-            </button>
-
-        `;
-
-    container.appendChild(newRow);
-
-    teacherIndex++;
-  }
-
-
-  function removeTeacherRow(button) {
-
-    const row =
-            button.closest('.teacher-row');
-
-    if (row) {
-      row.remove();
+        for (const field of fields) {
+            if (!field.checkValidity()) {
+                field.reportValidity();
+                return false;
+            }
+        }
+        return true;
     }
 
-  }
+    function updateCreateReview() {
+        document.getElementById('reviewName').textContent = document.getElementById('name').value.trim() || '-';
+        document.getElementById('reviewGrade').textContent = document.getElementById('targetGrade').value.trim() || '-';
+        const capacity = document.getElementById('maxStudents').value;
+        document.getElementById('reviewCapacity').textContent = capacity ? `${capacity}명` : '-';
 
+        const teachers = Array.from(document.querySelectorAll('.teacher-row')).map(row => {
+            const nameSelect = row.querySelector('.teacher-select-name');
+            const roleSelect = row.querySelector('.teacher-select-role');
+            return `${nameSelect.options[nameSelect.selectedIndex].text} · ${roleSelect.options[roleSelect.selectedIndex].text}`;
+        });
+        document.getElementById('reviewTeachers').textContent = teachers.join(', ') || '미배정';
+    }
+
+    function goToCreateStep(nextStep) {
+        if (nextStep < 1 || nextStep > 3) return;
+        if (currentCreateStep === 1 && nextStep > 1 && !validateBasicStep()) return;
+        if (nextStep === 3) updateCreateReview();
+
+        currentCreateStep = nextStep;
+        document.querySelectorAll('[data-step-content]').forEach(section => {
+            section.classList.toggle('active', Number(section.dataset.stepContent) === currentCreateStep);
+        });
+        document.querySelectorAll('[data-step-indicator]').forEach(indicator => {
+            const step = Number(indicator.dataset.stepIndicator);
+            indicator.classList.toggle('active', step === currentCreateStep);
+            indicator.classList.toggle('completed', step < currentCreateStep);
+        });
+
+        document.getElementById('createCancelButton').hidden = currentCreateStep !== 1;
+        document.getElementById('createPrevButton').hidden = currentCreateStep === 1;
+        document.getElementById('createNextButton').hidden = currentCreateStep === 3;
+        document.getElementById('createSubmitButton').hidden = currentCreateStep !== 3;
+    }
+
+    function addTeacherRow() {
+        const container = document.getElementById('teacher-list-container');
+        const row = document.createElement('div');
+        row.className = 'teacher-row';
+        row.innerHTML = `
+            <span class="teacher-badge">담당 강사</span>
+            <select class="admin-select teacher-select-name" name="teachers[${teacherIndex}].teacherId" aria-label="담당 강사">
+                <option value="1">김수학 강사 (ID: 1)</option>
+                <option value="2" selected>이영어 강사 (ID: 2)</option>
+                <option value="3">박과학 강사 (ID: 3)</option>
+            </select>
+            <select class="admin-select teacher-select-role" name="teachers[${teacherIndex}].roleType" aria-label="강사 역할">
+                <option value="SUB" selected>부담임</option>
+                <option value="MAIN">대표 담임</option>
+            </select>
+            <button class="teacher-delete-button" type="button" onclick="removeTeacherRow(this)">삭제</button>
+        `;
+        container.appendChild(row);
+        teacherIndex += 1;
+    }
+
+    function removeTeacherRow(button) {
+        button.closest('.teacher-row')?.remove();
+    }
 </script>
-
 </body>
 </html>
