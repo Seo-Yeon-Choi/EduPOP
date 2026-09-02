@@ -15,25 +15,40 @@
           th:href="@{/css/signup.css}">
 </head>
 
-<body>
+<body class="entry-page signup-page">
 
 <div th:replace="~{layout/header :: header}"></div>
 
 
-<main class="signup-container">
+<main class="entry-shell signup-container">
 
-    <section class="signup-card">
+    <section class="entry-card signup-card">
 
-        <div class="signup-header">
-            <h1>회원가입</h1>
-            <p>EduPOP 이용을 위한 정보를 입력해주세요.</p>
-        </div>
+        <header class="signup-header">
+            <a class="entry-brand signup-brand" th:href="@{/}">
+                <span class="entry-brand-mark" aria-hidden="true">EP</span>
+                <span>EduPOP</span>
+            </a>
+            <p class="entry-eyebrow">Create Account</p>
+            <h1 class="entry-title">회원가입</h1>
+            <p>EduPOP에서 함께 성장하기 위한 정보를 입력해주세요.</p>
+        </header>
 
 
         <form th:action="@{/signUp}"
               method="post"
               class="signup-form"
               id="signupForm">
+
+            <div th:if="${error != null}" class="entry-message entry-message-error" th:text="${error}">
+                입력 내용을 확인해주세요.
+            </div>
+
+            <section class="signup-form-section">
+                <div class="signup-section-heading">
+                    <span class="signup-section-number">1</span>
+                    <div><h2>계정 정보</h2><p>로그인에 사용할 아이디와 비밀번호를 입력해주세요.</p></div>
+                </div>
 
             <!-- 아이디 -->
             <div class="form-group">
@@ -66,6 +81,14 @@
 
             </div>
 
+            </section>
+
+            <section class="signup-form-section">
+                <div class="signup-section-heading">
+                    <span class="signup-section-number signup-section-number-mint">2</span>
+                    <div><h2>사용자 정보</h2><p>서비스 이용과 안내에 필요한 기본 정보입니다.</p></div>
+                </div>
+
 
             <!-- 이름 -->
             <div class="form-group">
@@ -81,7 +104,6 @@
                        required>
 
             </div>
-
 
             <!-- 이메일 -->
             <div class="form-group">
@@ -176,14 +198,22 @@
 
             </div>
 
+            </section>
+
 
             <!-- =====================================
                  학원 검색
                  관리자 회원가입에서는 표시하지 않음
             ====================================== -->
 
-            <div class="form-group academy-search-group"
-                 th:if="${requestedRole != 'ADMIN'}">
+            <section class="signup-form-section academy-search-section"
+                     th:if="${requestedRole != 'ADMIN'}">
+                <div class="signup-section-heading">
+                    <span class="signup-section-number signup-section-number-lavender">3</span>
+                    <div><h2>학원 정보</h2><p>현재 소속된 학원을 검색해 선택해주세요.</p></div>
+                </div>
+
+            <div class="form-group academy-search-group">
 
                 <label for="academySearch">
                     학원 선택
@@ -299,9 +329,11 @@
 
             </div>
 
+            </section>
+
 
             <button type="submit"
-                    class="signup-button">
+                    class="entry-button entry-button-primary signup-button">
 
                 가입하기
 

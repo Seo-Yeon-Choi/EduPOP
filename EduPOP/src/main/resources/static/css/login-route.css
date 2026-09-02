@@ -193,3 +193,221 @@
         margin-right: 14px;
     }
 }
+
+/* EduPOP landing */
+.landing-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.landing-hero {
+    min-height: 560px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr);
+    align-items: center;
+    gap: clamp(38px, 7vw, 96px);
+}
+
+.landing-copy .entry-brand {
+    margin-bottom: 46px;
+}
+
+.landing-copy .entry-title {
+    max-width: 640px;
+    font-size: clamp(38px, 4.4vw, 58px);
+    line-height: 1.22;
+}
+
+.landing-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.landing-feature-card {
+    min-height: 170px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid rgba(255, 255, 255, .78);
+    border-radius: 24px;
+    box-shadow: var(--shadow-soft);
+}
+
+.landing-feature-card:nth-child(even) {
+    transform: translateY(24px);
+}
+
+.feature-coral { background: #ffe8dc; }
+.feature-mint { background: #d4f4f0; }
+.feature-lavender { background: #eae7f8; }
+.feature-yellow { background: #fef5d0; }
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    color: #fff;
+    background: var(--color-primary);
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.feature-mint .feature-icon { background: #51ae9f; }
+.feature-lavender .feature-icon { background: #8d80c8; }
+.feature-yellow .feature-icon { background: #d19728; }
+
+.landing-feature-card h2 {
+    margin: 0 0 5px;
+    color: var(--color-text-primary);
+    font-size: 16px;
+    font-weight: 850;
+    letter-spacing: -.025em;
+}
+
+.landing-feature-card p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.role-entry-section {
+    padding: 30px;
+}
+
+.role-entry-heading {
+    margin-bottom: 20px;
+}
+
+.role-entry-heading h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -.035em;
+}
+
+.role-entry-heading > p:last-child {
+    margin: 7px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+}
+
+.role-button-group {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.role-button {
+    min-width: 0;
+    min-height: 88px;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 17px;
+    background: #fff;
+    transition: border-color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.role-button:hover {
+    border-color: rgba(224, 112, 90, .42);
+    background: var(--color-surface-soft);
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-2px);
+}
+
+.role-button:hover .role-arrow {
+    transform: translateX(3px);
+}
+
+.role-icon {
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    color: #fff;
+    background: var(--color-primary);
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.role-teacher .role-icon { background: #5bc8b8; }
+.role-admin .role-icon { background: #7a6fa8; }
+
+.role-text {
+    min-width: 0;
+    gap: 4px;
+}
+
+.role-title {
+    color: var(--color-text-primary);
+    font-size: 15px;
+    font-weight: 850;
+}
+
+.role-description {
+    overflow: hidden;
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.role-arrow {
+    color: var(--color-primary);
+    font-weight: 900;
+    transition: transform .18s ease;
+}
+
+@media (max-width: 960px) {
+    .landing-hero {
+        grid-template-columns: 1fr;
+        gap: 42px;
+    }
+
+    .landing-copy .entry-brand {
+        margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 720px) {
+    .landing-hero {
+        min-height: auto;
+    }
+
+    .landing-copy .entry-title {
+        font-size: 36px;
+    }
+
+    .landing-copy .entry-description br {
+        display: none;
+    }
+
+    .role-button-group {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .landing-feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .landing-feature-card:nth-child(even) {
+        transform: none;
+    }
+
+    .role-entry-section {
+        padding: 22px;
+    }
+}

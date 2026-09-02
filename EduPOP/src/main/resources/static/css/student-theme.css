@@ -23,6 +23,7 @@
 
 body:has(.student-sidebar),
 body.student-focus-page {
+    padding-top: var(--layout-header-height);
     background: var(--student-bg);
     color: var(--student-ink);
     font-family: "Pretendard", "Noto Sans KR", sans-serif;
@@ -39,21 +40,21 @@ body.student-focus-page h3 {
 
 body:has(.student-sidebar) .top-header,
 body.student-focus-page .top-header {
-    display: none;
+    display: flex;
 }
 
 .student-sidebar {
     position: fixed;
-    inset: 0 auto 0 0;
+    inset: var(--layout-header-height) auto 0 0;
     z-index: 1000;
-    width: 220px;
-    padding: 24px 12px 18px;
+    width: var(--layout-sidebar-width);
+    padding: 18px 12px 16px;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    background: rgba(255, 255, 255, 0.96);
-    border-right: 1px solid rgba(245, 237, 227, 0.95);
-    box-shadow: 6px 0 30px rgba(103, 74, 61, 0.035);
+    background: rgba(255, 250, 245, 0.97);
+    border-right: 1px solid var(--color-border-soft);
+    box-shadow: 5px 0 24px rgba(103, 74, 61, 0.035);
 }
 
 .student-brand {
@@ -93,47 +94,50 @@ body.student-focus-page .top-header {
 
 .student-sidebar .nav-item {
     min-height: 48px;
-    padding: 11px 14px;
+    padding: 11px 12px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    border-radius: 16px;
+    gap: 11px;
+    border-radius: 14px;
     color: var(--student-muted);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 750;
     transition: transform .18s ease, color .18s ease, background .18s ease, box-shadow .18s ease;
 }
 
 .student-sidebar .nav-item:hover {
     color: var(--student-ink);
-    background: var(--student-bg);
+    background: var(--color-surface-soft);
     transform: translateX(2px);
 }
 
 .student-sidebar .nav-item.active {
-    color: #fff;
-    background: var(--student-primary);
-    box-shadow: 0 0 0 3px rgba(255, 114, 96, .16), 0 7px 16px rgba(255, 114, 96, .20);
+    color: var(--student-primary-dark);
+    background: var(--color-primary-soft);
+    box-shadow: inset 3px 0 0 var(--student-primary);
+    font-weight: 850;
 }
 
 .student-sidebar .nav-icon {
-    width: 23px;
-    height: 23px;
+    width: 20px;
+    height: 20px;
     display: grid;
     place-items: center;
-    font-size: 18px;
+    flex: 0 0 20px;
+    font-size: 16px;
     line-height: 1;
 }
 
 .student-sidebar-profile {
     margin-top: 18px;
-    padding: 12px;
+    padding: 10px;
     display: grid;
     grid-template-columns: 42px minmax(0, 1fr);
     align-items: center;
     gap: 9px;
-    background: var(--student-bg);
-    border-radius: 18px;
+    border: 1px solid var(--color-border-soft);
+    border-radius: 16px;
+    background: var(--color-surface-soft);
 }
 
 .student-logout-form {
@@ -197,7 +201,7 @@ body:has(.student-sidebar) .exam-list-container,
 body:has(.student-sidebar) .result-list-container,
 body:has(.student-sidebar) .result-container,
 body:has(.student-sidebar) .account-page-container {
-    margin-left: 220px;
+    margin-left: var(--layout-sidebar-width);
     padding-top: 0;
 }
 
@@ -537,16 +541,27 @@ body:has(.student-sidebar) .reading-page .page-toolbar {
     background: linear-gradient(135deg, #dff5fb, var(--student-sky-soft));
 }
 
-body:has(.student-sidebar) .reading-page:not(.reading-form-page):not(.reading-detail-page) .page-toolbar::after {
+body:has(.student-sidebar) .reading-list-page .page-toolbar {
+    grid-template-columns: minmax(0, 1fr) auto minmax(160px, 200px);
+    display: grid;
+}
+
+body:has(.student-sidebar) .reading-list-page .page-toolbar::after {
     content: "";
-    position: absolute;
-    right: 36px;
-    bottom: -12px;
-    width: 215px;
-    height: 200px;
+    width: 100%;
+    max-width: 200px;
+    height: 180px;
+    align-self: end;
+    grid-column: 3;
+    grid-row: 1;
     background: url("../images/exp/character.png") center bottom / contain no-repeat;
     filter: drop-shadow(0 13px 10px rgba(103, 74, 61, .14));
     animation: student-float 2.7s ease-in-out infinite;
+}
+
+body:has(.student-sidebar) .reading-list-page .page-toolbar > .btn {
+    position: relative;
+    z-index: 2;
 }
 
 body:has(.student-sidebar) .reading-page .page-toolbar > div {
@@ -984,6 +999,8 @@ body:has(.student-sidebar) .account-info-grid dd { margin: 5px 0 0; overflow-wra
     body:has(.student-sidebar) .reading-page,
     body:has(.student-sidebar) .account-page-container { width: min(100% - 28px, 1000px); margin: 0 auto; padding-top: 18px; }
     body:has(.student-sidebar) .reading-page .page-toolbar { min-height: 185px; padding: 26px; }
+    body:has(.student-sidebar) .reading-list-page .page-toolbar { grid-template-columns: 1fr; align-items: start; }
+    body:has(.student-sidebar) .reading-list-page .page-toolbar > .btn { justify-self: start; }
     body:has(.student-sidebar) .reading-page .page-toolbar::after { display: none; }
     body:has(.student-sidebar) .reading-page .report-grid,
     body:has(.student-sidebar) .reading-page .form-grid-three,

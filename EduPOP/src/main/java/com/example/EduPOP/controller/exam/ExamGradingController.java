@@ -72,9 +72,9 @@ public class ExamGradingController {
         model.addAttribute("exams", examList);
         model.addAttribute("currentClassId", classId);
 
-        // 로그인한 학원의 시험 템플릿 목록
+        // 로그인한 교사가 만든 시험 목록
         List<ExamTemplateResponse> templates =
-                examService.getExamTemplates(academyId);
+                examService.getExamTemplatesByTeacher(teacherId);
 
         model.addAttribute("templates", templates);
 

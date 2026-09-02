@@ -446,3 +446,221 @@
         font-size: 24px;
     }
 }
+
+/* Warm EduPOP academy selection */
+.academy-select-container {
+    max-width: 680px;
+    align-items: flex-start;
+    padding-top: 116px;
+    background: transparent;
+}
+
+.academy-select-card {
+    max-width: none;
+    padding: 38px;
+    border-color: var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.academy-select-header {
+    margin-bottom: 28px;
+    text-align: left;
+}
+
+.academy-select-brand {
+    margin-bottom: 30px;
+}
+
+.academy-select-header .entry-eyebrow {
+    margin-bottom: 7px;
+}
+
+.academy-select-header h1 {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 31px;
+}
+
+.academy-select-header > p:last-child {
+    margin-top: 8px;
+    color: var(--color-text-secondary);
+}
+
+.academy-select-form {
+    gap: 16px;
+}
+
+.academy-form-section {
+    padding: 22px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px;
+    border: 1px solid var(--color-border-soft);
+    border-radius: 18px;
+    background: var(--color-surface-soft);
+}
+
+.academy-section-heading {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+}
+
+.academy-section-number {
+    width: 29px;
+    height: 29px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 10px;
+    color: #fff;
+    background: var(--color-primary);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.academy-section-number-mint { background: #51ae9f; }
+
+.academy-section-heading h2 {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 15px;
+    font-weight: 850;
+}
+
+.academy-section-heading p {
+    margin: 4px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 11px;
+}
+
+.academy-select-form .form-group {
+    min-width: 0;
+}
+
+.academy-select-form .form-group label {
+    color: var(--color-text-primary);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.academy-select-form .form-group input,
+.academy-select-form .form-group select {
+    height: auto;
+    min-height: 48px;
+    padding: 11px 14px;
+    border-color: var(--color-border);
+    border-radius: 13px;
+    color: var(--color-text-primary);
+}
+
+.academy-select-form .form-group input:hover,
+.academy-select-form .form-group select:hover {
+    border-color: #d8bda9;
+}
+
+.academy-select-form .form-group input:focus,
+.academy-select-form .form-group select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(224, 112, 90, .12);
+}
+
+.academy-select-form .form-group input:user-invalid,
+.academy-select-form .form-group select:user-invalid {
+    border-color: var(--color-danger);
+    background: #fffafa;
+}
+
+.academy-membership-section {
+    display: block;
+}
+
+.academy-membership-section .academy-section-heading {
+    margin-bottom: 19px;
+}
+
+.academy-search-guide {
+    color: var(--color-text-secondary);
+}
+
+.academy-search-results {
+    top: calc(100% + 6px);
+    border-color: var(--color-border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+}
+
+.academy-search-item {
+    border-color: var(--color-border-soft);
+}
+
+.academy-search-item:hover,
+.academy-search-item:focus-visible {
+    outline: none;
+    background: var(--color-primary-soft);
+}
+
+.academy-result-name,
+#selectedAcademyName {
+    color: var(--color-text-primary);
+}
+
+.academy-result-address,
+.selected-academy-address {
+    color: var(--color-text-secondary);
+}
+
+.selected-academy {
+    border-color: #a8e8e0;
+    border-radius: 13px;
+    background: var(--color-accent-soft);
+}
+
+.selected-academy-label {
+    color: #39775a;
+}
+
+.academy-change-button {
+    border-color: rgba(61, 139, 94, .28);
+    border-radius: 10px;
+    color: var(--color-success);
+}
+
+.academy-change-button:hover {
+    background: #f3fbf7;
+}
+
+.academy-error {
+    color: var(--color-danger);
+    font-weight: 700;
+}
+
+.submit-button {
+    height: auto;
+    margin-top: 2px;
+    border-radius: 14px;
+    background: var(--color-primary);
+}
+
+.submit-button:hover {
+    background: var(--color-primary-hover);
+    box-shadow: 0 7px 16px rgba(224, 112, 90, .22);
+}
+
+@media (max-width: 600px) {
+    .academy-select-container {
+        padding-top: 88px;
+    }
+
+    .academy-select-card {
+        padding: 28px 18px;
+        border-radius: 20px;
+    }
+
+    .academy-form-section {
+        padding: 18px 15px;
+        grid-template-columns: 1fr;
+    }
+}

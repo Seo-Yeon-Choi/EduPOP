@@ -14,8 +14,8 @@ import java.util.Map;
 @Mapper
 public interface ExamMapper {
 
-    // 템플릿 목록 조회
-    List<ExamTemplateResponse> findTemplatesByAcademyId(@Param("academyId") Long academyId);
+    // 로그인한 교사가 만든 시험 목록 조회
+    List<ExamTemplateResponse> findTemplatesByTeacherId(@Param("teacherId") Long teacherId);
 
     // 신규 시험지 생성
     int insertExam(ExamCreateOrCopyRequest request);

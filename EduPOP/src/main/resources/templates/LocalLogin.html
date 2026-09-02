@@ -9,51 +9,60 @@
     <link rel="stylesheet" th:href="@{/css/locallogin.css}">
 </head>
 
-<body>
+<body class="entry-page auth-page">
 
 <div th:replace="~{layout/header :: header}"></div>
 
-<main class="local-login-container">
+<main class="entry-shell local-login-container">
+    <section class="entry-card local-login-card">
 
-    <section class="local-login-card">
+        <a class="entry-brand local-login-brand" th:href="@{/}">
+            <span class="entry-brand-mark" aria-hidden="true">EP</span>
+            <span>EduPOP</span>
+        </a>
 
         <div class="local-login-header">
-            <h1>로그인</h1>
+            <p class="entry-eyebrow">Welcome Back</p>
+            <h1 class="entry-title">다시 만나서 반가워요</h1>
             <p>회원가입한 계정으로 로그인해주세요.</p>
         </div>
 
         <form th:action="@{/login}" method="post" class="local-login-form">
 
-            <div class="local-form-group">
-                <label for="loginId">아이디</label>
+            <div class="entry-form-group local-form-group">
+                <label class="entry-form-label" for="loginId">아이디</label>
 
                 <input
                         type="text"
                         id="loginId"
                         name="loginId"
                         placeholder="아이디를 입력해주세요."
+                        class="entry-input"
+                        autocomplete="username"
                         required
                         autofocus>
             </div>
 
-            <div class="local-form-group">
-                <label for="passwordHash">비밀번호</label>
+            <div class="entry-form-group local-form-group">
+                <label class="entry-form-label" for="passwordHash">비밀번호</label>
 
                 <input
                         type="password"
                         id="passwordHash"
                         name="passwordHash"
+                        class="entry-input"
                         placeholder="비밀번호를 입력해주세요."
+                        autocomplete="current-password"
                         required>
             </div>
 
             <div th:if="${error != null}"
-                 class="local-error-message">
+                 class="entry-message entry-message-error local-error-message">
                 <p th:text="${error}"></p>
             </div>
 
             <button type="submit"
-                    class="local-login-button">
+                    class="entry-button entry-button-primary local-login-button">
                 로그인
             </button>
 

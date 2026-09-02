@@ -9,6 +9,7 @@
 </head>
 
 <body>
+<div th:replace="~{layout/header :: header}"></div>
 <div th:replace="~{layout/sidebar-student :: sidebar}"></div>
 
 <main class="student-main-container">
@@ -60,15 +61,6 @@
                         <p>최근에 틀렸던 문제를 다시 만나볼 시간!</p>
                     </div>
                     <strong>확인하기 →</strong>
-                </a>
-
-                <a th:href="@{/student/exams}" class="student-mission-card mission-exam">
-                    <span class="mission-icon">✏️</span>
-                    <div>
-                        <h3>예정된 시험</h3>
-                        <p>새 시험과 단어 시험 일정을 확인해요.</p>
-                    </div>
-                    <strong>시험 보기 →</strong>
                 </a>
 
                 <a th:href="@{/student/reading-reports/create}" class="student-mission-card mission-book">

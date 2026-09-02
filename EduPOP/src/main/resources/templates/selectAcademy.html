@@ -10,22 +10,33 @@
     <link rel="stylesheet" th:href="@{/css/kakao-academy.css}">
 </head>
 
-<body>
+<body class="entry-page academy-select-page">
 
 <div th:replace="~{layout/header :: header}"></div>
 
-<main class="academy-select-container">
+<main class="entry-shell academy-select-container">
 
-    <section class="academy-select-card">
+    <section class="entry-card academy-select-card">
 
-        <div class="academy-select-header">
-            <h1>추가 정보 입력</h1>
+        <header class="academy-select-header">
+            <a class="entry-brand academy-select-brand" th:href="@{/}">
+                <span class="entry-brand-mark" aria-hidden="true">EP</span>
+                <span>EduPOP</span>
+            </a>
+            <p class="entry-eyebrow">Complete Profile</p>
+            <h1 class="entry-title">추가 정보 입력</h1>
             <p>EduPOP 이용을 위해 정보를 입력하고 학원을 선택해주세요.</p>
-        </div>
+        </header>
 
         <form th:action="@{/selectAcademy}"
               method="post"
               class="academy-select-form">
+
+            <section class="academy-form-section">
+                <div class="academy-section-heading">
+                    <span class="academy-section-number">1</span>
+                    <div><h2>기본 정보</h2><p>연락처와 학생 정보를 확인해주세요.</p></div>
+                </div>
 
             <div class="form-group">
                 <label for="email">이메일</label>
@@ -86,8 +97,16 @@
 
             </div>
 
-            <div class="form-group academy-search-group"
-                 th:if="${requestedRole != 'ADMIN'}">
+            </section>
+
+            <section class="academy-form-section academy-membership-section"
+                     th:if="${requestedRole != 'ADMIN'}">
+                <div class="academy-section-heading">
+                    <span class="academy-section-number academy-section-number-mint">2</span>
+                    <div><h2>소속 학원</h2><p>검색 결과에서 현재 소속된 학원을 선택해주세요.</p></div>
+                </div>
+
+            <div class="form-group academy-search-group">
 
                 <label for="academySearch">
                     학원 선택
@@ -188,7 +207,10 @@
                 </p>
 
             </div>
-            <button type="submit" class="submit-button">
+
+            </section>
+
+            <button type="submit" class="entry-button entry-button-primary submit-button">
                 선택 완료
             </button>
 
@@ -201,7 +223,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        const form = document.querySelector('form');
+        const form = document.querySelector('.academy-select-form');
 
         const searchInput =
             document.getElementById('academySearch');

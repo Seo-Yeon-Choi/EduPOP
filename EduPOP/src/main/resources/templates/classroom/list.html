@@ -13,9 +13,10 @@
 </head>
 <body class="admin-page admin-classroom-list-page">
 
+<div th:replace="~{layout/header :: header}"></div>
 <div th:replace="~{layout/sidebar-admin :: sidebar}"></div>
 
-<div class="toast-container position-fixed top-0 end-0 p-3">
+<div class="toast-container admin-notification-layer position-fixed end-0 p-3">
     <div class="toast admin-toast" id="actionToast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex align-items-center p-3">
             <div style="flex:1;">

@@ -1,88 +1,38 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <body>
 
 <header th:fragment="header" class="top-header">
-
-    <!-- 로고 -->
     <div class="header-logo">
-
         <th:block th:if="${session.loginUser != null}"
                   th:switch="${session.loginUser.role.toString()}">
-
-            <!-- 학생 -->
             <a th:case="'STUDENT'"
                th:href="@{/main/studentMain}"
-               class="logo-link">
+               class="logo-link"
+               aria-label="EduPOP 학생 홈">
                 EduPOP
             </a>
-
-            <!-- 선생님 -->
             <a th:case="'TEACHER'"
                th:href="@{/main/teacherMain}"
-               class="logo-link">
+               class="logo-link"
+               aria-label="EduPOP 선생님 홈">
                 EduPOP
             </a>
-
-            <!-- 관리자 -->
             <a th:case="'ADMIN'"
                th:href="@{/main/adminMain}"
-               class="logo-link">
+               class="logo-link"
+               aria-label="EduPOP 관리자 홈">
                 EduPOP
             </a>
-
         </th:block>
 
-        <!-- 비로그인 -->
         <a th:if="${session.loginUser == null}"
            th:href="@{/}"
-           class="logo-link">
+           class="logo-link"
+           aria-label="EduPOP 시작 페이지">
             EduPOP
         </a>
-
     </div>
-
-    <!-- 우측 사용자 정보 -->
-    <div class="header-user">
-
-        <!-- 로그인 상태 -->
-        <th:block th:if="${session.loginUser != null}">
-
-            <span class="user-name"
-                  th:text="|${session.loginUser.name}님|">
-                사용자님
-            </span>
-
-            <span class="user-role"
-                  th:text="${session.loginUser.role}">
-                STUDENT
-            </span>
-
-            <form th:action="@{/logout}"
-                  method="post">
-
-                <button type="submit"
-                        class="logout-button">
-                    로그아웃
-                </button>
-
-            </form>
-
-        </th:block>
-
-        <!-- 비로그인 상태 -->
-        <th:block th:unless="${session.loginUser != null}">
-
-            <a th:href="@{/login}">
-                로그인
-            </a>
-
-        </th:block>
-
-    </div>
-
 </header>
 
 </body>

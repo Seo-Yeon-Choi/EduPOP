@@ -232,3 +232,97 @@
         gap: 6px;
     }
 }
+
+/* Warm EduPOP local login */
+.local-login-container {
+    max-width: 520px;
+    padding-top: 116px;
+    background: transparent;
+}
+
+.local-login-card {
+    max-width: none;
+    padding: 38px;
+    border-color: var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.local-login-brand {
+    margin-bottom: 30px;
+}
+
+.local-login-header {
+    margin-bottom: 28px;
+    text-align: left;
+}
+
+.local-login-header .entry-eyebrow {
+    margin-bottom: 7px;
+}
+
+.local-login-header h1 {
+    margin-bottom: 8px;
+    color: var(--color-text-primary);
+    font-size: 28px;
+}
+
+.local-login-header p:last-child {
+    color: var(--color-text-secondary);
+}
+
+.local-login-form {
+    gap: 16px;
+}
+
+.local-form-group input {
+    height: auto;
+    min-height: 48px;
+    padding: 11px 14px;
+    border-color: var(--color-border);
+    border-radius: 13px;
+    color: var(--color-text-primary);
+}
+
+.local-form-group input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(224, 112, 90, .12);
+}
+
+.local-error-message {
+    border: 0;
+    color: #a84040;
+    background: var(--color-danger-soft);
+}
+
+.local-login-button {
+    height: auto;
+    margin-top: 3px;
+    border-radius: 14px;
+    background: var(--color-primary);
+}
+
+.local-login-button:hover {
+    background: var(--color-primary-hover);
+    box-shadow: 0 7px 16px rgba(224, 112, 90, .22);
+}
+
+.local-signup-area {
+    border-color: var(--color-border-soft);
+    color: var(--color-text-secondary);
+}
+
+.local-signup-link {
+    color: var(--color-primary);
+}
+
+@media (max-width: 600px) {
+    .local-login-container {
+        padding-top: 88px;
+    }
+
+    .local-login-card {
+        padding: 28px 22px;
+        border-radius: 20px;
+    }
+}

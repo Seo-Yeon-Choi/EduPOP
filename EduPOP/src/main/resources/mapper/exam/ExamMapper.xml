@@ -4,18 +4,18 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.EduPOP.repository.exam.ExamMapper">
-    <select id="findTemplatesByAcademyId" resultType="com.example.EduPOP.controller.exam.dto.ExamTemplateResponse">
+    <select id="findTemplatesByTeacherId" resultType="com.example.EduPOP.controller.exam.dto.ExamTemplateResponse">
         SELECT
         e.exam_id AS examId,
         e.title AS title,
-        COALESCE(e.exam_type, 'MONTH') AS examType,
-        COALESCE(SUM(eq.score), 100.0) AS totalScore,
-        COALESCE(COUNT(eq.question_id), 0) AS totalQuestions
+        COALESCE(e.exam_type, 'OTHER') AS examType,
+        COALESCE(SUM(eq.score), 0.0) AS totalScore,
+        COUNT(eq.question_id) AS totalQuestions
         FROM exams e
         LEFT JOIN exam_questions eq ON e.exam_id = eq.exam_id AND eq.ai_generated = FALSE
-        WHERE (e.template_exam_id IS NULL OR e.class_id IS NULL)
-        GROUP BY e.exam_id, e.title, e.exam_type
-        ORDER BY e.exam_id ASC
+        WHERE e.teacher_id = #{teacherId}
+        GROUP BY e.exam_id, e.title, e.exam_type, e.created_at
+        ORDER BY e.created_at DESC, e.exam_id DESC
     </select>
 
     <insert id="insert" parameterType="Exam" useGeneratedKeys="true" keyProperty="examId">

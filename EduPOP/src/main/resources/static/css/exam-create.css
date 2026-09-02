@@ -126,86 +126,6 @@ body {
     font-size: 16px;
 }
 
-.exam-create-steps {
-    margin: 16px 0 22px;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    overflow: hidden;
-    border: 1px solid #e8d5c4;
-    border-radius: 18px;
-    background: #fff;
-    list-style: none;
-    box-shadow: 0 8px 22px rgba(107, 76, 60, .045);
-}
-
-.exam-create-steps li {
-    min-height: 74px;
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    position: relative;
-    color: #9b7a6a;
-}
-
-.exam-create-steps li + li {
-    border-left: 1px solid #f0e4d8;
-}
-
-.exam-create-steps li > span {
-    width: 32px;
-    height: 32px;
-    display: grid;
-    place-items: center;
-    flex: 0 0 auto;
-    border-radius: 10px;
-    color: #9b7a6a;
-    background: #fff8f0;
-    font-size: 11px;
-    font-weight: 900;
-}
-
-.exam-create-steps strong,
-.exam-create-steps small {
-    display: block;
-}
-
-.exam-create-steps strong {
-    color: #6b4c3c;
-    font-size: 11px;
-}
-
-.exam-create-steps small {
-    margin-top: 3px;
-    font-size: 9px;
-}
-
-.exam-create-steps li.active {
-    background: #fffaf5;
-}
-
-.exam-create-steps li.active::after {
-    content: "";
-    height: 3px;
-    position: absolute;
-    right: 18px;
-    bottom: 0;
-    left: 18px;
-    border-radius: 999px 999px 0 0;
-    background: #f26549;
-}
-
-.exam-create-steps li.active > span {
-    color: #fff;
-    background: #f26549;
-    box-shadow: 0 5px 12px rgba(242, 101, 73, .2);
-}
-
-.exam-create-steps li.active strong {
-    color: #3d2b1f;
-}
-
 .pdf-info {
     min-height: 68px;
     margin-bottom: 18px;
@@ -836,14 +756,6 @@ textarea:focus {
         flex-direction: column;
     }
 
-    .exam-create-steps li {
-        padding: 12px;
-    }
-
-    .exam-create-steps small {
-        display: none;
-    }
-
     .question-builder-layout {
         grid-template-columns: 1fr;
     }
@@ -882,14 +794,6 @@ textarea:focus {
 
     .exam-create-heading h1 {
         font-size: 26px;
-    }
-
-    .exam-create-steps li {
-        justify-content: center;
-    }
-
-    .exam-create-steps li > div {
-        display: none;
     }
 
     .exam-info-grid,

@@ -53,6 +53,7 @@ public class ExamController {
         List<ExamListResponse> exams = examService.getExamListResponseByTeacher(teacherId, classId);
 
         model.addAttribute("exams", exams);
+        model.addAttribute("templates", examService.getExamTemplatesByTeacher(teacherId));
         return "exam/exam-list";
     }
 

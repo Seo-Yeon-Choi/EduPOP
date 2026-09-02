@@ -10,60 +10,76 @@
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 
-<body>
+<body class="entry-page auth-page">
 
 <div th:replace="~{layout/header :: header}"></div>
 
-<main class="login-main-container">
-
-    <section class="login-main-card">
-
-        <div class="login-main-header">
-            <p class="login-label">EDUPOP</p>
-
-            <h1>EduPOP에 오신 것을 환영합니다!</h1>
-
-            <p class="login-description">
-                원하는 방법으로 로그인하거나 새로운 계정을 만들어주세요.
-            </p>
+<main class="entry-shell login-main-container">
+    <section class="login-welcome-panel" aria-labelledby="login-welcome-title">
+        <div class="entry-brand">
+            <span class="entry-brand-mark" aria-hidden="true">EP</span>
+            <span>EduPOP</span>
         </div>
+        <p class="entry-eyebrow">Welcome Back</p>
+        <h1 id="login-welcome-title">배움의 흐름을<br>다시 이어가세요</h1>
+        <p>오늘의 학습과 복습, 차곡차곡 쌓인 성장 기록이 기다리고 있어요.</p>
+        <div class="login-welcome-note">
+            <span aria-hidden="true">✓</span>
+            <p><strong>하나의 계정으로 간편하게</strong>학생, 선생님, 관리자 공간에 역할별로 연결됩니다.</p>
+        </div>
+    </section>
 
-        <div class="login-option-area">
+    <section class="entry-card login-main-card">
+        <header class="login-main-header">
+            <p class="entry-eyebrow login-label">Sign In</p>
+            <h2>로그인</h2>
+            <p class="login-description">가입한 계정 정보를 입력해주세요.</p>
+        </header>
 
-            <a href="/LocalLogin"
-               class="login-option-button local-login-button">
+        <form th:action="@{/login}" method="post" class="embedded-login-form">
+            <div class="entry-form-group">
+                <label class="entry-form-label" for="loginId">아이디</label>
+                <input class="entry-input" type="text" id="loginId" name="loginId"
+                       placeholder="아이디를 입력해주세요." autocomplete="username" required autofocus>
+            </div>
+            <div class="entry-form-group">
+                <label class="entry-form-label" for="passwordHash">비밀번호</label>
+                <input class="entry-input" type="password" id="passwordHash" name="passwordHash"
+                       placeholder="비밀번호를 입력해주세요." autocomplete="current-password" required>
+            </div>
+            <div th:if="${error != null}" class="entry-message entry-message-error local-error-message">
+                <p th:text="${error}">로그인 정보를 확인해주세요.</p>
+            </div>
+            <button type="submit" class="entry-button entry-button-primary local-login-button">로그인</button>
+        </form>
 
-                <span class="button-icon">👤</span>
+        <div class="social-divider"><span>소셜 계정으로 계속하기</span></div>
 
-                <span class="button-text">
-                    일반 아이디로 로그인
-                </span>
-
-            </a>
+        <div class="login-option-area" aria-label="소셜 로그인">
 
             <a href="/kakao/login" class="kakao-login-button">
 
-                <span class="naver-login-logo"></span>
-                <span class="naver-login-text">카카오로 로그인</span>
+                <span class="kakao-login-logo" aria-hidden="true"></span>
+                <span class="kakao-login-text">카카오로 로그인</span>
 
             </a>
 
             <a href="/naver/login" class="naver-login-button">
 
-                <span class="naver-login-logo">N</span>
+                <span class="naver-login-logo" aria-hidden="true">N</span>
                 <span class="naver-login-text">네이버로 로그인</span>
 
             </a>
 
             <a href="/google/login" class="google-login-button">
 
-                <span class="google-login-logo">G</span>
+                <span class="google-login-logo" aria-hidden="true">G</span>
                 <span class="google-login-text">구글로 로그인</span>
 
             </a>
 
             <p th:if="${param.error != null}"
-               class="login-error-message">
+               class="entry-message entry-message-error login-error-message">
                 소셜 로그인에 실패했습니다. 다시 시도해주세요.
             </p>
 
@@ -74,14 +90,13 @@
         </div>
 
         <a href="/signUp"
-           class="signup-button">
+           class="entry-button entry-button-secondary signup-button">
 
             일반 회원가입
 
         </a>
 
     </section>
-
 </main>
 
 </body>

@@ -405,6 +405,10 @@
                 <select id="templateExamId"
                         class="form-select">
 
+                    <option value="" selected disabled>
+                        시험지를 선택하세요
+                    </option>
+
                     <option th:each="tpl : ${templates}"
                             th:value="${tpl.examId}"
                             th:text="${tpl.title}">

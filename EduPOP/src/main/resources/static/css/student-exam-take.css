@@ -1,8 +1,8 @@
 .exam-take-container {
     width: min(100% - 48px, 1080px);
-    min-height: 100vh;
+    min-height: calc(100vh - var(--layout-header-height));
     margin: 0 auto;
-    padding: 24px 0 110px;
+    padding: clamp(28px, 3vw, 36px) 0 110px;
 }
 
 body:has(.student-sidebar) .exam-take-container {
@@ -12,7 +12,7 @@ body:has(.student-sidebar) .exam-take-container {
 
 .exam-header {
     position: sticky;
-    top: 16px;
+    top: calc(var(--layout-header-height) + 16px);
     z-index: 20;
     min-height: 92px;
     padding: 16px 20px;

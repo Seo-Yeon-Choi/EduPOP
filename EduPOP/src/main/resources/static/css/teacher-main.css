@@ -105,8 +105,7 @@
     gap: 11px;
 }
 
-.teacher-focus-icon,
-.teacher-assistant-mark {
+.teacher-focus-icon {
     display: grid;
     place-items: center;
     flex: 0 0 auto;
@@ -168,22 +167,8 @@
     font-weight: 900;
 }
 
-.teacher-home-layout {
+.teacher-home-core {
     margin-top: 28px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 310px;
-    gap: 24px;
-    align-items: start;
-}
-
-.teacher-home-primary,
-.teacher-home-aside {
-    min-width: 0;
-}
-
-.teacher-home-section + .teacher-home-section,
-.teacher-home-aside > section + section {
-    margin-top: 24px;
 }
 
 .teacher-section-heading {
@@ -205,9 +190,7 @@
     letter-spacing: .13em;
 }
 
-.teacher-section-heading h2,
-.teacher-todo-card h2,
-.teacher-account-card h2 {
+.teacher-section-heading h2 {
     margin: 5px 0 0;
     color: #3d2b1f;
     font-size: 20px;
@@ -296,207 +279,6 @@
     font-size: 12px;
 }
 
-.teacher-quick-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 11px;
-}
-
-.teacher-quick-card {
-    min-height: 132px;
-    padding: 16px 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    border: 1px solid #e8d5c4;
-    border-radius: 18px;
-    color: #3d2b1f;
-    background: #fff;
-    transition: transform .18s ease, background .18s ease;
-}
-
-.teacher-quick-card:hover {
-    transform: translateY(-2px);
-    background: #fffaf5;
-}
-
-.teacher-quick-card.primary {
-    border-color: #f26549;
-    color: #fff;
-    background: #f26549;
-    box-shadow: 0 8px 18px rgba(242, 101, 73, .22);
-}
-
-.teacher-quick-card.primary:hover {
-    background: #e0563a;
-}
-
-.teacher-quick-card > span {
-    font-size: 23px;
-}
-
-.teacher-quick-card strong {
-    margin-top: 8px;
-    font-size: 13px;
-}
-
-.teacher-quick-card small {
-    margin-top: 4px;
-    color: #9b7a6a;
-    font-size: 9px;
-}
-
-.teacher-quick-card.primary small {
-    color: rgba(255, 255, 255, .76);
-}
-
-.teacher-todo-card,
-.teacher-account-card {
-    padding: 20px;
-    border: 1px solid #e8d5c4;
-    border-radius: 22px;
-    background: #fff;
-    box-shadow: 0 8px 24px rgba(107, 76, 60, .055);
-}
-
-.teacher-todo-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.teacher-assistant-mark {
-    width: 47px;
-    height: 47px;
-    background: #5bc8b8;
-    font-size: 20px;
-}
-
-.teacher-todo-title span {
-    color: #5bc8b8;
-    font-size: 8px;
-    font-weight: 900;
-    letter-spacing: .1em;
-}
-
-.teacher-todo-title h2 {
-    margin-top: 2px;
-    font-size: 16px;
-}
-
-.teacher-todo-list {
-    margin-top: 16px;
-    display: grid;
-    gap: 9px;
-}
-
-.teacher-todo-list a {
-    min-height: 54px;
-    padding: 10px 11px;
-    display: grid;
-    grid-template-columns: 30px minmax(0, 1fr) 16px;
-    align-items: center;
-    gap: 8px;
-    border-radius: 14px;
-    color: #3d2b1f;
-    background: #fff8f0;
-}
-
-.teacher-todo-list a:hover {
-    background: #f5ebd8;
-}
-
-.teacher-todo-list a > span {
-    width: 30px;
-    height: 30px;
-    display: grid;
-    place-items: center;
-    border-radius: 10px;
-    font-weight: 900;
-}
-
-.teacher-todo-list strong {
-    min-width: 0;
-    font-size: 11px;
-}
-
-.teacher-todo-list b {
-    color: #9b7a6a;
-    font-size: 12px;
-}
-
-.todo-coral { color: #e8645a; background: #fde8e6; }
-.todo-yellow { color: #f5a623; background: #fef0d0; }
-.todo-mint { color: #4aa99a; background: #d4f4f0; }
-
-.teacher-account-card {
-    border-color: #c8c0e8;
-    background: linear-gradient(145deg, #f5f3fd, #eae7f8);
-}
-
-.teacher-account-card .teacher-section-kicker {
-    color: #9b8fd4;
-}
-
-.teacher-account-card h2 {
-    font-size: 17px;
-}
-
-.teacher-account-card p {
-    margin: 8px 0 16px;
-    color: #6b4c3c;
-    font-size: 11px;
-    line-height: 1.65;
-}
-
-.teacher-account-card > div {
-    display: flex;
-    gap: 8px;
-}
-
-.teacher-account-card a,
-.teacher-account-card button {
-    min-height: 38px;
-    padding: 8px 11px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 0;
-    border-radius: 11px;
-    font: inherit;
-    font-size: 10px;
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.teacher-account-card a {
-    color: #fff;
-    background: #9b8fd4;
-}
-
-.teacher-account-card button {
-    color: #6b4c3c;
-    background: rgba(255, 255, 255, .8);
-}
-
-@media (max-width: 1080px) {
-    .teacher-home-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .teacher-home-aside {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-    }
-
-    .teacher-home-aside > section + section {
-        margin-top: 0;
-    }
-}
-
 @media (max-width: 760px) {
     .teacher-home-shell {
         width: min(100% - 28px, 1180px);
@@ -513,18 +295,13 @@
         width: 100%;
     }
 
-    .teacher-overview-grid,
-    .teacher-home-aside {
+    .teacher-overview-grid {
         grid-template-columns: 1fr;
     }
 
     .teacher-overview-card:first-child {
         grid-row: auto;
         min-height: 190px;
-    }
-
-    .teacher-quick-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .teacher-section-heading {

@@ -29,6 +29,7 @@
 body.admin-page {
     min-width: 320px;
     min-height: 100vh;
+    padding-top: var(--layout-header-height);
     background: var(--admin-bg);
     color: var(--admin-text);
     font-family: "Pretendard", "Noto Sans KR", Arial, sans-serif;
@@ -47,7 +48,7 @@ body.admin-page {
 }
 
 .admin-page .top-header {
-    display: none;
+    display: flex;
 }
 
 .admin-page button,
@@ -64,14 +65,16 @@ body.admin-page {
 
 .admin-sidebar {
     position: fixed;
-    inset: 0 auto 0 0;
+    inset: var(--layout-header-height) auto 0 0;
     z-index: 1030;
     display: flex;
-    width: 224px;
+    width: var(--layout-sidebar-width);
     flex-direction: column;
     overflow-y: auto;
-    border-right: 1px solid var(--admin-border);
-    background: var(--admin-sidebar);
+    padding: 18px 12px 16px;
+    border-right: 1px solid var(--color-border-soft);
+    background: rgba(255, 250, 245, .97);
+    box-shadow: 5px 0 24px rgba(103, 74, 61, .035);
 }
 
 .admin-brand {
@@ -122,8 +125,8 @@ body.admin-page {
     display: flex;
     flex: 1;
     flex-direction: column;
-    gap: 18px;
-    padding: 16px 12px;
+    gap: 16px;
+    padding: 0;
 }
 
 .admin-nav-section {
@@ -142,27 +145,29 @@ body.admin-page {
 
 .admin-nav-item {
     display: flex;
-    min-height: 42px;
+    min-height: 48px;
     align-items: center;
     gap: 11px;
-    padding: 9px 12px;
-    border-radius: 12px;
+    padding: 11px 12px;
+    border-radius: 14px;
     color: var(--admin-text-subtle);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 650;
     transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
 }
 
 .admin-nav-item:hover {
-    background: #eae5d8;
+    background: var(--color-surface-soft);
     color: var(--admin-text);
+    transform: translateX(2px);
 }
 
 .admin-nav-item.active,
 .admin-nav-item[aria-current="page"] {
-    background: var(--admin-primary);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(224, 112, 90, 0.22);
+    background: var(--admin-primary-soft);
+    color: var(--admin-primary-dark);
+    box-shadow: inset 3px 0 0 var(--admin-primary);
+    font-weight: 850;
 }
 
 .admin-nav-icon {
@@ -171,18 +176,18 @@ body.admin-page {
     height: 18px;
     align-items: center;
     justify-content: center;
-    flex: 0 0 18px;
+    flex: 0 0 20px;
     color: #9a958f;
 }
 
 .admin-nav-icon svg {
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
 }
 
 .admin-nav-item.active .admin-nav-icon,
 .admin-nav-item[aria-current="page"] .admin-nav-icon {
-    color: #fff;
+    color: var(--admin-primary);
 }
 
 .admin-nav-text {
@@ -202,12 +207,13 @@ body.admin-page {
 
 .admin-nav-item.active .admin-nav-badge,
 .admin-nav-item[aria-current="page"] .admin-nav-badge {
-    background: rgba(255, 255, 255, 0.24);
+    background: var(--admin-primary);
+    color: #fff;
 }
 
 .admin-sidebar-user {
-    padding: 14px 12px;
-    border-top: 1px solid var(--admin-border);
+    margin-top: 18px;
+    padding: 0;
 }
 
 .admin-user-card {
@@ -216,7 +222,9 @@ body.admin-page {
     align-items: center;
     gap: 9px;
     padding: 8px;
-    border-radius: 12px;
+    border: 1px solid var(--color-border-soft);
+    border-radius: 16px;
+    background: var(--color-surface-soft);
 }
 
 .admin-user-avatar {
@@ -283,8 +291,8 @@ body.admin-page {
 }
 
 .admin-shell {
-    min-height: 100vh;
-    margin-left: 224px;
+    min-height: calc(100vh - var(--layout-header-height));
+    margin-left: var(--layout-sidebar-width);
     padding: 32px;
 }
 
@@ -626,7 +634,7 @@ body.admin-page {
 
 .dashboard-main-grid {
     display: grid;
-    grid-template-columns: minmax(300px, 5fr) minmax(420px, 7fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
 }
 
@@ -653,13 +661,11 @@ body.admin-page {
     color: var(--admin-yellow);
 }
 
-.attention-list,
-.quick-action-list {
+.attention-list {
     display: grid;
 }
 
-.attention-item,
-.quick-action-item {
+.attention-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -669,30 +675,24 @@ body.admin-page {
     color: inherit;
 }
 
-.attention-item:last-child,
-.quick-action-item:last-child {
+.attention-item:last-child {
     border-bottom: 0;
 }
 
-.attention-item:hover,
-.quick-action-item:hover {
+.attention-item:hover {
     background: var(--admin-surface-soft);
 }
 
 .attention-copy strong,
-.attention-copy span,
-.quick-action-copy strong,
-.quick-action-copy span {
+.attention-copy span {
     display: block;
 }
 
-.attention-copy strong,
-.quick-action-copy strong {
+.attention-copy strong {
     font-size: 13px;
 }
 
-.attention-copy span,
-.quick-action-copy span {
+.attention-copy span {
     margin-top: 3px;
     color: var(--admin-text-muted);
     font-size: 11px;
@@ -1035,7 +1035,7 @@ body.admin-page {
 .admin-bulk-bar {
     position: fixed;
     bottom: 22px;
-    left: calc(50% + 112px);
+    left: calc(50% + 110px);
     z-index: 1050;
     display: none;
     align-items: center;
@@ -1383,14 +1383,25 @@ body.admin-page {
     font-weight: 700;
 }
 
+.admin-notification-layer {
+    top: calc(var(--layout-header-height) + 12px);
+    right: 0;
+    z-index: 2100;
+    width: min(100%, 380px);
+    max-height: calc(100vh - var(--layout-header-height) - 24px);
+    overflow: visible;
+    pointer-events: none;
+}
+
 .admin-toast.toast {
-    z-index: 1080;
-    min-width: 320px;
+    width: 100%;
+    min-width: 0;
     border: 1px solid var(--admin-border) !important;
     border-radius: 14px !important;
     background: #fff !important;
     color: var(--admin-text) !important;
     box-shadow: 0 10px 35px rgba(40, 35, 30, 0.14) !important;
+    pointer-events: auto;
 }
 
 /* Classroom detail */
@@ -1678,8 +1689,8 @@ body.admin-page {
 }
 
 .admin-modal-scene {
-    min-height: 100vh;
-    margin-left: 224px;
+    min-height: calc(100vh - var(--layout-header-height));
+    margin-left: var(--layout-sidebar-width);
     padding: 32px;
 }
 
@@ -1705,7 +1716,7 @@ body.admin-page {
 
 .admin-modal-backdrop {
     position: fixed;
-    inset: 0 0 0 224px;
+    inset: var(--layout-header-height) 0 0 var(--layout-sidebar-width);
     z-index: 1040;
     background: rgba(40, 35, 30, 0.38);
     backdrop-filter: blur(2px);
@@ -1714,7 +1725,7 @@ body.admin-page {
 .setup-modal {
     position: fixed;
     top: 50%;
-    left: calc(50% + 112px);
+    left: calc(50% + 110px);
     z-index: 1050;
     width: min(760px, calc(100vw - 280px));
     max-height: calc(100vh - 48px);
@@ -2003,7 +2014,7 @@ body.admin-onboarding {
     width: auto;
     max-width: none;
     min-height: 100vh;
-    margin: 0 0 0 224px;
+    margin: 0 0 0 var(--layout-sidebar-width);
     padding: 32px;
     background: var(--admin-bg);
 }
@@ -2056,6 +2067,7 @@ body.admin-onboarding {
 @media (max-width: 860px) {
     .admin-sidebar {
         position: relative;
+        inset: auto;
         width: 100%;
         min-height: auto;
         overflow: visible;

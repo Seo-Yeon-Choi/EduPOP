@@ -316,3 +316,267 @@
 .kakao-login-text {
     line-height: 1;
 }
+
+/* Warm EduPOP authentication */
+.login-main-container {
+    max-width: 1040px;
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(420px, 1fr);
+    align-items: center;
+    gap: clamp(40px, 7vw, 90px);
+    padding-top: 116px;
+    background: transparent;
+}
+
+.login-welcome-panel .entry-brand {
+    margin-bottom: 52px;
+}
+
+.login-welcome-panel h1 {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: clamp(38px, 4vw, 52px);
+    font-weight: 900;
+    letter-spacing: -.05em;
+    line-height: 1.25;
+}
+
+.login-welcome-panel > p:not(.entry-eyebrow) {
+    max-width: 430px;
+    margin: 14px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+.login-welcome-note {
+    max-width: 440px;
+    margin-top: 30px;
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border-radius: 17px;
+    color: #39775a;
+    background: var(--color-accent-soft);
+}
+
+.login-welcome-note > span {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 9px;
+    color: #fff;
+    background: #51ae9f;
+    font-weight: 900;
+}
+
+.login-welcome-note p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.login-welcome-note strong {
+    display: block;
+    margin-bottom: 2px;
+    color: #32695a;
+    font-size: 13px;
+}
+
+.login-main-card {
+    max-width: none;
+    padding: 36px;
+    border-color: var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.login-main-header {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.login-main-header h2 {
+    margin: 0 0 7px;
+    color: var(--color-text-primary);
+    font-size: 27px;
+    font-weight: 900;
+    letter-spacing: -.04em;
+}
+
+.login-label,
+.login-description {
+    color: var(--color-primary);
+}
+
+.login-description {
+    color: var(--color-text-secondary);
+}
+
+.embedded-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.embedded-login-form .local-login-button {
+    width: 100%;
+    height: auto;
+    margin-top: 3px;
+    background: var(--color-primary);
+}
+
+.embedded-login-form .local-login-button:hover {
+    background: var(--color-primary-hover);
+    box-shadow: 0 7px 16px rgba(224, 112, 90, .22);
+}
+
+.local-error-message p {
+    margin: 0;
+}
+
+.social-divider {
+    margin: 24px 0 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #a29790;
+    font-size: 11px;
+}
+
+.social-divider::before,
+.social-divider::after {
+    height: 1px;
+    flex: 1;
+    background: var(--color-border-soft);
+    content: "";
+}
+
+.login-option-area {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.kakao-login-button,
+.naver-login-button,
+.google-login-button {
+    position: relative;
+    width: 100%;
+    height: 48px;
+    padding: 0 18px;
+    display: grid;
+    grid-template-columns: 24px minmax(0, auto) 24px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1;
+    transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.kakao-login-button:hover,
+.naver-login-button:hover,
+.google-login-button:hover {
+    transform: translateY(-1px);
+}
+
+.kakao-login-button:focus-visible,
+.naver-login-button:focus-visible,
+.google-login-button:focus-visible {
+    outline: 3px solid rgba(224, 112, 90, .18);
+    outline-offset: 2px;
+}
+
+.kakao-login-logo,
+.naver-login-logo,
+.google-login-logo {
+    position: static;
+    grid-column: 1;
+    justify-self: center;
+}
+
+.kakao-login-text,
+.naver-login-text,
+.google-login-text {
+    grid-column: 2;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1;
+}
+
+.kakao-login-logo {
+    width: 20px;
+    height: 16px;
+}
+
+.naver-login-logo,
+.google-login-logo {
+    width: 20px;
+    font-size: 19px;
+    text-align: center;
+}
+
+.google-login-button {
+    border-color: #dadce0;
+    box-shadow: 0 2px 7px rgba(60, 64, 67, .06);
+}
+
+.login-error-message {
+    grid-column: 1 / -1;
+    margin: 0;
+    text-align: left;
+}
+
+.signup-divider {
+    margin: 23px 0 14px;
+    color: var(--color-text-secondary);
+}
+
+.signup-divider::before,
+.signup-divider::after {
+    background: var(--color-border-soft);
+}
+
+.signup-button {
+    height: auto;
+    border-color: var(--color-border);
+    color: var(--color-text-primary);
+    border-radius: 14px;
+}
+
+.signup-button:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-soft);
+    box-shadow: none;
+}
+
+@media (max-width: 900px) {
+    .login-main-container {
+        max-width: 560px;
+        grid-template-columns: 1fr;
+    }
+
+    .login-welcome-panel {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .login-main-container {
+        padding-top: 88px;
+    }
+
+    .login-main-card {
+        padding: 28px 22px;
+        border-radius: 20px;
+    }
+
+    .login-option-area { gap: 9px; }
+}

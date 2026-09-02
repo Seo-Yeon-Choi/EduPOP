@@ -6,8 +6,9 @@
     <title>EduPOP - 학원 등록</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
+    <link rel="stylesheet" th:href="@{/css/academy-register.css}">
 </head>
-<body class="admin-onboarding">
+<body class="admin-onboarding academy-register-entry">
 
 <main class="admin-onboarding-shell">
     <a class="onboarding-brand" th:href="@{/}">
@@ -43,7 +44,7 @@
                 입력 내용을 확인해주세요.
             </div>
 
-            <section class="admin-form-section" style="padding-right:0;padding-left:0;">
+            <section class="admin-form-section academy-register-section">
                 <h2 class="form-section-title">
                     <span class="admin-section-number">1</span>
                     기본 정보
@@ -67,9 +68,9 @@
                 </div>
             </section>
 
-            <section class="admin-form-section" style="padding-right:0;padding-left:0;">
+            <section class="admin-form-section academy-register-section">
                 <h2 class="form-section-title">
-                    <span class="admin-section-number" style="background:var(--admin-green);">2</span>
+                    <span class="admin-section-number section-number-green">2</span>
                     주소
                 </h2>
                 <div class="admin-form-field">
@@ -79,9 +80,9 @@
                 </div>
             </section>
 
-            <section class="admin-form-section" style="padding-right:0;padding-left:0;border-bottom:0;">
+            <section class="admin-form-section academy-register-section academy-register-section-last">
                 <h2 class="form-section-title">
-                    <span class="admin-section-number" style="background:var(--admin-purple);">3</span>
+                    <span class="admin-section-number section-number-purple">3</span>
                     사업자 정보
                 </h2>
                 <div class="admin-form-grid">
@@ -101,7 +102,11 @@
                 입력한 사업자등록정보는 국세청 API의 진위확인에 사용됩니다. 사업자등록증의 대표자명과 개업일자를 정확히 입력해주세요.
             </div>
 
-            <button class="ui-button ui-button-primary" type="submit" style="width:100%;min-height:46px;">
+            <p class="business-verification-state" aria-live="polite">
+                등록 버튼을 누르면 사업자 정보 확인 후 학원이 등록됩니다.
+            </p>
+
+            <button class="ui-button ui-button-primary academy-submit-button" type="submit">
                 사업자 정보 확인 후 등록
             </button>
         </form>

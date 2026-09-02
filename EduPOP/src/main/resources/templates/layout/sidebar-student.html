@@ -6,40 +6,36 @@
     <link rel="stylesheet" th:href="@{/css/student-theme.css}">
 
     <aside class="sidebar student-sidebar" aria-label="학생 메뉴">
-        <a class="student-brand" th:href="@{/main/studentMain}" aria-label="EduPOP 학생 홈">
-            <span class="student-brand-mark">EP</span>
-            <span class="student-brand-name">EduPOP</span>
-        </a>
-
         <nav class="sidebar-nav">
-            <a th:href="@{/main/studentMain}" class="nav-item">
+            <a th:href="@{/main/studentMain}" class="nav-item" data-menu="home">
                 <span class="nav-icon" aria-hidden="true">⌂</span>
                 <span class="nav-label">홈</span>
             </a>
 
-            <a th:href="@{/student/exams}" class="nav-item">
+            <a th:href="@{/student/exams}" class="nav-item" data-menu="exams">
                 <span class="nav-icon" aria-hidden="true">📝</span>
                 <span class="nav-label">시험 · 복습</span>
             </a>
 
-            <a th:href="@{/student/exams/results}" class="nav-item">
+            <a th:href="@{/student/exams/results}" class="nav-item" data-menu="results">
                 <span class="nav-icon" aria-hidden="true">🌱</span>
                 <span class="nav-label">성장 기록</span>
             </a>
 
             <a th:href="@{/student/reading}"
                class="nav-item"
+               data-menu="reading"
                th:classappend="${activeMenu == 'reading' || activeMenu == 'reading-create'} ? ' active' : ''">
                 <span class="nav-icon" aria-hidden="true">📚</span>
                 <span class="nav-label">독서</span>
             </a>
 
-            <a th:href="@{/student/report}" class="nav-item">
+            <a th:href="@{/student/report}" class="nav-item" data-menu="report">
                 <span class="nav-icon" aria-hidden="true">🗒️</span>
                 <span class="nav-label">나의 리포트</span>
             </a>
 
-            <a th:href="@{/account}" class="nav-item">
+            <a th:href="@{/account}" class="nav-item" data-menu="account">
                 <span class="nav-icon" aria-hidden="true">👤</span>
                 <span class="nav-label">계정 관리</span>
             </a>
@@ -57,6 +53,27 @@
             </form>
         </div>
     </aside>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname;
+            const activeMenu = (function () {
+                if (currentPath === "/main/studentMain" || currentPath === "/studentMain") return "home";
+                if (currentPath.startsWith("/student/exams/results")) return "results";
+                if (currentPath.startsWith("/student/exams") || currentPath.startsWith("/student/exam")) return "exams";
+                if (currentPath.startsWith("/student/reading")) return "reading";
+                if (currentPath.startsWith("/student/report")) return "report";
+                if (currentPath.startsWith("/account")) return "account";
+                return "";
+            })();
+
+            document.querySelectorAll(".student-sidebar .nav-item[data-menu]").forEach(function (item) {
+                const isActive = item.dataset.menu === activeMenu;
+                item.classList.toggle("active", isActive);
+                if (isActive) item.setAttribute("aria-current", "page");
+            });
+        });
+    </script>
 </th:block>
 
 </body>

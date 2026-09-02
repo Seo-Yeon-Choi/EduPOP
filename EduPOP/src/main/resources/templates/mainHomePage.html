@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>EduPOP - 로그인</title>
+    <title>EduPOP - 배움이 자라는 학습 공간</title>
 
     <!-- 공통 CSS -->
     <link rel="stylesheet" th:href="@{/css/common.css}">
@@ -13,56 +13,70 @@
     <link rel="stylesheet" th:href="@{/css/login-route.css}">
 </head>
 
-<body>
+<body class="entry-page landing-page">
 
 <!-- 기존 공통 Header -->
 <div th:replace="~{layout/header :: header}"></div>
 
-<main class="login-route-container">
-
-    <section class="login-route-card">
-
-        <div class="login-route-header">
-            <h1>로그인</h1>
-            <p>사용자 유형을 선택해주세요.</p>
+<main class="entry-shell landing-shell">
+    <section class="landing-hero" aria-labelledby="landing-title">
+        <div class="landing-copy">
+            <div class="entry-brand">
+                <span class="entry-brand-mark" aria-hidden="true">EP</span>
+                <span>EduPOP</span>
+            </div>
+            <p class="entry-eyebrow">Learn · Review · Grow</p>
+            <h1 id="landing-title" class="entry-title">오늘의 배움이<br>내일의 성장으로 이어지도록</h1>
+            <p class="entry-description">
+                시험과 복습, 학습 결과, 독서 기록을 한곳에서 관리하며<br>
+                학생과 선생님이 함께 성장하는 학습 공간입니다.
+            </p>
         </div>
 
-        <div class="role-button-group">
-
-            <a href="/login/route/student" class="role-button">
-                <div class="role-icon">🎓</div>
-                <div class="role-text">
-                    <span class="role-title">학생 로그인</span>
-                    <span class="role-description">
-                        시험 응시와 학습 결과를 확인합니다.
-                    </span>
-                </div>
-            </a>
-
-            <a href="/login/route/teacher" class="role-button">
-                <div class="role-icon">📚</div>
-                <div class="role-text">
-                    <span class="role-title">교사 로그인</span>
-                    <span class="role-description">
-                        시험과 학생 학습 정보를 관리합니다.
-                    </span>
-                </div>
-            </a>
-
-            <a href="/login/route/admin" class="role-button">
-                <div class="role-icon">⚙️</div>
-                <div class="role-text">
-                    <span class="role-title">관리자 로그인</span>
-                    <span class="role-description">
-                        학원과 사용자 정보를 관리합니다.
-                    </span>
-                </div>
-            </a>
-
+        <div class="landing-feature-grid" aria-label="EduPOP 주요 기능">
+            <article class="landing-feature-card feature-coral">
+                <span class="feature-icon" aria-hidden="true">✓</span>
+                <div><h2>시험 · 학습 관리</h2><p>시험 응시부터 채점까지 간편하게</p></div>
+            </article>
+            <article class="landing-feature-card feature-mint">
+                <span class="feature-icon" aria-hidden="true">↻</span>
+                <div><h2>오늘의 복습</h2><p>틀린 문제를 다시 보며 탄탄하게</p></div>
+            </article>
+            <article class="landing-feature-card feature-lavender">
+                <span class="feature-icon" aria-hidden="true">↗</span>
+                <div><h2>학습 결과 · 리포트</h2><p>변화와 성장을 한눈에 확인하기</p></div>
+            </article>
+            <article class="landing-feature-card feature-yellow">
+                <span class="feature-icon" aria-hidden="true">▥</span>
+                <div><h2>독서 · 성장 관리</h2><p>읽고 생각한 내용을 차곡차곡</p></div>
+            </article>
         </div>
-
     </section>
 
+    <section id="role-entry" class="entry-card role-entry-section" aria-labelledby="role-entry-title">
+        <div class="role-entry-heading">
+            <p class="entry-eyebrow">Get Started</p>
+            <h2 id="role-entry-title">어떤 공간으로 시작할까요?</h2>
+            <p>역할을 선택하면 로그인과 회원가입을 이어서 진행할 수 있어요.</p>
+        </div>
+        <div class="role-button-group">
+            <a href="/login/route/student" class="role-button role-student">
+                <span class="role-icon" aria-hidden="true">S</span>
+                <span class="role-text"><strong class="role-title">학생</strong><span class="role-description">시험 응시와 나의 성장 기록</span></span>
+                <span class="role-arrow" aria-hidden="true">→</span>
+            </a>
+            <a href="/login/route/teacher" class="role-button role-teacher">
+                <span class="role-icon" aria-hidden="true">T</span>
+                <span class="role-text"><strong class="role-title">선생님</strong><span class="role-description">시험과 학생 학습 관리</span></span>
+                <span class="role-arrow" aria-hidden="true">→</span>
+            </a>
+            <a href="/login/route/admin" class="role-button role-admin">
+                <span class="role-icon" aria-hidden="true">A</span>
+                <span class="role-text"><strong class="role-title">관리자</strong><span class="role-description">학원과 사용자 운영 관리</span></span>
+                <span class="role-arrow" aria-hidden="true">→</span>
+            </a>
+        </div>
+    </section>
 </main>
 
 <!-- 회원탈퇴 완료시 띄울 안내창 -->

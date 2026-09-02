@@ -181,8 +181,8 @@ public class ExamService {
     }
 
     @Transactional(readOnly = true)
-    public List<ExamTemplateResponse> getExamTemplates(Long academyId) {
-        return examMapper.findTemplatesByAcademyId(academyId);
+    public List<ExamTemplateResponse> getExamTemplatesByTeacher(Long teacherId) {
+        return examMapper.findTemplatesByTeacherId(teacherId);
     }
 
     @Transactional(rollbackFor = Exception.class)

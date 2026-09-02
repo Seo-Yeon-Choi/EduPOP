@@ -299,3 +299,155 @@
         width: 100%;
     }
 }
+
+/* Warm EduPOP approval state */
+.pending-container {
+    max-width: 600px;
+    padding-top: 116px;
+    background: transparent;
+}
+
+.pending-card {
+    max-width: none;
+    padding: 38px 42px 34px;
+    border-color: var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.pending-brand {
+    margin-bottom: 32px;
+}
+
+.pending-icon {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    margin-bottom: 20px;
+    color: #966b05;
+    background: var(--color-warning-soft);
+    box-shadow: 0 0 0 10px rgba(254, 243, 226, .52);
+}
+
+.pending-icon span {
+    margin-top: -8px;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.pending-label {
+    color: var(--color-warning);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .14em;
+}
+
+.pending-card h1 {
+    margin-bottom: 18px;
+    color: var(--color-text-primary);
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -.04em;
+}
+
+.user-welcome {
+    margin-bottom: 22px;
+}
+
+.user-welcome h3 {
+    color: var(--color-text-primary);
+    font-size: 16px;
+}
+
+.user-welcome p {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+}
+
+.pending-info {
+    margin-bottom: 22px;
+    padding: 18px;
+    border-color: var(--color-border-soft);
+    border-radius: 16px;
+    background: var(--color-surface-soft);
+}
+
+.info-title {
+    color: var(--color-text-primary);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.status-badge {
+    padding: 6px 11px;
+    color: #966b05;
+    background: var(--color-warning-soft);
+    font-size: 11px;
+}
+
+.pending-description {
+    border-color: var(--color-border-soft);
+    color: var(--color-text-secondary);
+    font-size: 12px;
+}
+
+.account-buttons {
+    gap: 10px;
+}
+
+.account-buttons .logout-button,
+.account-buttons .withdraw-button {
+    min-width: 132px;
+    min-height: 44px;
+    height: auto;
+    padding: 9px 17px;
+    border-radius: 13px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.account-buttons .logout-button {
+    border-color: var(--color-primary);
+    color: #fff;
+    background: var(--color-primary);
+}
+
+.account-buttons .logout-button:hover {
+    border-color: var(--color-primary-hover);
+    color: #fff;
+    background: var(--color-primary-hover);
+    box-shadow: 0 6px 14px rgba(224, 112, 90, .2);
+}
+
+.account-buttons .withdraw-button {
+    border-color: #efcaca;
+    color: var(--color-danger);
+    background: #fff;
+}
+
+.account-buttons .withdraw-button:hover {
+    border-color: #e5abab;
+    background: var(--color-danger-soft);
+}
+
+.withdraw-warning {
+    border-color: var(--color-border-soft);
+    color: #9a958f;
+}
+
+@media (max-width: 600px) {
+    .pending-container {
+        padding-top: 88px;
+    }
+
+    .pending-card {
+        padding: 30px 20px 26px;
+        border-radius: 20px;
+    }
+
+    .pending-card h1 {
+        font-size: 24px;
+    }
+}

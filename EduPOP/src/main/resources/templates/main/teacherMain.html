@@ -42,101 +42,44 @@
             </div>
         </section>
 
-        <div class="teacher-home-layout">
-            <div class="teacher-home-primary">
-                <section class="teacher-home-section" aria-labelledby="todayTitle">
-                    <div class="teacher-section-heading">
-                        <div>
-                            <span class="teacher-section-kicker">TODAY WORKSPACE</span>
-                            <h2 id="todayTitle">오늘 무엇을 확인할까요?</h2>
-                        </div>
-                        <p>필요한 업무로 바로 이동할 수 있어요.</p>
-                    </div>
-
-                    <div class="teacher-overview-grid">
-                        <a th:href="@{/teacher/exams}" class="teacher-overview-card overview-grading">
-                            <span class="teacher-overview-icon">✓</span>
-                            <div>
-                                <strong>채점이 필요한 시험</strong>
-                                <p>시험별 답안과 OMR 현황을 확인하고 채점을 시작해요.</p>
-                            </div>
-                            <b>채점 관리 →</b>
-                        </a>
-
-                        <a th:href="@{/analytics/teacher/students}" class="teacher-overview-card overview-students">
-                            <span class="teacher-overview-icon">♟</span>
-                            <div>
-                                <strong>학생 성장 확인</strong>
-                                <p>담당 반을 선택하고 학생별 학습 흐름을 살펴봐요.</p>
-                            </div>
-                            <b>학생 관리 →</b>
-                        </a>
-
-                        <a th:href="@{/teacher/reading}" class="teacher-overview-card overview-reading">
-                            <span class="teacher-overview-icon">▥</span>
-                            <div>
-                                <strong>독서 피드백</strong>
-                                <p>학생의 독서 감상문을 읽고 따뜻한 피드백을 남겨요.</p>
-                            </div>
-                            <b>독서록 보기 →</b>
-                        </a>
-                    </div>
-                </section>
-
-                <section class="teacher-home-section" aria-labelledby="quickTitle">
-                    <div class="teacher-section-heading compact">
-                        <div>
-                            <span class="teacher-section-kicker">QUICK ACTION</span>
-                            <h2 id="quickTitle">빠른 실행</h2>
-                        </div>
-                    </div>
-                    <div class="teacher-quick-grid">
-                        <a th:href="@{/teacher/exams/create}" class="teacher-quick-card primary">
-                            <span>✎</span><strong>시험지 만들기</strong><small>새 시험과 문제 등록</small>
-                        </a>
-                        <a th:href="@{/teacher/exams}" class="teacher-quick-card">
-                            <span>✓</span><strong>채점하기</strong><small>시험별 채점 현황</small>
-                        </a>
-                        <a th:href="@{/teacher/exams/lists}" class="teacher-quick-card">
-                            <span>▤</span><strong>시험지 목록</strong><small>상세 확인과 수정</small>
-                        </a>
-                        <a th:href="@{/teacher/reading}" class="teacher-quick-card">
-                            <span>▥</span><strong>피드백 작성</strong><small>독서 감상문 확인</small>
-                        </a>
-                    </div>
-                </section>
+        <section class="teacher-home-section teacher-home-core" aria-labelledby="todayTitle">
+            <div class="teacher-section-heading">
+                <div>
+                    <span class="teacher-section-kicker">TODAY WORKSPACE</span>
+                    <h2 id="todayTitle">오늘 무엇을 확인할까요?</h2>
+                </div>
+                <p>필요한 업무로 바로 이동할 수 있어요.</p>
             </div>
 
-            <aside class="teacher-home-aside" aria-label="선생님 업무 도우미">
-                <section class="teacher-todo-card">
-                    <div class="teacher-todo-title">
-                        <span class="teacher-assistant-mark" aria-hidden="true">✓</span>
-                        <div>
-                            <span>EduPOP ASSISTANT</span>
-                            <h2>오늘 확인하면 좋아요</h2>
-                        </div>
-                    </div>
-                    <div class="teacher-todo-list">
-                        <a th:href="@{/teacher/exams}"><span class="todo-coral">✓</span><strong>채점 진행 상황 확인</strong><b>→</b></a>
-                        <a th:href="@{/analytics/teacher/students}"><span class="todo-yellow">!</span><strong>학생별 학습 흐름 확인</strong><b>→</b></a>
-                        <a th:href="@{/teacher/reading}"><span class="todo-mint">▥</span><strong>독서 피드백 작성</strong><b>→</b></a>
-                    </div>
-                </section>
-
-                <section class="teacher-account-card">
-                    <span class="teacher-section-kicker">MY ACCOUNT</span>
-                    <h2>계정 관리</h2>
-                    <p>계정 정보를 확인하거나 안전하게 로그아웃할 수 있습니다.</p>
+            <div class="teacher-overview-grid">
+                <a th:href="@{/teacher/exams}" class="teacher-overview-card overview-grading">
+                    <span class="teacher-overview-icon">✓</span>
                     <div>
-                        <a th:href="@{/account}">계정정보 조회</a>
-                        <form th:action="@{/logout}" method="post">
-                            <input th:if="${_csrf != null}" type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                            <button type="submit">로그아웃</button>
-                        </form>
+                        <strong>채점이 필요한 시험</strong>
+                        <p>시험별 답안과 OMR 현황을 확인하고 채점을 시작해요.</p>
                     </div>
-                </section>
-            </aside>
-        </div>
+                    <b>채점 관리 →</b>
+                </a>
+
+                <a th:href="@{/analytics/teacher/students}" class="teacher-overview-card overview-students">
+                    <span class="teacher-overview-icon">♟</span>
+                    <div>
+                        <strong>학생 성장 확인</strong>
+                        <p>담당 반을 선택하고 학생별 학습 흐름을 살펴봐요.</p>
+                    </div>
+                    <b>학생 관리 →</b>
+                </a>
+
+                <a th:href="@{/teacher/reading}" class="teacher-overview-card overview-reading">
+                    <span class="teacher-overview-icon">▥</span>
+                    <div>
+                        <strong>독서 피드백</strong>
+                        <p>학생의 독서 감상문을 읽고 따뜻한 피드백을 남겨요.</p>
+                    </div>
+                    <b>독서록 보기 →</b>
+                </a>
+            </div>
+        </section>
     </div>
 </main>
 
