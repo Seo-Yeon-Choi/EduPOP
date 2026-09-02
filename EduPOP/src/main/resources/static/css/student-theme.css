@@ -527,9 +527,9 @@ body:has(.student-sidebar) .reading-page .page-toolbar {
     min-height: 220px;
     margin: 0 0 22px;
     padding: 36px;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(150px, 215px);
     align-items: center;
-    justify-content: space-between;
     gap: 26px;
     overflow: hidden;
     position: relative;
@@ -537,22 +537,27 @@ body:has(.student-sidebar) .reading-page .page-toolbar {
     background: linear-gradient(135deg, #dff5fb, var(--student-sky-soft));
 }
 
-body:has(.student-sidebar) .reading-page:not(.reading-form-page):not(.reading-detail-page) .page-toolbar::after {
-    content: "";
-    position: absolute;
-    right: 36px;
-    bottom: -12px;
-    width: 215px;
+body:has(.student-sidebar) .reading-page .reading-toolbar-character {
+    width: 100%;
+    min-width: 0;
     height: 200px;
+    align-self: end;
     background: url("../images/exp/character.png") center bottom / contain no-repeat;
     filter: drop-shadow(0 13px 10px rgba(103, 74, 61, .14));
     animation: student-float 2.7s ease-in-out infinite;
 }
 
-body:has(.student-sidebar) .reading-page .page-toolbar > div {
+body:has(.student-sidebar) .reading-page .page-toolbar > .reading-toolbar-copy {
+    min-width: 0;
     max-width: 590px;
     position: relative;
     z-index: 1;
+}
+
+body:has(.student-sidebar) .reading-page .page-toolbar > .btn {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
 }
 
 body:has(.student-sidebar) .reading-page .page-kicker {
@@ -983,8 +988,20 @@ body:has(.student-sidebar) .account-info-grid dd { margin: 5px 0 0; overflow-wra
 @media (max-width: 760px) {
     body:has(.student-sidebar) .reading-page,
     body:has(.student-sidebar) .account-page-container { width: min(100% - 28px, 1000px); margin: 0 auto; padding-top: 18px; }
-    body:has(.student-sidebar) .reading-page .page-toolbar { min-height: 185px; padding: 26px; }
-    body:has(.student-sidebar) .reading-page .page-toolbar::after { display: none; }
+    body:has(.student-sidebar) .reading-page .page-toolbar {
+        min-height: 270px;
+        padding: 26px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-rows: minmax(0, 1fr) 120px;
+        gap: 18px;
+    }
+    body:has(.student-sidebar) .reading-page .reading-toolbar-character {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-self: end;
+        width: min(42vw, 180px);
+        height: 120px;
+    }
     body:has(.student-sidebar) .reading-page .report-grid,
     body:has(.student-sidebar) .reading-page .form-grid-three,
     body:has(.student-sidebar) .account-info-grid { grid-template-columns: 1fr; }
@@ -1049,8 +1066,8 @@ body:has(.student-sidebar) .account-info-grid dd { margin: 5px 0 0; overflow-wra
 
     .student-brand,
     .student-sidebar-profile,
-    .student-sidebar .nav-item:nth-child(5),
-    .student-sidebar .nav-item:nth-child(6) {
+    .student-sidebar .nav-item:nth-child(6),
+    .student-sidebar .nav-item:nth-child(7) {
         display: none;
     }
 

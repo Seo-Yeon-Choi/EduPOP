@@ -24,7 +24,7 @@
 
         <!-- 페이지 제목과 감상문 작성 버튼 -->
         <div class="page-toolbar">
-            <div>
+            <div class="reading-toolbar-copy">
                 <p class="page-kicker">
                     나의 독서
                 </p>
@@ -41,8 +41,10 @@
             <!-- 감상문 작성 화면으로 이동 -->
             <a class="btn btn-primary"
                th:href="@{/student/reading-reports/create}">
-                독서감상문 작성
+                독서록 작성
             </a>
+
+            <div class="reading-toolbar-character" aria-hidden="true"></div>
         </div>
 
         <!-- 컨트롤러가 전달한 성공 문구가 있을 때만 표시 -->

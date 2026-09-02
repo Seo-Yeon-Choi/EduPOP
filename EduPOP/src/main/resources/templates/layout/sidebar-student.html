@@ -34,6 +34,13 @@
                 <span class="nav-label">독서</span>
             </a>
 
+            <a th:href="@{/student/reading-reports/create}"
+               class="nav-item nav-subitem"
+               th:classappend="${activeMenu == 'reading-create'} ? ' active' : ''">
+                <span class="nav-icon" aria-hidden="true">✍️</span>
+                <span class="nav-label">독서록 작성</span>
+            </a>
+
             <a th:href="@{/student/report}" class="nav-item">
                 <span class="nav-icon" aria-hidden="true">🗒️</span>
                 <span class="nav-label">나의 리포트</span>
