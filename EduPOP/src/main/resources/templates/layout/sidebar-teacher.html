@@ -1,68 +1,103 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<!--
-    교사 Sidebar
+<th:block th:fragment="sidebar">
+    <link rel="stylesheet" th:href="@{/css/teacher-theme.css}">
 
-    사용 방법
-    <div th:replace="~{layout/sidebar-teacher :: sidebar}"></div>
--->
-<aside th:fragment="sidebar" class="sidebar">
-
-    <div class="sidebar-title">
-        선생님
-    </div>
-
-    <nav class="sidebar-nav">
-
-        <!-- 홈 -->
-        <a th:href="@{/main/teacherMain}"
-           class="nav-item">
-            <span class="nav-icon">⌂</span>
-            <span>홈</span>
+    <aside class="sidebar teacher-sidebar" aria-label="선생님 메뉴">
+        <a class="teacher-brand" th:href="@{/main/teacherMain}" aria-label="EduPOP 선생님 홈">
+            <span class="teacher-brand-mark">E</span>
+            <span class="teacher-brand-name">EduPOP</span>
+            <span class="teacher-brand-role">선생님</span>
         </a>
 
-        <!-- 반 관리 -->
-        <a th:href="@{/teacher/exams}"
-           class="nav-item">
-            <span class="nav-icon">▣</span>
-            <span>채점 관리</span>
-        </a>
+        <nav class="sidebar-nav teacher-sidebar-nav">
+            <div class="teacher-nav-group teacher-nav-home">
+                <a th:href="@{/main/teacherMain}" class="nav-item" data-menu="home">
+                    <span class="nav-icon" aria-hidden="true">⌂</span>
+                    <span class="nav-label">홈</span>
+                </a>
+            </div>
 
-        <!-- 학생 관리 탭 -->
-        <a th:href="@{/analytics/teacher/students}"
-           class="nav-item">
-            <span class="nav-icon">👥</span>
-            <span>학생 관리</span>
-        </a>
+            <div class="teacher-nav-group">
+                <span class="teacher-nav-label">수업</span>
+                <a th:href="@{/teacher/exams}" class="nav-item" data-menu="grading">
+                    <span class="nav-icon" aria-hidden="true">✓</span>
+                    <span class="nav-label">채점 관리</span>
+                </a>
+                <a th:href="@{/teacher/exams/create}" class="nav-item" data-menu="exam-create">
+                    <span class="nav-icon" aria-hidden="true">✚</span>
+                    <span class="nav-label">시험지 생성</span>
+                </a>
+                <a th:href="@{/teacher/exams/lists}" class="nav-item" data-menu="exam-list">
+                    <span class="nav-icon" aria-hidden="true">▤</span>
+                    <span class="nav-label">시험지 목록</span>
+                </a>
+            </div>
 
-        <!-- 시험지 생성 -->
-        <a th:href="@{/teacher/exams/create}"
-           class="nav-item">
-            <span class="nav-icon">➕</span>
-            <span>시험지 생성</span>
-        </a>
+            <div class="teacher-nav-group">
+                <span class="teacher-nav-label">학생</span>
+                <a th:href="@{/analytics/teacher/students}" class="nav-item" data-menu="students">
+                    <span class="nav-icon" aria-hidden="true">♟</span>
+                    <span class="nav-label">학생 관리</span>
+                </a>
+            </div>
 
-        <!-- 시험지 목록 -->
-        <a th:href="@{/teacher/exams/lists}"
-           class="nav-item">
-            <span class="nav-icon">📋</span>
-            <span>시험지 목록</span>
-        </a>
+            <div class="teacher-nav-group">
+                <span class="teacher-nav-label">독서</span>
+                <a th:href="@{/teacher/reading}" class="nav-item" data-menu="reading">
+                    <span class="nav-icon" aria-hidden="true">▥</span>
+                    <span class="nav-label">독서 피드백</span>
+                </a>
+            </div>
 
-        <!-- 독서 관리 -->
-        <a th:href="@{/teacher/reading}"
-           class="nav-item">
-            <span class="nav-icon">▤</span>
-            <span>독서 피드백</span>
-        </a>
+            <div class="teacher-nav-group">
+                <span class="teacher-nav-label">설정</span>
+                <a th:href="@{/account}" class="nav-item" data-menu="account">
+                    <span class="nav-icon" aria-hidden="true">⚙</span>
+                    <span class="nav-label">계정 관리</span>
+                </a>
+            </div>
+        </nav>
 
-    </nav>
+        <div class="teacher-sidebar-profile">
+            <div class="teacher-profile-avatar" aria-hidden="true"
+                 th:text="${session.loginUser != null and session.loginUser.name != null and !#strings.isEmpty(session.loginUser.name) ? #strings.substring(session.loginUser.name, 0, 1) : 'T'}">T</div>
+            <div class="teacher-profile-copy">
+                <strong th:text="${session.loginUser != null ? session.loginUser.name + ' 선생님' : '선생님'}">선생님</strong>
+                <span>Teacher Workspace</span>
+            </div>
+            <form class="teacher-logout-form" th:action="@{/logout}" method="post">
+                <input th:if="${_csrf != null}" type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button class="teacher-logout-button" type="submit" title="로그아웃" aria-label="로그아웃">↪</button>
+            </form>
+        </div>
+    </aside>
 
-</aside>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname;
+            const activeMenu = (function () {
+                if (currentPath === "/main/teacherMain") return "home";
+                if (currentPath === "/teacher/exams/create") return "exam-create";
+                if (currentPath === "/teacher/exams/lists" || /^\/teacher\/exams\/\d+/.test(currentPath)) return "exam-list";
+                if (currentPath === "/teacher/exams" || currentPath.startsWith("/exam/")) return "grading";
+                if (currentPath.startsWith("/analytics/")) return "students";
+                if (currentPath.startsWith("/teacher/reading")) return "reading";
+                if (currentPath.startsWith("/account")) return "account";
+                return "";
+            })();
+
+            document.querySelectorAll(".teacher-sidebar .nav-item[data-menu]").forEach(function (item) {
+                if (item.dataset.menu === activeMenu) {
+                    item.classList.add("active");
+                    item.setAttribute("aria-current", "page");
+                }
+            });
+        });
+    </script>
+</th:block>
 
 </body>
 </html>

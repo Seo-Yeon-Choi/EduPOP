@@ -1,387 +1,488 @@
 .teacher-main-container {
-    margin-left: 240px;
-
     min-height: 100vh;
-
-    padding: 104px 40px 50px;
-
-    background: #f7f8fa;
-
-    box-sizing: border-box;
 }
 
-
-/* ==============================
-   환영 영역
-============================== */
-
-.teacher-welcome {
-    max-width: 1050px;
-
-    margin-bottom: 30px;
-    padding: 32px;
-
-    background: #ffffff;
-
-    border: 1px solid #e6e8eb;
-    border-radius: 16px;
-
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+.teacher-home-shell {
+    width: min(100% - 56px, 1180px);
+    margin: 0 auto;
+    padding: 32px 0 60px;
 }
 
-.welcome-label {
-    margin: 0 0 8px;
-
-    font-size: 12px;
-    font-weight: 700;
-
-    letter-spacing: 1px;
-
-    color: #4f6ef7;
-}
-
-.teacher-welcome h1 {
-    margin: 0 0 12px;
-
-    font-size: 28px;
-    font-weight: 700;
-
-    color: #222222;
-}
-
-.welcome-description {
-    margin: 0;
-
-    font-size: 14px;
-    line-height: 1.7;
-
-    color: #777777;
-}
-
-
-/* ==============================
-   교사 메뉴
-============================== */
-
-.teacher-menu-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(300px, 1fr));
-
-    gap: 20px;
-
-    max-width: 1050px;
-
-    margin-bottom: 32px;
-}
-
-.teacher-menu-card {
+.teacher-home-hero {
+    min-height: 285px;
+    padding: 36px 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    overflow: hidden;
     position: relative;
-
-    display: flex;
-    align-items: center;
-
-    min-height: 135px;
-
-    padding: 25px;
-
-    background: #ffffff;
-
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-
-    text-decoration: none;
-
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
-
-    box-sizing: border-box;
-
-    transition:
-            transform 0.2s ease,
-            border-color 0.2s ease,
-            box-shadow 0.2s ease,
-            background-color 0.2s ease;
+    border: 1px solid #f5c4b0;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #fff0e6 0%, #ffe8dc 52%, #ffd4c2 100%);
 }
 
-.teacher-menu-card:hover {
-    transform: translateY(-3px);
-
-    border-color: #4f6ef7;
-
-    background: #fafbff;
-
-    box-shadow: 0 8px 20px rgba(79, 110, 247, 0.1);
+.teacher-home-hero::before,
+.teacher-home-hero::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .28);
+    pointer-events: none;
 }
 
-
-/* ==============================
-   아이콘
-============================== */
-
-.menu-icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    width: 58px;
-    height: 58px;
-
-    margin-right: 18px;
-
-    flex-shrink: 0;
-
-    background: #eef1ff;
-
-    border-radius: 14px;
-
-    font-size: 27px;
+.teacher-home-hero::before {
+    width: 230px;
+    height: 230px;
+    top: -115px;
+    right: -70px;
 }
 
-
-/* ==============================
-   메뉴 내용
-============================== */
-
-.menu-content {
-    flex: 1;
+.teacher-home-hero::after {
+    width: 130px;
+    height: 130px;
+    right: 28%;
+    bottom: -86px;
 }
 
-.menu-content h2 {
-    margin: 0 0 8px;
-
-    font-size: 18px;
-    font-weight: 700;
-
-    color: #222222;
+.teacher-hero-copy,
+.teacher-hero-assistant {
+    position: relative;
+    z-index: 1;
 }
 
-.menu-content p {
-    margin: 0;
-
+.teacher-hero-date {
+    margin: 0 0 9px;
+    color: #f26549;
     font-size: 13px;
-    line-height: 1.6;
-
-    color: #777777;
+    font-weight: 750;
 }
 
-.menu-arrow {
-    margin-left: 14px;
-
-    font-size: 28px;
-
-    color: #aaaaaa;
-
-    transition:
-            transform 0.2s ease,
-            color 0.2s ease;
-}
-
-.teacher-menu-card:hover .menu-arrow {
-    transform: translateX(3px);
-
-    color: #4f6ef7;
-}
-
-
-/* ==============================
-   계정 관리
-============================== */
-
-.account-area {
-    width: 100%;
-    max-width: 1050px;
-
-    padding: 28px 30px;
-
-    background: #ffffff;
-
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
-
-    box-sizing: border-box;
-}
-
-.account-header {
-    margin-bottom: 20px;
-}
-
-.account-header h2 {
-    margin: 0 0 8px;
-
-    font-size: 18px;
-    font-weight: 700;
-
-    color: #222222;
-}
-
-.account-header p {
+.teacher-hero-copy h1 {
     margin: 0;
-
-    font-size: 13px;
-
-    color: #777777;
+    color: #3d2b1f;
+    font-size: clamp(27px, 3vw, 36px);
+    font-weight: 900;
+    letter-spacing: -.045em;
 }
 
+.teacher-hero-copy > p:not(.teacher-hero-date) {
+    margin: 10px 0 0;
+    color: #6b4c3c;
+    font-size: 15px;
+}
 
-/* ==============================
-   계정 버튼
-============================== */
-
-.account-buttons {
+.teacher-hero-chips {
+    margin-top: 22px;
     display: flex;
-    align-items: center;
-
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.account-buttons form {
-    margin: 0;
+.teacher-hero-chips span {
+    padding: 7px 11px;
+    border-radius: 999px;
+    color: #6b4c3c;
+    background: rgba(255, 255, 255, .62);
+    font-size: 11px;
+    font-weight: 750;
 }
 
-.logout-button {
-    display: inline-flex;
+.teacher-hero-assistant {
+    width: 250px;
+    min-height: 190px;
+    display: flex;
+    align-items: flex-end;
     justify-content: center;
+    flex: 0 0 auto;
+}
+
+.teacher-hero-assistant img {
+    width: 145px;
+    height: 172px;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 16px rgba(107, 76, 60, .13));
+}
+
+.teacher-assistant-bubble {
+    position: absolute;
+    top: 5px;
+    left: -8px;
+    padding: 10px 13px;
+    border: 1px solid #e8d5c4;
+    border-radius: 15px 15px 4px 15px;
+    color: #3d2b1f;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 6px 16px rgba(107, 76, 60, .08);
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.teacher-home-layout {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 310px;
+    gap: 24px;
+    align-items: start;
+}
+
+.teacher-home-primary,
+.teacher-home-aside {
+    min-width: 0;
+}
+
+.teacher-home-section + .teacher-home-section,
+.teacher-home-aside > section + section {
+    margin-top: 24px;
+}
+
+.teacher-section-heading {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.teacher-section-heading.compact {
     align-items: center;
-
-    min-width: 110px;
-    height: 42px;
-
-    padding: 0 18px;
-
-    background: #ffffff;
-
-    border: 1px solid #dfe2e7;
-    border-radius: 8px;
-
-    color: #444444;
-
-    font-size: 14px;
-    font-weight: 600;
-
-    text-decoration: none;
-
-    box-sizing: border-box;
-
-    transition:
-            background-color 0.2s ease,
-            border-color 0.2s ease;
 }
 
-.logout-button:hover {
-    background: #f5f6f8;
-
-    border-color: #c9cdd3;
+.teacher-section-kicker {
+    color: #f26549;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .13em;
 }
 
-
-/* ==============================
-   회원 탈퇴
-============================== */
-
-.withdraw-button {
-    min-width: 120px;
-    height: 42px;
-
-    padding: 0 18px;
-
-    border: 1px solid #ffbaba;
-    border-radius: 8px;
-
-    background: #ffffff;
-
-    color: #e54848;
-
-    font-size: 14px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition:
-            background-color 0.2s ease,
-            border-color 0.2s ease,
-            color 0.2s ease;
+.teacher-section-heading h2,
+.teacher-todo-card h2,
+.teacher-account-card h2 {
+    margin: 5px 0 0;
+    color: #3d2b1f;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -.035em;
 }
 
-.withdraw-button:hover {
-    background: #fff2f2;
-
-    border-color: #ff8f8f;
-
-    color: #d93636;
-}
-
-.withdraw-warning {
-    margin: 18px 0 0;
-
-    padding-top: 16px;
-
-    border-top: 1px solid #eeeeee;
-
+.teacher-section-heading > p {
+    margin: 0;
+    color: #9b7a6a;
     font-size: 12px;
-    line-height: 1.6;
-
-    color: #999999;
 }
 
+.teacher-overview-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 14px;
+}
 
-/* ==============================
-   반응형
-============================== */
+.teacher-overview-card {
+    min-height: 165px;
+    padding: 21px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
 
-@media (max-width: 900px) {
+.teacher-overview-card:first-child {
+    grid-row: span 2;
+    min-height: 344px;
+    justify-content: center;
+}
 
-    .teacher-main-container {
-        margin-left: 0;
+.teacher-overview-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(107, 76, 60, .10);
+}
 
-        padding: 90px 20px 40px;
-    }
+.overview-grading {
+    border-color: #f5c4b0;
+    background: linear-gradient(145deg, #fff0e6, #ffe3d6);
+}
 
-    .teacher-menu-grid {
+.overview-students {
+    border-color: #c8c0e8;
+    background: #eae7f8;
+}
+
+.overview-reading {
+    border-color: #a8e8e0;
+    background: #e8f9f7;
+}
+
+.teacher-overview-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    color: #f26549;
+    background: rgba(255, 255, 255, .8);
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.teacher-overview-card strong {
+    display: block;
+    margin-top: 16px;
+    color: #3d2b1f;
+    font-size: 17px;
+}
+
+.teacher-overview-card p {
+    margin: 6px 0 0;
+    color: #6b4c3c;
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+.teacher-overview-card b {
+    margin-top: auto;
+    padding-top: 16px;
+    color: #6b4c3c;
+    font-size: 12px;
+}
+
+.teacher-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 11px;
+}
+
+.teacher-quick-card {
+    min-height: 132px;
+    padding: 16px 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    border: 1px solid #e8d5c4;
+    border-radius: 18px;
+    color: #3d2b1f;
+    background: #fff;
+    transition: transform .18s ease, background .18s ease;
+}
+
+.teacher-quick-card:hover {
+    transform: translateY(-2px);
+    background: #fffaf5;
+}
+
+.teacher-quick-card.primary {
+    border-color: #f26549;
+    color: #fff;
+    background: #f26549;
+    box-shadow: 0 8px 18px rgba(242, 101, 73, .22);
+}
+
+.teacher-quick-card.primary:hover {
+    background: #e0563a;
+}
+
+.teacher-quick-card > span {
+    font-size: 23px;
+}
+
+.teacher-quick-card strong {
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.teacher-quick-card small {
+    margin-top: 4px;
+    color: #9b7a6a;
+    font-size: 9px;
+}
+
+.teacher-quick-card.primary small {
+    color: rgba(255, 255, 255, .76);
+}
+
+.teacher-todo-card,
+.teacher-account-card {
+    padding: 20px;
+    border: 1px solid #e8d5c4;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(107, 76, 60, .055);
+}
+
+.teacher-todo-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.teacher-todo-title img {
+    width: 47px;
+    height: 47px;
+    object-fit: contain;
+}
+
+.teacher-todo-title span {
+    color: #5bc8b8;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .1em;
+}
+
+.teacher-todo-title h2 {
+    margin-top: 2px;
+    font-size: 16px;
+}
+
+.teacher-todo-list {
+    margin-top: 16px;
+    display: grid;
+    gap: 9px;
+}
+
+.teacher-todo-list a {
+    min-height: 54px;
+    padding: 10px 11px;
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 16px;
+    align-items: center;
+    gap: 8px;
+    border-radius: 14px;
+    color: #3d2b1f;
+    background: #fff8f0;
+}
+
+.teacher-todo-list a:hover {
+    background: #f5ebd8;
+}
+
+.teacher-todo-list a > span {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    font-weight: 900;
+}
+
+.teacher-todo-list strong {
+    min-width: 0;
+    font-size: 11px;
+}
+
+.teacher-todo-list b {
+    color: #9b7a6a;
+    font-size: 12px;
+}
+
+.todo-coral { color: #e8645a; background: #fde8e6; }
+.todo-yellow { color: #f5a623; background: #fef0d0; }
+.todo-mint { color: #4aa99a; background: #d4f4f0; }
+
+.teacher-account-card {
+    border-color: #c8c0e8;
+    background: linear-gradient(145deg, #f5f3fd, #eae7f8);
+}
+
+.teacher-account-card .teacher-section-kicker {
+    color: #9b8fd4;
+}
+
+.teacher-account-card h2 {
+    font-size: 17px;
+}
+
+.teacher-account-card p {
+    margin: 8px 0 16px;
+    color: #6b4c3c;
+    font-size: 11px;
+    line-height: 1.65;
+}
+
+.teacher-account-card > div {
+    display: flex;
+    gap: 8px;
+}
+
+.teacher-account-card a,
+.teacher-account-card button {
+    min-height: 38px;
+    padding: 8px 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 11px;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.teacher-account-card a {
+    color: #fff;
+    background: #9b8fd4;
+}
+
+.teacher-account-card button {
+    color: #6b4c3c;
+    background: rgba(255, 255, 255, .8);
+}
+
+@media (max-width: 1080px) {
+    .teacher-home-layout {
         grid-template-columns: 1fr;
     }
+
+    .teacher-home-aside {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .teacher-home-aside > section + section {
+        margin-top: 0;
+    }
 }
 
-@media (max-width: 600px) {
-
-    .teacher-main-container {
-        padding: 86px 16px 30px;
+@media (max-width: 760px) {
+    .teacher-home-shell {
+        width: min(100% - 28px, 1180px);
+        padding-top: 20px;
     }
 
-    .teacher-welcome {
-        padding: 24px 20px;
-    }
-
-    .teacher-welcome h1 {
-        font-size: 24px;
-    }
-
-    .teacher-menu-card {
-        padding: 20px;
-    }
-
-    .menu-icon {
-        width: 50px;
-        height: 50px;
-
-        margin-right: 14px;
-
-        font-size: 23px;
-    }
-
-    .account-area {
-        padding: 24px 20px;
-    }
-
-    .account-buttons {
+    .teacher-home-hero {
+        padding: 27px 24px;
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
     }
 
-    .logout-button,
-    .withdraw-button {
+    .teacher-hero-assistant {
         width: 100%;
+        min-height: 165px;
+    }
+
+    .teacher-assistant-bubble {
+        left: 10%;
+    }
+
+    .teacher-overview-grid,
+    .teacher-home-aside {
+        grid-template-columns: 1fr;
+    }
+
+    .teacher-overview-card:first-child {
+        grid-row: auto;
+        min-height: 190px;
+    }
+
+    .teacher-quick-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .teacher-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
