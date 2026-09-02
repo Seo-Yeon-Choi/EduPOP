@@ -46,7 +46,7 @@
 }
 
 .teacher-hero-copy,
-.teacher-hero-assistant {
+.teacher-hero-focus {
     position: relative;
     z-index: 1;
 }
@@ -88,34 +88,84 @@
     font-weight: 750;
 }
 
-.teacher-hero-assistant {
-    width: 250px;
-    min-height: 190px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+.teacher-hero-focus {
+    width: min(100%, 330px);
+    padding: 22px;
     flex: 0 0 auto;
+    border: 1px solid rgba(255, 255, 255, .72);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, .68);
+    box-shadow: 0 14px 34px rgba(107, 76, 60, .08);
+    backdrop-filter: blur(8px);
 }
 
-.teacher-hero-assistant img {
-    width: 145px;
-    height: 172px;
-    object-fit: contain;
-    filter: drop-shadow(0 14px 16px rgba(107, 76, 60, .13));
+.teacher-focus-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
 }
 
-.teacher-assistant-bubble {
-    position: absolute;
-    top: 5px;
-    left: -8px;
-    padding: 10px 13px;
-    border: 1px solid #e8d5c4;
-    border-radius: 15px 15px 4px 15px;
+.teacher-focus-icon,
+.teacher-assistant-mark {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 13px;
+    color: #fff;
+    background: #f26549;
+    font-weight: 900;
+}
+
+.teacher-focus-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+    box-shadow: 0 8px 18px rgba(242, 101, 73, .2);
+}
+
+.teacher-focus-heading small,
+.teacher-focus-heading strong {
+    display: block;
+}
+
+.teacher-focus-heading small {
+    color: #f26549;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .12em;
+}
+
+.teacher-focus-heading strong {
+    margin-top: 3px;
     color: #3d2b1f;
-    background: rgba(255, 255, 255, .94);
-    box-shadow: 0 6px 16px rgba(107, 76, 60, .08);
+    font-size: 15px;
+}
+
+.teacher-hero-focus ul {
+    margin: 17px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+    list-style: none;
+}
+
+.teacher-hero-focus li {
+    min-height: 34px;
+    padding: 7px 9px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border-radius: 11px;
+    color: #6b4c3c;
+    background: rgba(255, 248, 240, .82);
     font-size: 11px;
-    font-weight: 750;
+    font-weight: 700;
+}
+
+.teacher-hero-focus li span {
+    color: #f26549;
+    font-size: 9px;
+    font-weight: 900;
 }
 
 .teacher-home-layout {
@@ -317,10 +367,11 @@
     gap: 10px;
 }
 
-.teacher-todo-title img {
+.teacher-assistant-mark {
     width: 47px;
     height: 47px;
-    object-fit: contain;
+    background: #5bc8b8;
+    font-size: 20px;
 }
 
 .teacher-todo-title span {
@@ -458,13 +509,8 @@
         align-items: flex-start;
     }
 
-    .teacher-hero-assistant {
+    .teacher-hero-focus {
         width: 100%;
-        min-height: 165px;
-    }
-
-    .teacher-assistant-bubble {
-        left: 10%;
     }
 
     .teacher-overview-grid,

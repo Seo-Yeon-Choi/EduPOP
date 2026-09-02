@@ -26,9 +26,19 @@
                     <span>한눈에 보는 수업 준비</span>
                 </div>
             </div>
-            <div class="teacher-hero-assistant" aria-label="EduPOP 교사 도우미">
-                <span class="teacher-assistant-bubble">오늘 확인할 내용을 함께 살펴봐요.</span>
-                <img th:src="@{/images/exp/character.png}" alt="선생님의 수업 준비를 돕는 EduPOP 캐릭터">
+            <div class="teacher-hero-focus" aria-label="오늘의 교사 워크스페이스 안내">
+                <div class="teacher-focus-heading">
+                    <span class="teacher-focus-icon" aria-hidden="true">✓</span>
+                    <div>
+                        <small>TEACHER WORKSPACE</small>
+                        <strong>오늘의 수업 준비</strong>
+                    </div>
+                </div>
+                <ul>
+                    <li><span>01</span> 시험과 채점 현황 확인</li>
+                    <li><span>02</span> 학생별 학습 흐름 점검</li>
+                    <li><span>03</span> 독서 피드백 작성</li>
+                </ul>
             </div>
         </section>
 
@@ -100,7 +110,7 @@
             <aside class="teacher-home-aside" aria-label="선생님 업무 도우미">
                 <section class="teacher-todo-card">
                     <div class="teacher-todo-title">
-                        <img th:src="@{/images/exp/character.png}" alt="" aria-hidden="true">
+                        <span class="teacher-assistant-mark" aria-hidden="true">✓</span>
                         <div>
                             <span>EduPOP ASSISTANT</span>
                             <h2>오늘 확인하면 좋아요</h2>
