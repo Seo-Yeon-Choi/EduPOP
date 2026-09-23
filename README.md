@@ -108,7 +108,8 @@ flowchart TB
     S --> B["Controller · Service"]
     B --> D["MyBatis · JPA · MySQL"]
     B --> X["OAuth · OpenAI · 국세청 API"]
-    B --> P["PDFBox · Chart.js"]
+    B --> P["PDFBox"]
+    V --> C["Chart.js"]
 ~~~
 
 ## 프로젝트 구조
@@ -154,21 +155,9 @@ git clone https://github.com/Seo-Yeon-Choi/EduPOP.git
 cd EduPOP/EduPOP
 ~~~
 
-### 3. 데이터베이스 준비
+#### 3. 데이터베이스 준비
 
-MySQL에서 edupop 데이터베이스를 만든 뒤 스키마를 적용합니다.
-
-~~~sql
-CREATE DATABASE edupop
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-~~~
-
-~~~bash
-mysql -u root -p edupop < DB/schema.sql
-~~~
-
-이후 **src/main/resources/application.properties**의 데이터베이스 계정 정보를 로컬 환경에 맞게 수정합니다.
+`DB/schema.sql`에는 테이블 생성과 후속 ALTER 문이 함께 있으며, 기존 정의와 중복되는 열 추가도 포함되어 있습니다. 따라서 **빈 DB에 파일을 그대로 적용하는 재현 가능한 초기화 절차로 확인되지 않았습니다.** 코드에 맞는 MySQL 스키마를 검토·정리한 뒤 `src/main/resources/application.properties`의 접속 정보를 설정해야 합니다.
 
 ### 4. 환경 변수 설정
 
@@ -201,7 +190,11 @@ macOS / Linux:
 ./mvnw spring-boot:run
 ~~~
 
-실행 후 브라우저에서 **http://localhost:8080**으로 접속합니다.
+스키마와 외부 연동 설정이 준비되었다면 기본 포트의 **http://localhost:8080**에서 확인할 수 있습니다. 현재 저장소만으로 깨끗한 DB에서 곧바로 실행되는 절차는 검증되지 않았습니다.
+
+## 시연
+
+- [EduPOP 서비스 시연 영상](https://youtu.be/mkAcPCD7VOY)
 
 ## 설계 포인트
 
